@@ -199,5 +199,4 @@
     50% { box-shadow: 0 0 35px oklch(0.82 0.14 85 / 0.7), 0 0 90px oklch(0.82 0.14 85 / 0.35); }
   }
   .glow-pulse { animation: glow-pulse 2.6s ease-in-out infinite; }
-  }
 }
