@@ -11,7 +11,7 @@ import { Petals } from "./Petals";
 export function WeddingInvitation() {
   const [opened, setOpened] = useState(false);
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-[oklch(0.14_0.06_25)] text-[oklch(0.95_0.04_85)]">
+    <main className="relative min-h-screen overflow-x-hidden bg-[oklch(0.97_0.012_90)] text-[oklch(0.28_0.03_60)]">
       <Gate opened={opened} onOpen={() => setOpened(true)} />
       {opened && <Petals />}
       <Hero />

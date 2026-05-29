@@ -4,38 +4,39 @@ import { Ornament } from "./Ornament";
 const families = [
   {
     side: "PARENTS OF THE GROOM",
-    name: "Mr. & Mrs. Rajendran",
-    note: "Tracing ancestral roots from Tanjavur, uniting two grand families with timeless tradition.",
-    glyph: "ॐ",
+    line1: "Mr. (Late) Regin Cyril",
+    line2: "& Mrs. Elizabeth Pushpalatha Cyril",
+    glyph: "✝",
   },
   {
     side: "PARENTS OF THE BRIDE",
-    name: "Mr. & Mrs. Suresh Kumar",
-    note: "Tracing ancestral roots from Madurai, offering their cherished daughter under pure love and divine warmth.",
-    glyph: "卐",
+    line1: "Mr. V. Raju",
+    line2: "& Mrs. V. Nirmala",
+    glyph: "✝",
   },
 ];
 
 export function Families() {
   return (
-    <section className="bg-emerald-royal relative overflow-hidden border-y border-gold/30 py-24">
+    <section className="bg-royal relative overflow-hidden border-y border-gold/30 py-24">
       <div className="mx-auto max-w-4xl px-6 text-center">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
-          MANGALA SHUBH
+          IN CHRIST’S NAME
         </p>
         <h2 className="font-script mt-4 text-4xl italic text-gold-gradient md:text-5xl">
-          Family &amp; Blessings
+          With the Blessings of Our Families
         </h2>
         <Ornament className="mt-6" />
 
-        <p className="font-display mt-10 text-[10px] tracking-[0.35em] text-[oklch(0.82_0.1_85)]/80">
-          ✦  WITH THE DIVINE BLESSINGS OF OUR ANCESTORS  ✦
+        <p className="mx-auto mt-8 max-w-xl font-script italic text-[oklch(0.4_0.04_60)]/80">
+          “Every good and perfect gift is from above, coming down from the Father of the
+          heavenly lights.” — James 1:17
         </p>
 
         <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-16">
           {families.map((f, i) => (
             <motion.div
-              key={f.name}
+              key={f.line1}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -43,32 +44,29 @@ export function Families() {
               className="space-y-3"
             >
               <span className="font-script text-2xl text-gold-gradient">{f.glyph}</span>
-              <h3 className="font-display text-xl text-[oklch(0.95_0.04_85)] md:text-2xl">
-                {f.name}
-              </h3>
-              <p className="font-display text-[9px] tracking-[0.4em] text-[oklch(0.78_0.1_80)]">
+              <p className="font-display text-[9px] tracking-[0.4em] text-[oklch(0.45_0.04_60)]/80">
                 {f.side}
               </p>
-              <p className="mx-auto max-w-xs font-script italic text-[oklch(0.85_0.05_90)]/80">
-                {f.note}
+              <h3 className="font-display text-lg text-[oklch(0.28_0.03_60)] md:text-xl">
+                {f.line1}
+              </h3>
+              <p className="font-script italic text-lg text-[oklch(0.32_0.03_60)]">
+                {f.line2}
               </p>
             </motion.div>
           ))}
         </div>
 
         <p className="font-script mt-16 text-xl italic text-gold-gradient md:text-2xl">
-          cordially request the honour of your esteemed presence
-        </p>
-        <p className="font-display mt-3 text-[10px] tracking-[0.35em] text-[oklch(0.82_0.1_85)]/80">
-          TO CELEBRATE THE AUSPICIOUS WEDDING OF THEIR BELOVED CHILDREN
+          joyfully invite you to witness the holy matrimony of their beloved children
         </p>
 
         <div className="mt-10">
           <p className="font-display text-2xl tracking-[0.35em] text-gold-gradient md:text-3xl">
-            AARAV &nbsp;&amp;&nbsp; ANANYA
+            RITHIN CYRIL &nbsp;&amp;&nbsp; V. HARSHITA
           </p>
-          <p className="font-display mt-3 text-[10px] tracking-[0.4em] text-[oklch(0.82_0.1_85)]/80">
-            MYLAPORE, CHENNAI · FRIDAY &amp; SATURDAY
+          <p className="font-display mt-3 text-[10px] tracking-[0.4em] text-[oklch(0.45_0.04_60)]/80">
+            SUNDAY · 18 OCTOBER 2026 · ANANDAPURA, S. COORG
           </p>
         </div>
       </div>

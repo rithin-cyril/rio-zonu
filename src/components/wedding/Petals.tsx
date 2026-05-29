@@ -32,17 +32,17 @@ export function Petals({ count = 24 }: { count?: number }) {
             <svg viewBox="0 0 20 20" fill="none">
               <path
                 d="M10 2c2 3 6 4 6 8s-3 8-6 8-6-4-6-8 4-5 6-8z"
-                fill="#e85c7a"
-                opacity="0.85"
+                fill="#f4c2c8"
+                opacity="0.8"
               />
             </svg>
           ) : (
             <svg viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="3" fill="#fff7d6" />
-              <ellipse cx="10" cy="4" rx="2.4" ry="4" fill="#fffaf0" opacity="0.95" />
-              <ellipse cx="10" cy="16" rx="2.4" ry="4" fill="#fffaf0" opacity="0.95" />
-              <ellipse cx="4" cy="10" rx="4" ry="2.4" fill="#fffaf0" opacity="0.95" />
-              <ellipse cx="16" cy="10" rx="4" ry="2.4" fill="#fffaf0" opacity="0.95" />
+              <circle cx="10" cy="10" r="3" fill="#fff8e6" />
+              <ellipse cx="10" cy="4" rx="2.4" ry="4" fill="#ffffff" opacity="0.95" />
+              <ellipse cx="10" cy="16" rx="2.4" ry="4" fill="#ffffff" opacity="0.95" />
+              <ellipse cx="4" cy="10" rx="4" ry="2.4" fill="#ffffff" opacity="0.95" />
+              <ellipse cx="16" cy="10" rx="4" ry="2.4" fill="#ffffff" opacity="0.95" />
             </svg>
           )}
         </span>

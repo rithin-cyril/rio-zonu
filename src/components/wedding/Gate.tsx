@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import gopuram from "@/assets/gopuram-hero.jpg";
+import church from "@/assets/church-hero.jpg";
 import { Ornament } from "./Ornament";
 
 export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }) {
@@ -11,13 +11,13 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
       className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
     >
       <img
-        src={gopuram}
-        alt="Tamil temple gopuram"
+        src={church}
+        alt="Church sanctuary with stained glass"
         width={1920}
         height={1280}
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.97_0.012_90)]/40 via-[oklch(0.97_0.012_90)]/20 to-[oklch(0.97_0.012_90)]/75" />
 
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-between px-6 py-10 text-center">
         <motion.div
@@ -28,9 +28,9 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
         >
           <Ornament />
           <p className="font-display text-[10px] tracking-[0.4em] text-gold-gradient">
-            SACRED UNION
+            HOLY MATRIMONY
           </p>
-          <p className="font-deva text-2xl text-gold-gradient md:text-3xl">शुभ विवाह</p>
+          <p className="font-hand text-3xl text-gold-gradient md:text-4xl">By God’s Grace</p>
         </motion.div>
 
         <motion.button
@@ -42,14 +42,17 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
           whileTap={{ scale: 0.95 }}
           className="group flex flex-col items-center gap-4"
         >
-          <span className="glow-pulse relative flex h-28 w-28 items-center justify-center rounded-full border-2 border-gold bg-gradient-to-br from-[oklch(0.45_0.18_28)] to-[oklch(0.25_0.12_25)] shadow-2xl md:h-32 md:w-32">
-            <span className="absolute inset-2 rounded-full border border-[oklch(0.72_0.11_80)]/40" />
-            <span className="font-script text-3xl italic text-gold-gradient md:text-4xl">
-              ॐ
+          <span className="glow-pulse relative flex h-28 w-28 items-center justify-center rounded-full border-2 border-gold bg-gradient-to-br from-white to-[oklch(0.92_0.03_85)] shadow-2xl md:h-32 md:w-32">
+            <span className="absolute inset-2 rounded-full border border-gold/40" />
+            <span className="font-script text-4xl italic text-gold-gradient md:text-5xl" aria-hidden>
+              ✝
             </span>
           </span>
           <span className="font-display text-[11px] tracking-[0.45em] text-gold-gradient">
             TAP TO OPEN THE INVITATION
+          </span>
+          <span className="font-script italic text-sm text-[oklch(0.45_0.04_60)]/80">
+            “Therefore what God has joined together, let no one separate.” — Mark 10:9
           </span>
         </motion.button>
 

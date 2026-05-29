@@ -8,7 +8,7 @@
   @font-face { font-family: "Cormorant"; font-style: italic; font-weight: 400 700; font-display: swap; src: url("https://fonts.gstatic.com/s/cormorantgaramond/v16/63oqEAv6tlS1S2BWGGSefqg.woff2") format("woff2"); }
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Tiro+Devanagari+Hindi:ital@0;1&family=Marcellus&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Marcellus&family=Pinyon+Script&display=swap");
 
 /*
  * Design system definition.
@@ -68,21 +68,21 @@
   --font-display: "Cinzel", serif;
   --font-script: "Cormorant Garamond", serif;
   --font-body: "Marcellus", serif;
-  --font-deva: "Tiro Devanagari Hindi", serif;
+  --font-hand: "Pinyon Script", cursive;
   --color-gold: var(--gold);
   --color-gold-soft: var(--gold-soft);
-  --color-maroon: var(--maroon);
-  --color-emerald-deep: var(--emerald-deep);
+  --color-ivory: var(--ivory);
+  --color-sage: var(--sage);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.18 0.06 25);
-  --foreground: oklch(0.95 0.04 85);
-  --maroon: oklch(0.22 0.09 28);
-  --emerald-deep: oklch(0.27 0.07 160);
-  --gold: oklch(0.82 0.14 85);
-  --gold-soft: oklch(0.72 0.11 80);
+  --background: oklch(0.97 0.012 90);
+  --foreground: oklch(0.28 0.03 60);
+  --ivory: oklch(0.97 0.012 90);
+  --sage: oklch(0.74 0.04 145);
+  --gold: oklch(0.68 0.1 80);
+  --gold-soft: oklch(0.78 0.07 82);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
@@ -163,27 +163,27 @@
 
   .font-display { font-family: var(--font-display); letter-spacing: 0.08em; }
   .font-script { font-family: var(--font-script); }
-  .font-deva { font-family: var(--font-deva); }
+  .font-hand { font-family: var(--font-hand); }
 
   .bg-royal {
     background:
-      radial-gradient(ellipse at top, oklch(0.28 0.1 28) 0%, oklch(0.16 0.06 25) 55%, oklch(0.1 0.04 25) 100%);
+      radial-gradient(ellipse at top, oklch(0.985 0.008 95) 0%, oklch(0.96 0.014 90) 55%, oklch(0.93 0.02 88) 100%);
   }
-  .bg-emerald-royal {
+  .bg-sage-veil {
     background:
-      radial-gradient(ellipse at center, oklch(0.32 0.08 160) 0%, oklch(0.18 0.06 160) 60%, oklch(0.12 0.04 160) 100%);
+      radial-gradient(ellipse at center, oklch(0.94 0.025 145) 0%, oklch(0.9 0.03 140) 60%, oklch(0.86 0.035 138) 100%);
   }
   .text-gold-gradient {
-    background: linear-gradient(180deg, #f6d77a 0%, #e9b949 50%, #b88528 100%);
+    background: linear-gradient(180deg, #c89a4a 0%, #a87a2a 55%, #7a5418 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .border-gold {
-    border-color: oklch(0.72 0.11 80);
+    border-color: oklch(0.68 0.1 80);
   }
   .shadow-gold {
-    box-shadow: 0 0 40px -10px oklch(0.82 0.14 85 / 0.4), inset 0 0 20px oklch(0.82 0.14 85 / 0.1);
+    box-shadow: 0 0 40px -10px oklch(0.68 0.1 80 / 0.35), inset 0 0 20px oklch(0.68 0.1 80 / 0.08);
   }
 
   @keyframes float-petal {
@@ -195,8 +195,8 @@
   .petal { animation: float-petal linear infinite; }
 
   @keyframes glow-pulse {
-    0%, 100% { box-shadow: 0 0 20px oklch(0.82 0.14 85 / 0.4), 0 0 60px oklch(0.82 0.14 85 / 0.2); }
-    50% { box-shadow: 0 0 35px oklch(0.82 0.14 85 / 0.7), 0 0 90px oklch(0.82 0.14 85 / 0.35); }
+    0%, 100% { box-shadow: 0 0 20px oklch(0.85 0.08 80 / 0.5), 0 0 60px oklch(0.85 0.08 80 / 0.25); }
+    50% { box-shadow: 0 0 40px oklch(0.9 0.08 82 / 0.8), 0 0 100px oklch(0.9 0.08 82 / 0.4); }
   }
   .glow-pulse { animation: glow-pulse 2.6s ease-in-out infinite; }
 }
