@@ -29,8 +29,7 @@ export function Families() {
         <Ornament className="mt-6" />
 
         <p className="mx-auto mt-8 max-w-xl font-script italic text-[oklch(0.4_0.04_60)]/80">
-          “Every good and perfect gift is from above, coming down from the Father of the
-          heavenly lights.” — James 1:17
+          With love and blessings from our families
         </p>
 
         <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-16">

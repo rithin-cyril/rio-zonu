@@ -36,8 +36,7 @@ export function Countdown() {
           Counting Every Blessed Moment
         </h2>
         <p className="mx-auto mt-4 max-w-xl font-script italic text-[oklch(0.4_0.04_60)]/80">
-          “For everything there is a season, and a time for every matter under heaven.” —
-          Ecclesiastes 3:1
+          We can't wait to celebrate with you
         </p>
 
         <Ornament className="mt-10" />

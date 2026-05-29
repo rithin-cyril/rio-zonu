@@ -52,7 +52,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             TAP TO OPEN THE INVITATION
           </span>
           <span className="font-script italic text-sm text-[oklch(0.45_0.04_60)]/80">
-            “Therefore what God has joined together, let no one separate.” — Mark 10:9
+            Save the Date · 18 October 2026
           </span>
         </motion.button>
 
