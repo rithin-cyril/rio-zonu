@@ -28,7 +28,7 @@ export function Families() {
         </h2>
         <Ornament className="mt-6" />
 
-        <p className="mx-auto mt-8 max-w-xl font-script italic text-[oklch(0.4_0.04_60)]/80">
+        <p className="mx-auto mt-8 max-w-xl font-script text-lg italic ink-soft">
           With love and blessings from our families
         </p>
 
@@ -43,13 +43,13 @@ export function Families() {
               className="space-y-3"
             >
               <span className="font-script text-2xl text-gold-gradient">{f.glyph}</span>
-              <p className="font-display text-[9px] tracking-[0.4em] text-[oklch(0.45_0.04_60)]/80">
+              <p className="font-display text-[10px] font-semibold tracking-[0.4em] ink-soft">
                 {f.side}
               </p>
-              <h3 className="font-display text-lg text-[oklch(0.28_0.03_60)] md:text-xl">
+              <h3 className="font-display text-xl font-semibold ink md:text-2xl">
                 {f.line1}
               </h3>
-              <p className="font-script italic text-lg text-[oklch(0.32_0.03_60)]">
+              <p className="font-script text-xl italic ink-soft">
                 {f.line2}
               </p>
             </motion.div>
@@ -64,7 +64,7 @@ export function Families() {
           <p className="font-display text-2xl tracking-[0.35em] text-gold-gradient md:text-3xl">
             RITHIN CYRIL &nbsp;&amp;&nbsp; V. HARSHITA
           </p>
-          <p className="font-display mt-3 text-[10px] tracking-[0.4em] text-[oklch(0.45_0.04_60)]/80">
+          <p className="font-display mt-3 text-[11px] font-semibold tracking-[0.4em] ink-soft">
             SUNDAY · 18 OCTOBER 2026 · ANANDAPURA, S. COORG
           </p>
         </div>
