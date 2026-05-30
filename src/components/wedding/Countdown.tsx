@@ -35,7 +35,7 @@ export function Countdown() {
         <h2 className="font-script mt-4 text-4xl italic text-gold-gradient md:text-5xl">
           Counting Every Blessed Moment
         </h2>
-        <p className="mx-auto mt-4 max-w-xl font-script italic text-[oklch(0.4_0.04_60)]/80">
+        <p className="mx-auto mt-4 max-w-xl font-script text-lg italic ink-soft">
           We can't wait to celebrate with you
         </p>
 
@@ -52,14 +52,14 @@ export function Countdown() {
               className="flex flex-col items-center"
             >
               <div className="relative aspect-square w-full max-w-[120px]">
-                <div className="absolute inset-0 rounded-full border-2 border-gold shadow-gold bg-white/70 backdrop-blur" />
+                <div className="absolute inset-0 rounded-full border-2 border-gold shadow-gold bg-white/85 backdrop-blur" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-2xl text-gold-gradient md:text-4xl">
+                  <span className="font-display text-3xl font-semibold text-gold-gradient md:text-4xl">
                     {String(p.value).padStart(2, "0")}
                   </span>
                 </div>
               </div>
-              <span className="font-display mt-3 text-[9px] tracking-[0.35em] text-[oklch(0.4_0.04_60)]/80">
+              <span className="font-display mt-3 text-[10px] font-semibold tracking-[0.35em] ink-soft">
                 {p.label}
               </span>
             </motion.div>

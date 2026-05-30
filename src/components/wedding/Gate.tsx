@@ -51,7 +51,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
           <span className="font-display text-[11px] tracking-[0.45em] text-gold-gradient">
             TAP TO OPEN THE INVITATION
           </span>
-          <span className="font-script italic text-sm text-[oklch(0.45_0.04_60)]/80">
+          <span className="font-script text-base italic ink-soft">
             Save the Date · 18 October 2026
           </span>
         </motion.button>

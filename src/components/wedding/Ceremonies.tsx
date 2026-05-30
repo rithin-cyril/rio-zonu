@@ -57,7 +57,7 @@ export function Ceremonies() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-display text-[9px] tracking-[0.4em] text-[oklch(0.45_0.04_60)]/80">
+                    <span className="font-display text-[10px] font-semibold tracking-[0.4em] ink-soft">
                       EVENT
                     </span>
                     <span className="font-display text-[10px] tracking-[0.3em] text-gold-gradient">
@@ -67,15 +67,15 @@ export function Ceremonies() {
                   <h3 className="font-script mt-3 text-2xl italic text-gold-gradient">
                     {e.title}
                   </h3>
-                  <p className="mt-2 font-script italic text-[oklch(0.4_0.04_60)]/85">
+                  <p className="mt-2 font-script text-base italic ink-soft">
                     {e.verse}
                   </p>
 
-                  <div className="mt-4 space-y-1.5 border-t border-gold/30 pt-4 text-sm text-[oklch(0.3_0.03_60)]">
+                  <div className="mt-4 space-y-1.5 border-t border-gold/40 pt-4 text-[15px] ink">
                     <p>📅 {e.date}</p>
-                    <p className="text-gold-gradient">🕒 {e.time}</p>
-                    <p className="pt-1 text-[oklch(0.28_0.03_60)] font-semibold">📍 {e.venue}</p>
-                    <p className="text-xs text-[oklch(0.45_0.04_60)]">{e.address}</p>
+                    <p className="font-semibold text-gold-gradient">🕒 {e.time}</p>
+                    <p className="pt-1 font-semibold ink">📍 {e.venue}</p>
+                    <p className="text-sm ink-soft">{e.address}</p>
                   </div>
 
                   <a

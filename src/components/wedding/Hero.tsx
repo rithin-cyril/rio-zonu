@@ -42,7 +42,7 @@ export function Hero() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1.1, delay: 0.7 }}
-          className="font-script mt-6 text-lg italic text-[oklch(0.4_0.04_60)] md:text-xl"
+          className="font-script mt-6 text-xl italic ink md:text-2xl"
         >
           “I have found the one whom my soul loves.” — Song of Solomon 3:4
         </motion.p>
@@ -64,13 +64,13 @@ export function Hero() {
               18 · OCTOBER · 2026
             </p>
           </div>
-          <p className="font-display mt-3 text-[9px] tracking-[0.4em] text-[oklch(0.45_0.04_60)]/70">
+          <p className="font-display mt-3 text-[10px] font-semibold tracking-[0.4em] ink-soft">
             CSI KANTHI CHURCH · ANANDAPURA · S. COORG
           </p>
         </motion.div>
 
         <Ornament className="mt-12" />
-        <p className="font-display mt-3 text-[9px] tracking-[0.45em] text-gold-gradient/80">
+        <p className="font-display mt-3 text-[10px] font-semibold tracking-[0.45em] text-gold-gradient">
           SCROLL TO EXPLORE
         </p>
       </div>
