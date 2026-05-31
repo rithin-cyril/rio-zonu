@@ -16,11 +16,21 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
         <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.1, delay: 0.1 }}
+          className="font-script text-xl italic ink md:text-2xl"
+        >
+          "I have found the one whom my soul loves." — Song of Solomon 3:4
+        </motion.p>
+
+        <motion.p
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="font-display text-[10px] tracking-[0.45em] text-gold-gradient"
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="font-body mt-6 text-base tracking-[0.18em] text-emerald-deep uppercase md:text-2xl"
         >
           TOGETHER WITH OUR FAMILIES
         </motion.p>
@@ -29,7 +39,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1.1, delay: 0.2 }}
+          transition={{ duration: 1.1, delay: 0.5 }}
           className="font-script mt-8 text-5xl italic leading-tight text-gold-gradient md:text-7xl"
         >
           Rithin Cyril
@@ -37,21 +47,11 @@ export function Hero() {
           V. Harshita
         </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.1, delay: 0.7 }}
-          className="font-script mt-6 text-xl italic ink md:text-2xl"
-        >
-          “I have found the one whom my soul loves.” — Song of Solomon 3:4
-        </motion.p>
-
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.9, delay: 1 }}
+          transition={{ duration: 0.9, delay: 0.9 }}
           className="mt-10 inline-flex flex-col items-center"
         >
           <p className="font-display text-[9px] tracking-[0.4em] text-gold-gradient">
