@@ -10,7 +10,7 @@ const families = [
   },
   {
     side: "PARENTS OF THE BRIDE",
-    line1: "Mr. V. Raju",
+    line1: "Mr. V. R. Raju",
     line2: "& Mrs. V. Nirmala",
     glyph: "✝",
   },
