@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Gate } from "./Gate";
 import { Hero } from "./Hero";
+import { Couple } from "./Couple";
 import { Countdown } from "./Countdown";
 import { Families } from "./Families";
 import { Ceremonies } from "./Ceremonies";
@@ -19,6 +20,7 @@ export function WeddingInvitation() {
       {opened && <MusicPlayer />}
       {opened && <BackToTop />}
       <Hero />
+      <Couple />
       <Countdown />
       <Families />
       <Ceremonies />

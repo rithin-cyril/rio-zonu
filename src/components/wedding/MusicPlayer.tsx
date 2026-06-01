@@ -37,12 +37,12 @@ export function MusicPlayer() {
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
         transition={{ duration: 0.6 }}
-        className="fixed right-4 top-4 z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-gold bg-white/85 shadow-gold backdrop-blur md:right-6 md:top-6 md:h-12 md:w-12"
+        className="fixed right-4 top-4 z-[60] flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.72_0.09_80)]/50 bg-white/90 shadow-gold backdrop-blur md:right-6 md:top-6"
       >
         {muted ? (
-          <VolumeX className="h-5 w-5 text-[oklch(0.42_0.1_70)]" strokeWidth={1.6} />
+          <VolumeX className="h-4 w-4 text-[oklch(0.52_0.09_72)]" strokeWidth={1.6} />
         ) : (
-          <Volume2 className="h-5 w-5 text-[oklch(0.42_0.1_70)]" strokeWidth={1.6} />
+          <Volume2 className="h-4 w-4 text-[oklch(0.52_0.09_72)]" strokeWidth={1.6} />
         )}
       </motion.button>
     </>

@@ -1,23 +1,16 @@
-import { Ornament } from "./Ornament";
-
 export function Closing() {
   return (
-    <footer className="bg-royal relative overflow-hidden border-t border-gold/30 py-16">
-      <div className="mx-auto max-w-2xl px-6 text-center">
-        <Ornament />
-        <p className="font-script mt-6 text-2xl italic text-gold-gradient md:text-3xl">
-          “The Lord bless you and keep you;
-          <br />
-          the Lord make his face shine on you and be gracious to you.”
+    <footer className="bg-ivory-soft relative overflow-hidden py-20">
+      <div className="mx-auto max-w-xl px-6 text-center">
+        <p className="font-script text-2xl italic leading-relaxed text-gold-gradient md:text-3xl">
+          &ldquo;The Lord bless you and keep you.&rdquo;
         </p>
-        <p className="font-display mt-3 text-[11px] font-semibold tracking-[0.4em] ink-soft">
-          — NUMBERS 6:24–25
+        <p className="mt-3 font-display text-[10px] tracking-[0.3em] ink-soft">
+          &mdash; NUMBERS 6:24
         </p>
-        <p className="mt-8 font-script text-lg italic ink-soft">
-          With grateful hearts, we await your prayers and presence on our blessed day.
-        </p>
-        <p className="font-display mt-8 text-[10px] font-semibold tracking-[0.4em] text-gold-gradient">
-          © 2026 · RITHIN &amp; HARSHITA · TO GOD BE THE GLORY ✝
+        <div className="divider-hairline mt-10" />
+        <p className="mt-10 font-display text-[10px] tracking-[0.28em] text-gold-gradient">
+          RITHIN &amp; HARSHITA &middot; 2026
         </p>
       </div>
     </footer>
