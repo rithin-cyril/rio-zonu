@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Ornament } from "./Ornament";
 
 const TARGET = new Date("2026-10-18T09:00:00+05:30").getTime();
 
@@ -27,39 +26,30 @@ export function Countdown() {
   const parts = useCountdown();
 
   return (
-    <section className="bg-sage-veil relative overflow-hidden py-24 md:py-32">
-      <div className="mx-auto max-w-4xl px-6 text-center">
-        <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
-          IN HIS PERFECT TIME
-        </p>
-        <h2 className="font-script mt-4 text-4xl italic text-gold-gradient md:text-5xl">
+    <section className="bg-ivory-soft relative overflow-hidden py-24">
+      <div className="mx-auto max-w-xl px-6 text-center">
+        <h2 className="font-script text-3xl italic text-gold-gradient md:text-4xl">
           Counting Every Blessed Moment
         </h2>
-        <p className="mx-auto mt-4 max-w-xl font-script text-lg italic ink-soft">
-          We can't wait to celebrate with you
+        <p className="mx-auto mt-4 max-w-sm font-script text-lg italic leading-relaxed ink-soft">
+          Every second brings us closer to forever.
         </p>
+        <div className="divider-hairline mt-8" />
 
-        <Ornament className="mt-10" />
-
-        <div className="mt-10 grid grid-cols-4 gap-4 md:gap-8">
+        <div className="mt-12 grid grid-cols-4 gap-2 sm:gap-4">
           {parts.map((p, i) => (
             <motion.div
               key={p.label}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
+              transition={{ duration: 0.5, delay: i * 0.06 }}
               className="flex flex-col items-center"
             >
-              <div className="relative aspect-square w-full max-w-[120px]">
-                <div className="absolute inset-0 rounded-full border-2 border-gold shadow-gold bg-white/85 backdrop-blur" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-3xl font-semibold text-gold-gradient md:text-4xl">
-                    {String(p.value).padStart(2, "0")}
-                  </span>
-                </div>
-              </div>
-              <span className="font-display mt-3 text-[10px] font-semibold tracking-[0.35em] ink-soft">
+              <span className="font-script text-4xl text-gold-gradient md:text-5xl">
+                {String(p.value).padStart(2, "0")}
+              </span>
+              <span className="mt-2 font-display text-[10px] tracking-[0.25em] ink-soft">
                 {p.label}
               </span>
             </motion.div>

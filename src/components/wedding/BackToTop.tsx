@@ -25,9 +25,9 @@ export function BackToTop() {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
           transition={{ duration: 0.35 }}
-          className="fixed bottom-5 right-4 z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-gold bg-white/85 shadow-gold backdrop-blur md:bottom-6 md:right-6 md:h-12 md:w-12"
+          className="fixed bottom-5 right-4 z-[60] flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.72_0.09_80)]/50 bg-white/90 shadow-gold backdrop-blur md:bottom-6 md:right-6"
         >
-          <ChevronUp className="h-5 w-5 text-[oklch(0.42_0.1_70)]" strokeWidth={1.8} />
+          <ChevronUp className="h-4 w-4 text-[oklch(0.52_0.09_72)]" strokeWidth={1.8} />
         </motion.button>
       )}
     </AnimatePresence>

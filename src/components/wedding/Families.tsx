@@ -1,52 +1,41 @@
 import { motion } from "motion/react";
-import { Ornament } from "./Ornament";
 
 const families = [
   {
-    side: "PARENTS OF THE GROOM",
+    side: "The Groom's Family",
     line1: "Mr. (Late) Regin Cyril",
     line2: "& Mrs. Elizabeth Pushpalatha Cyril",
-    glyph: "✝",
   },
   {
-    side: "PARENTS OF THE BRIDE",
+    side: "The Bride's Family",
     line1: "Mr. V. R. Raju",
     line2: "& Mrs. V. Nirmala",
-    glyph: "✝",
   },
 ];
 
 export function Families() {
   return (
-    <section className="bg-royal relative overflow-hidden border-y border-gold/30 py-24">
-      <div className="mx-auto max-w-4xl px-6 text-center">
-        <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
-          IN CHRIST’S NAME
-        </p>
-        <h2 className="font-script mt-4 text-4xl italic text-gold-gradient md:text-5xl">
-          With the Blessings of Our Families
+    <section className="bg-royal relative overflow-hidden py-24">
+      <div className="mx-auto max-w-xl px-6 text-center">
+        <h2 className="font-script text-3xl italic text-gold-gradient md:text-4xl">
+          With Our Families' Blessings
         </h2>
-        <Ornament className="mt-6" />
+        <div className="divider-hairline mt-6" />
 
-        <p className="mx-auto mt-8 max-w-xl font-script text-lg italic ink-soft">
-          With love and blessings from our families
-        </p>
-
-        <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-16">
+        <div className="mt-12 flex flex-col gap-12">
           {families.map((f, i) => (
             <motion.div
               key={f.line1}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: i * 0.1 }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
               className="space-y-3"
             >
-              <span className="font-script text-2xl text-gold-gradient">{f.glyph}</span>
-              <p className="font-display text-[10px] font-semibold tracking-[0.4em] ink-soft">
+              <p className="font-script text-xl italic text-gold-gradient">
                 {f.side}
               </p>
-              <h3 className="font-display text-xl font-semibold ink md:text-2xl">
+              <h3 className="font-script text-2xl italic ink md:text-3xl">
                 {f.line1}
               </h3>
               <p className="font-script text-xl italic ink-soft">
@@ -56,18 +45,16 @@ export function Families() {
           ))}
         </div>
 
-        <p className="font-script mt-16 text-xl italic text-gold-gradient md:text-2xl">
-          joyfully invite you to witness the holy matrimony of their beloved children
+        <div className="divider-hairline mt-16" />
+        <p className="mt-10 font-script text-lg italic leading-relaxed ink-soft md:text-xl">
+          joyfully invite you to witness the holy matrimony of
         </p>
-
-        <div className="mt-10">
-          <p className="font-display text-2xl tracking-[0.35em] text-gold-gradient md:text-3xl">
-            RITHIN CYRIL &nbsp;&amp;&nbsp; V. HARSHITA
-          </p>
-          <p className="font-display mt-3 text-[11px] font-semibold tracking-[0.4em] ink-soft">
-            SUNDAY · 18 OCTOBER 2026 · ANANDAPURA, S. COORG
-          </p>
-        </div>
+        <p className="mt-4 font-script text-2xl italic text-gold-gradient md:text-3xl">
+          Rithin Cyril &amp; V. Harshita
+        </p>
+        <p className="mt-3 font-display text-[11px] tracking-[0.28em] ink-soft">
+          SUNDAY · 18 OCTOBER 2026
+        </p>
       </div>
     </section>
   );
