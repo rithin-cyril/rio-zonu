@@ -3,13 +3,13 @@ import { Ornament } from "./Ornament";
 
 const families = [
   {
-    side: "PARENTS OF THE GROOM",
+    side: "THE GROOM’S FAMILY",
     line1: "Mr. (Late) Regin Cyril",
     line2: "& Mrs. Elizabeth Pushpalatha Cyril",
     glyph: "✝",
   },
   {
-    side: "PARENTS OF THE BRIDE",
+    side: "THE BRIDE’S FAMILY",
     line1: "Mr. V. R. Raju",
     line2: "& Mrs. V. Nirmala",
     glyph: "✝",
@@ -24,12 +24,12 @@ export function Families() {
           IN CHRIST’S NAME
         </p>
         <h2 className="font-script mt-4 text-4xl italic text-gold-gradient md:text-5xl">
-          With the Blessings of Our Families
+          With Our Families’ Blessings
         </h2>
         <Ornament className="mt-6" />
 
         <p className="mx-auto mt-8 max-w-xl font-script text-lg italic ink-soft">
-          With love and blessings from our families
+          With love and blessings from those who raised us
         </p>
 
         <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-16">
@@ -57,7 +57,7 @@ export function Families() {
         </div>
 
         <p className="font-script mt-16 text-xl italic text-gold-gradient md:text-2xl">
-          joyfully invite you to witness the holy matrimony of their beloved children
+          joyfully invite you to witness the Holy Matrimony of
         </p>
 
         <div className="mt-10">
@@ -65,7 +65,7 @@ export function Families() {
             RITHIN CYRIL &nbsp;&amp;&nbsp; V. HARSHITA
           </p>
           <p className="font-display mt-3 text-[11px] font-semibold tracking-[0.4em] ink-soft">
-            SUNDAY · 18 OCTOBER 2026 · ANANDAPURA, S. COORG
+            SUNDAY · 18 OCTOBER 2026
           </p>
         </div>
       </div>
