@@ -22,7 +22,16 @@ export function Hero() {
           transition={{ duration: 1.1, delay: 0.1 }}
           className="font-script text-xl italic ink md:text-2xl"
         >
-          "I have found the one whom my soul loves." — Song of Solomon 3:4
+          “I have found the one whom my soul loves.”
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, delay: 0.25 }}
+          className="font-display mt-2 text-[10px] tracking-[0.45em] text-gold-gradient"
+        >
+          — SONG OF SOLOMON 3:4
         </motion.p>
 
         <motion.p
@@ -30,7 +39,7 @@ export function Hero() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="font-body mt-6 text-base tracking-[0.18em] text-emerald-deep uppercase md:text-2xl"
+          className="font-body mt-8 text-base tracking-[0.18em] text-emerald-deep uppercase md:text-2xl"
         >
           TOGETHER WITH OUR FAMILIES
         </motion.p>
@@ -43,7 +52,7 @@ export function Hero() {
           className="font-script mt-8 text-5xl italic leading-tight text-gold-gradient md:text-7xl"
         >
           Rithin Cyril
-          <span className="block py-3 text-3xl md:text-4xl">&amp;</span>
+          <span className="block py-3 text-3xl text-[oklch(0.55_0.18_25)] md:text-4xl">♡</span>
           V. Harshita
         </motion.h1>
 

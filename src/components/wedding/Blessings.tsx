@@ -5,20 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 const verses = [
   {
-    ref: "1 Corinthians 13:4–7",
-    text: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud… It always protects, always trusts, always hopes, always perseveres.",
-  },
-  {
-    ref: "Ecclesiastes 4:12",
-    text: "Though one may be overpowered, two can defend themselves. A cord of three strands is not quickly broken.",
-  },
-  {
-    ref: "Genesis 2:24",
-    text: "Therefore a man shall leave his father and mother and hold fast to his wife, and they shall become one flesh.",
-  },
-  {
-    ref: "Colossians 3:14",
-    text: "And over all these virtues put on love, which binds them all together in perfect unity.",
+    ref: "1 Corinthians 13:4,7",
+    text: "Love is patient, love is kind. It always protects, always trusts, always hopes, always perseveres.",
   },
 ];
 
@@ -35,10 +23,10 @@ export function Blessings() {
           ✦  HIS WORD UPON US  ✦
         </p>
         <h2 className="font-script mt-4 text-4xl italic text-gold-gradient md:text-5xl">
-          Scripture &amp; Blessings
+          Leave Your Blessings
         </h2>
-        <p className="font-display mt-3 text-[11px] tracking-[0.35em] ink-soft">
-          VERSES THAT GUIDE OUR JOURNEY TOGETHER
+        <p className="mx-auto mt-3 max-w-xl font-script text-lg italic ink-soft">
+          Your prayers, blessings, and heartfelt wishes mean the world to us as we begin this beautiful journey together.
         </p>
         <Ornament className="mt-6" />
 
@@ -95,14 +83,14 @@ export function Blessings() {
               <input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Your name"
+                placeholder="Your Name"
                 maxLength={80}
                 className="mt-4 w-full border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
               />
               <textarea
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
-                placeholder="A prayer or wish for Rithin & Harshita…"
+                placeholder="Share your blessing, prayer, or wishes for Rithin & Harshita..."
                 rows={3}
                 maxLength={500}
                 className="mt-3 w-full border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"

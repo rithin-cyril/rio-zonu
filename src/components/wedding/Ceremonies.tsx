@@ -5,21 +5,19 @@ const events = [
   {
     n: "01",
     title: "Holy Matrimony",
-    verse: "“What God has joined together, let no one separate.” — Mark 10:9",
     date: "Sunday, 18 October 2026",
     time: "9:00 AM",
     venue: "CSI Kanthi Church",
-    address: "Anandapura, S. Coorg, Karnataka",
+    address: "Anandapura, South Coorg, Karnataka",
     map: "https://www.google.com/maps/search/CSI+Kanthi+Church+Anandapura+Coorg",
   },
   {
     n: "02",
     title: "Wedding Reception",
-    verse: "“This is the day the Lord has made; let us rejoice and be glad in it.” — Psalm 118:24",
     date: "Sunday, 18 October 2026",
     time: "12:00 Noon onwards",
     venue: "Church Hall",
-    address: "Siddapura, S. Coorg, Karnataka",
+    address: "Siddapura, South Coorg, Karnataka",
     map: "https://www.google.com/maps/search/CSI+Church+Hall+Siddapura+Coorg",
   },
 ];
@@ -67,9 +65,6 @@ export function Ceremonies() {
                   <h3 className="font-script mt-3 text-2xl italic text-gold-gradient">
                     {e.title}
                   </h3>
-                  <p className="mt-2 font-script text-base italic ink-soft">
-                    {e.verse}
-                  </p>
 
                   <div className="mt-4 space-y-1.5 border-t border-gold/40 pt-4 text-[15px] ink">
                     <p>📅 {e.date}</p>
@@ -84,7 +79,7 @@ export function Ceremonies() {
                     rel="noopener noreferrer"
                     className="mt-4 inline-block rounded border border-gold/60 px-4 py-1.5 font-display text-[10px] tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10"
                   >
-                    GOOGLE MAP LOCATION
+                    OPEN IN MAPS
                   </a>
                 </div>
               </motion.div>

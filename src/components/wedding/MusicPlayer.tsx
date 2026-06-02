@@ -3,14 +3,9 @@ import { motion } from "motion/react";
 import { Volume2, VolumeX } from "lucide-react";
 import song from "@/assets/wedding-song.mp3";
 
-const STORAGE_KEY = "wedding-music-muted";
-
 export function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [muted, setMuted] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem(STORAGE_KEY) === "1";
-  });
+  const [muted, setMuted] = useState<boolean>(false);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -22,7 +17,6 @@ export function MusicPlayer() {
         /* autoplay blocked – will start on next user interaction */
       });
     }
-    window.localStorage.setItem(STORAGE_KEY, muted ? "1" : "0");
   }, [muted]);
 
   return (
