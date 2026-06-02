@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-export function Petals({ count = 6 }: { count?: number }) {
+export function Petals({ count = 24 }: { count?: number }) {
   const petals = useMemo(
     () =>
       Array.from({ length: count }).map((_, i) => ({

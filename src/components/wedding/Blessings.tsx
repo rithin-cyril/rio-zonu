@@ -1,11 +1,26 @@
 import { useState } from "react";
 import { motion } from "motion/react";
+import { Ornament } from "./Ornament";
 import { supabase } from "@/integrations/supabase/client";
 
-const verse = {
-  ref: "1 Corinthians 13:4, 7",
-  text: "Love is patient, love is kind. It always protects, always trusts, always hopes, always perseveres.",
-};
+const verses = [
+  {
+    ref: "1 Corinthians 13:4–7",
+    text: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud… It always protects, always trusts, always hopes, always perseveres.",
+  },
+  {
+    ref: "Ecclesiastes 4:12",
+    text: "Though one may be overpowered, two can defend themselves. A cord of three strands is not quickly broken.",
+  },
+  {
+    ref: "Genesis 2:24",
+    text: "Therefore a man shall leave his father and mother and hold fast to his wife, and they shall become one flesh.",
+  },
+  {
+    ref: "Colossians 3:14",
+    text: "And over all these virtues put on love, which binds them all together in perfect unity.",
+  },
+];
 
 export function Blessings() {
   const [form, setForm] = useState({ name: "", note: "" });
@@ -14,31 +29,38 @@ export function Blessings() {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <section className="bg-sage-veil relative overflow-hidden py-24">
-      <div className="mx-auto max-w-xl px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="card-premium px-7 py-9"
-        >
-          <p className="font-script text-xl italic leading-relaxed ink md:text-2xl">
-            “{verse.text}”
-          </p>
-          <p className="mt-5 font-display text-[10px] tracking-[0.3em] text-gold-gradient">
-            — {verse.ref.toUpperCase()}
-          </p>
-        </motion.div>
+    <section className="bg-sage-veil relative overflow-hidden py-24 md:py-32">
+      <div className="mx-auto max-w-2xl px-6 text-center">
+        <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
+          ✦  HIS WORD UPON US  ✦
+        </p>
+        <h2 className="font-script mt-4 text-4xl italic text-gold-gradient md:text-5xl">
+          Scripture &amp; Blessings
+        </h2>
+        <p className="font-display mt-3 text-[11px] tracking-[0.35em] ink-soft">
+          VERSES THAT GUIDE OUR JOURNEY TOGETHER
+        </p>
+        <Ornament className="mt-6" />
 
-        <div className="mt-20">
-          <h2 className="font-script text-3xl italic text-gold-gradient md:text-4xl">
-            Leave Your Blessings
-          </h2>
-          <p className="mx-auto mt-4 max-w-sm font-script text-lg italic leading-relaxed ink-soft">
-            Your prayers and wishes mean the world to us.
-          </p>
-          <div className="divider-hairline mt-6" />
+        <div className="mt-12 space-y-5 text-left">
+          {verses.map((v, i) => (
+            <motion.div
+              key={v.ref}
+              initial={{ opacity: 0, x: i % 2 ? 20 : -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative rounded-md border border-gold/50 bg-white/90 p-6 shadow-gold backdrop-blur"
+            >
+              <span className="font-script text-2xl text-gold-gradient" aria-hidden>✝</span>
+              <p className="mt-2 font-script text-lg italic leading-relaxed ink md:text-xl">
+                “{v.text}”
+              </p>
+              <p className="mt-4 font-display text-[11px] font-semibold tracking-[0.35em] text-gold-gradient">
+                — {v.ref.toUpperCase()}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
         <form
@@ -59,10 +81,13 @@ export function Blessings() {
             }
             setSent(true);
           }}
-          className="card-premium mt-10 p-7 text-left"
+          className="mt-12 rounded-md border border-gold/50 bg-white/90 p-7 text-left shadow-gold backdrop-blur"
         >
+          <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient">
+            LEAVE A BLESSING FOR THE COUPLE
+          </p>
           {sent ? (
-            <p className="text-center font-script text-xl italic ink">
+            <p className="mt-4 font-script text-lg italic ink">
               Your blessing has been recorded. Thank you for praying with us ✦
             </p>
           ) : (
@@ -72,23 +97,23 @@ export function Blessings() {
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Your name"
                 maxLength={80}
-                className="h-12 w-full rounded-xl border border-[oklch(0.72_0.09_80)]/40 bg-white/80 px-4 font-body text-base ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/60 focus:border-[oklch(0.72_0.09_80)]"
+                className="mt-4 w-full border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
               />
               <textarea
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
                 placeholder="A prayer or wish for Rithin & Harshita…"
-                rows={4}
+                rows={3}
                 maxLength={500}
-                className="mt-3 w-full rounded-xl border border-[oklch(0.72_0.09_80)]/40 bg-white/80 px-4 py-3 font-body text-base leading-relaxed ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/60 focus:border-[oklch(0.72_0.09_80)]"
+                className="mt-3 w-full border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
               />
               {error && (
-                <p className="mt-3 text-center font-body text-sm text-[oklch(0.45_0.15_25)]">{error}</p>
+                <p className="mt-3 font-script italic text-sm text-[oklch(0.45_0.15_25)]">{error}</p>
               )}
               <button
                 type="submit"
                 disabled={submitting}
-                className="mt-5 h-12 w-full rounded-full bg-gradient-to-b from-[#d4b87a] to-[#a07e3a] font-display text-[12px] tracking-[0.28em] text-white shadow-gold transition active:scale-[0.99] disabled:opacity-60"
+                className="mt-6 inline-block rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
               >
                 {submitting ? "SENDING…" : "SEND BLESSING"}
               </button>
