@@ -36,7 +36,7 @@ export function Countdown() {
           Counting Every Blessed Moment
         </h2>
         <p className="mx-auto mt-4 max-w-xl font-script text-lg italic ink-soft">
-          We can't wait to celebrate with you
+          Every second brings us closer to the day we say “I do” and begin our forever together.
         </p>
 
         <Ornament className="mt-10" />
