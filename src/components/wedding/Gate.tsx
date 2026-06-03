@@ -26,7 +26,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
         {/* Soft pulsing glow over the central cross seal to invite tapping */}
         <span
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-[62%] h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full md:h-32 md:w-32"
+          className="pointer-events-none absolute left-1/2 top-[67%] h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full md:h-32 md:w-32"
           style={{
             background:
               "radial-gradient(circle, rgba(201,179,126,0.55) 0%, rgba(201,179,126,0) 70%)",
