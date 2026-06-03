@@ -24,13 +24,16 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 1 }}
-          className="space-y-2"
+          className="space-y-4"
         >
           <Ornament />
-          <p className="font-display text-[10px] tracking-[0.4em] text-gold-gradient">
+          <h1 className="font-display text-gold-gradient font-bold tracking-[0.32em] text-3xl sm:text-4xl md:text-6xl lg:text-7xl mt-6 mb-4 drop-shadow-sm">
             HOLY MATRIMONY
+          </h1>
+          <p className="font-body text-base md:text-xl tracking-[0.2em] uppercase text-[#2E2A26]">
+            Sunday · 18 October 2026
           </p>
-          <p className="font-hand text-3xl text-gold-gradient md:text-4xl">By God’s Grace</p>
+          <p className="font-hand text-3xl text-gold-gradient md:text-4xl mt-2">By God’s Grace</p>
         </motion.div>
 
         <motion.button
@@ -48,10 +51,10 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
               ✝
             </span>
           </span>
-          <span className="font-display text-[11px] tracking-[0.45em] text-gold-gradient">
+          <span className="font-display text-sm md:text-lg font-semibold tracking-[0.4em] text-[#2E2A26] px-6 py-2 animate-pulse">
             TAP TO OPEN THE INVITATION
           </span>
-          <span className="font-script text-base italic ink-soft">
+          <span className="font-script text-lg md:text-xl italic ink-soft">
             Save the Date · 18 October 2026
           </span>
         </motion.button>
