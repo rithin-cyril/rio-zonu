@@ -18,7 +18,7 @@ const families = [
 
 export function Families() {
   return (
-    <section className="bg-royal relative overflow-hidden border-y border-gold/30 py-24">
+    <section className="bg-lux-cream relative overflow-hidden border-y border-[#C9B37E]/40 py-24">
       <div className="mx-auto max-w-4xl px-6 text-center">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
           IN CHRIST’S NAME
