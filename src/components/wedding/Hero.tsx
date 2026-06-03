@@ -4,15 +4,15 @@ import { Ornament } from "./Ornament";
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
+    <section className="bg-lux-hero lux-glow relative flex min-h-[100svh] items-center justify-center overflow-hidden">
       <img
         src={namesBg}
         alt=""
         width={1920}
         height={1080}
-        className="absolute inset-0 h-full w-full object-cover opacity-90"
+        className="absolute inset-0 h-full w-full object-cover opacity-40"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.97_0.012_90)]/70 via-[oklch(0.95_0.018_90)]/85 to-[oklch(0.93_0.022_88)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#FBF8F1]/80 via-[#FBF8F1]/85 to-[#F2EADA]" />
 
       <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
         <motion.p
