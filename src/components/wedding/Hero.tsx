@@ -39,7 +39,7 @@ export function Hero() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="font-body mt-8 text-base tracking-[0.18em] text-emerald-deep uppercase md:text-2xl"
+          className="font-body mt-8 text-base tracking-[0.18em] text-gold-gradient uppercase md:text-2xl"
         >
           TOGETHER WITH OUR FAMILIES
         </motion.p>
@@ -63,7 +63,7 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 0.9 }}
           className="mt-10 inline-flex flex-col items-center"
         >
-          <p className="font-display text-[9px] tracking-[0.4em] text-gold-gradient">
+          <p className="font-display text-base md:text-xl font-semibold tracking-[0.5em] text-[#2E2A26] uppercase">
             SAVE THE DATE
           </p>
           <div className="relative mt-3 border-y border-gold px-8 py-3">
