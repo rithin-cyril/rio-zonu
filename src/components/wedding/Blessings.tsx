@@ -17,7 +17,7 @@ export function Blessings() {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <section className="bg-sage-veil relative overflow-hidden py-24 md:py-32">
+    <section className="bg-lux-warm relative overflow-hidden py-24 md:py-32">
       <div className="mx-auto max-w-2xl px-6 text-center">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
           ✦  HIS WORD UPON US  ✦
