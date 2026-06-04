@@ -11,7 +11,7 @@ import { Petals } from "./Petals";
  */
 export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }) {
   const SEAL_X = 50; // %
-  const SEAL_Y = 66.5; // %
+  const SEAL_Y = 67.6; // %, measured from artwork
 
   return (
     <motion.section
@@ -43,6 +43,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             // Cover behavior: whichever of width or height is larger wins.
             width: "max(100vw, calc(100svh * 1719 / 915))",
             height: "max(100svh, calc(100vw * 915 / 1719))",
+            containerType: "size",
           }}
         >
           <motion.img
@@ -74,8 +75,8 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             style={{
               left: `${SEAL_X}%`,
               top: `${SEAL_Y}%`,
-              width: "clamp(72px, 9vw, 140px)",
-              height: "clamp(72px, 9vw, 140px)",
+              width: "10cqh",
+              height: "10cqh",
               transform: "translate(-50%, -50%)",
               animation: "seal-ring 2.6s ease-out infinite",
             }}
@@ -88,11 +89,11 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             style={{
               left: `${SEAL_X}%`,
               top: `${SEAL_Y}%`,
-              width: "clamp(72px, 11vw, 160px)",
-              height: "clamp(72px, 11vw, 160px)",
+              width: "12cqh",
+              height: "12cqh",
               transform: "translate(-50%, -50%)",
               background:
-                "radial-gradient(circle, rgba(201,179,126,0.55) 0%, rgba(201,179,126,0) 70%)",
+                "radial-gradient(circle, rgba(201,179,126,0.55) 0%, rgba(201,179,126,0.25) 45%, rgba(201,179,126,0) 75%)",
               animation: "glow-pulse 2.6s ease-in-out infinite",
             }}
           />
