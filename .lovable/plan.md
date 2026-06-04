@@ -1,58 +1,48 @@
+## Goal
+Make the welcome (Gate) screen look polished on both mobile and desktop, align the pulsing glow with the cross inside its circular seal, layer in subtle animations inspired by the Vijay × Rashmika reference site, and update the site title + meta description.
 
-## What I'll change
+## Scope
+Only the first screen (`Gate`) and route metadata. No content changes to other sections.
 
-### 1. Richer, grander color palette (still simple)
-Upgrade `src/styles.css` tokens from soft sage/pale gold to a deeper, more luxurious "ivory + emerald + antique gold" set:
-- Background: warm ivory (`oklch(0.96 0.018 88)`)
-- Accent gold deepened (`oklch(0.62 0.13 78)`) with a richer gradient (`#a8741a → #6b3f0c`)
-- Secondary accent: deep emerald (`oklch(0.38 0.06 155)`) for headings/dividers
-- Stronger text color (`oklch(0.18 0.02 60)`) for body so it reads crisp
-- Refined `bg-sage-veil` → softer ivory-emerald veil
-- Heavier shadows on cards (`shadow-gold` deepened) for a "grand" feel
+---
 
-### 2. Sharper, more readable text
-- Bump body text from `Marcellus` body weight to slightly heavier rendering + add `font-feature-settings` and `text-rendering: optimizeLegibility`
-- Increase contrast: body text uses the new dark ink color instead of low-opacity tones
-- Increase font sizes by ~1 step on key paragraphs (Hero, Blessings cards, Ceremonies)
-- Replace the many `text-[oklch(...)]/60..80` faded utilities with solid foreground for readability
-- Tighten letter-spacing on display caps; loosen leading on script paragraphs
+## 1. Page metadata (`src/routes/index.tsx`)
+- `title`: `Rithin & Harshita Wedding 💍`
+- `og:title`: same
+- `description` + `og:description`:  
+  `By God's grace and with the blessings of our families, you are cordially invited to witness the sacred union of Rithin & Harshita as they begin their forever together on October 18, 2026.`
 
-### 3. Background music (looping) + Mute button
-- Copy uploaded mp3 to `src/assets/wedding-song.mp3`
-- New component `src/components/wedding/MusicPlayer.tsx`:
-  - Fixed position **top-right** (gold circular button)
-  - `<audio loop>` element, autoplay attempted after Gate opens (browsers block autoplay before interaction — opening the gate counts as the gesture, so playback starts then)
-  - Icon toggles between `Volume2` and `VolumeOff` (lucide-react)
-  - Persists muted state in `localStorage`
-- Mounted inside `WeddingInvitation.tsx`, only rendered after `opened === true`
+## 2. Gate layout — responsive & cross alignment (`src/components/wedding/Gate.tsx`)
+Current issue: the gate background is a fixed 1719×915 image rendered with `object-cover`, so on tall mobile viewports the sides get clipped and the cross-in-circle drifts away from the overlay glow.
 
-### 4. Back-to-top button
-- New component `src/components/wedding/BackToTop.tsx`:
-  - Fixed **bottom-right**, gold circular button, `ChevronUp` icon
-  - Appears after scroll > 400px (fade in via motion)
-  - Smooth-scrolls to top
+Changes:
+- Use `object-cover` with `object-position: center 38%` (or `center top` on tall portrait via a media-query class) so the cross seal stays vertically anchored on every aspect ratio.
+- Move the glow overlay so it tracks the seal rather than a hardcoded `top: 67%`:
+  - Wrap the `<img>` and the glow in a single positioned container whose aspect ratio is locked to the artwork (`aspect-[1719/915]`) and centered on the viewport; the glow can then sit at the true seal coordinates (`left: 50%`, `top: 66.5%`) and stay perfectly on the cross at any width.
+  - On viewports narrower/taller than the artwork ratio, scale the container with `min-h-[100svh] min-w-full` + `object-cover` fallback so there are no letterbox bars.
+- Glow sizing scales with viewport: `h-[14vw] w-[14vw]` clamped between `72px` and `160px`.
+- Add safe-area padding (`pb-[env(safe-area-inset-bottom)]`) and `100svh` (already there) to avoid mobile browser chrome cropping the "TAP TO OPEN" label baked into the artwork.
 
-### 5. Email blessing submissions to riowedszonu@email.com
-This needs a backend, so I'll:
-- Enable **Lovable Cloud**
-- Set up an email domain (one-time dialog) + email infrastructure
-- Create a transactional email template `blessing-received.tsx` that emails **riowedszonu@email.com** with the sender's name + blessing note
-- Wire `Blessings.tsx` form `onSubmit` → public server route `/api/public/blessing` that:
-  - Validates with Zod (name 1–80 chars, note 1–500 chars)
-  - Stores submission in a `blessings` table (so nothing is lost)
-  - Triggers the transactional email to riowedszonu@email.com
-- Form keeps the existing "Thank you" confirmation UX
+## 3. Reference-inspired animations
+From the reference site (https://vijay-rashmika-wedding.vercel.app/) the gate uses: soft falling petals, gentle drifting light rays/godrays, a pulsing tap seal, and a subtle fade-in/zoom on the artwork. Translate those tastefully:
 
-> Note: the address you gave is `riowedszonu@email.com`. I'll use it exactly as written — if it should be `@gmail.com` or another domain, tell me and I'll swap it.
+- **Artwork entrance**: `motion.img` fades in from `opacity:0, scale:1.04` to `opacity:1, scale:1` over ~1.6s `easeOut` (Ken Burns hint).
+- **Godrays**: an absolutely-positioned `<span>` with a soft conic/linear gradient over the upper third, animated with a slow `opacity` and `translateY` loop (8s) to mimic the warm light beams in the reference.
+- **Falling petals on the gate**: render the existing `<Petals />` component (or a lighter `<Petals count={14} />` variant) inside the Gate so petals start drifting *before* the user taps, matching the reference. They are removed when `opened` becomes true.
+- **Tap seal**: keep the radial glow, but layer a second slowly expanding ring (`scale 1 → 1.25`, `opacity 0.6 → 0`, 2.6s loop) for a "tap me" cue.
+- **Tap hint label**: small `Tap to open the invitation` text below the seal on mobile only (the baked-in artwork label can be hard to read on narrow screens), fading in/out at 2.2s interval.
+- **Transition out**: when tapped, the whole gate scales `1 → 1.03` and fades over 1.1s (keeps the current behavior, just smoother easing — `[0.22, 1, 0.36, 1]`).
+
+## 4. QA checklist
+- Cross stays inside the circular seal at 320 px, 390 px, 768 px, 1024 px, 1440 px widths.
+- Glow visually overlaps the cross at each breakpoint.
+- No horizontal scroll on mobile.
+- Petals + godrays do not block the tap area.
+- Tab title reads `Rithin & Harshita Wedding 💍`.
 
 ## Files touched
-- edit `src/styles.css` (palette, typography sharpness)
-- edit `src/components/wedding/Blessings.tsx` (form → server route, stronger text)
-- edit `src/components/wedding/WeddingInvitation.tsx` (mount MusicPlayer + BackToTop)
-- edit `src/components/wedding/Hero.tsx`, `Ceremonies.tsx`, `Families.tsx`, `Closing.tsx`, `Countdown.tsx`, `Gate.tsx` (text contrast tweaks only)
-- new `src/components/wedding/MusicPlayer.tsx`
-- new `src/components/wedding/BackToTop.tsx`
-- new `src/assets/wedding-song.mp3` (from upload)
-- new server route `src/routes/api/public/blessing.ts`
-- new email template + registry entry
-- new migration for `blessings` table
+- `src/components/wedding/Gate.tsx` (layout + animations)
+- `src/routes/index.tsx` (title + meta)
+- Possibly `src/styles.css` (one extra keyframe for the godray drift / ring pulse if not expressible with Tailwind utilities)
+
+No other sections, no backend, no new dependencies.
