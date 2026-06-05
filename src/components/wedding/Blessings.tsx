@@ -17,20 +17,20 @@ export function Blessings() {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <section className="bg-lux-warm relative overflow-hidden py-24 md:py-32">
-      <div className="mx-auto max-w-2xl px-6 text-center">
+    <section className="bg-lux-warm relative overflow-hidden py-14 md:py-20">
+      <div className="mx-auto max-w-2xl px-5 text-center sm:px-6">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
           ✦  HIS WORD UPON US  ✦
         </p>
-        <h2 className="font-script mt-4 text-4xl italic text-gold-gradient md:text-5xl">
+        <h2 className="font-script mt-3 text-3xl italic text-gold-gradient md:text-5xl">
           Leave Your Blessings
         </h2>
-        <p className="mx-auto mt-3 max-w-xl font-script text-lg italic ink-soft">
+        <p className="mx-auto mt-3 max-w-xl font-script text-base italic ink-soft md:text-lg">
           Your prayers, blessings, and heartfelt wishes mean the world to us as we begin this beautiful journey together.
         </p>
-        <Ornament className="mt-6" />
+        <Ornament className="mt-5" />
 
-        <div className="mt-12 space-y-5 text-left">
+        <div className="mt-8 space-y-5 text-left">
           {verses.map((v, i) => (
             <motion.div
               key={v.ref}
@@ -69,7 +69,7 @@ export function Blessings() {
             }
             setSent(true);
           }}
-          className="mt-12 rounded-md border border-gold/50 bg-white/90 p-7 text-left shadow-gold backdrop-blur"
+          className="mt-8 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
         >
           <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient">
             LEAVE A BLESSING FOR THE COUPLE
