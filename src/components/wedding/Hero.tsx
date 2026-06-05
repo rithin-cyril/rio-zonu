@@ -34,16 +34,6 @@ export function Hero() {
           — SONG OF SOLOMON 3:4
         </motion.p>
 
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="font-body mt-5 text-sm tracking-[0.18em] text-gold-gradient uppercase md:mt-7 md:text-xl"
-        >
-          TOGETHER WITH OUR FAMILIES
-        </motion.p>
-
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
