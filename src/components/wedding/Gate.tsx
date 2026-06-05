@@ -40,9 +40,10 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           style={{
             aspectRatio: "1719 / 915",
-            // Cover behavior: whichever of width or height is larger wins.
-            width: "max(100vw, calc(100svh * 1719 / 915))",
-            height: "max(100svh, calc(100vw * 915 / 1719))",
+            // Contain behavior: whole artwork always visible, no cropping.
+            // Whichever dimension is the binding constraint wins.
+            width: "min(100vw, calc(100svh * 1719 / 915))",
+            height: "min(100svh, calc(100vw * 915 / 1719))",
             containerType: "size",
           }}
         >
@@ -105,7 +106,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: [0, 1, 1, 0.6, 1], y: 0 }}
           transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-          className="font-display absolute bottom-[max(28px,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold tracking-[0.4em] text-[#5a4a32] sm:hidden"
+          className="font-display absolute bottom-[max(24px,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-semibold tracking-[0.4em] text-[#5a4a32] sm:hidden"
         >
           TAP TO OPEN THE INVITATION
         </motion.p>
