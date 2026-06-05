@@ -24,20 +24,20 @@ const events = [
 
 export function Ceremonies() {
   return (
-    <section className="bg-lux-glass relative overflow-hidden py-24 md:py-32">
-      <div className="mx-auto max-w-3xl px-6 text-center">
+    <section className="bg-lux-glass relative overflow-hidden py-14 md:py-20">
+      <div className="mx-auto max-w-3xl px-5 text-center sm:px-6">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
           ORDER OF CELEBRATION
         </p>
-        <h2 className="font-display mt-4 text-3xl tracking-[0.25em] text-gold-gradient md:text-5xl">
+        <h2 className="font-display mt-3 text-2xl tracking-[0.25em] text-gold-gradient md:text-5xl">
           THE BLESSED DAY
         </h2>
-        <Ornament className="mt-6" />
+        <Ornament className="mt-5" />
 
-        <div className="relative mt-20">
+        <div className="relative mt-12 md:mt-16">
           <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-gold/50 to-transparent" />
 
-          <div className="space-y-16">
+          <div className="space-y-10 md:space-y-14">
             {events.map((e, i) => (
               <motion.div
                 key={e.n}
