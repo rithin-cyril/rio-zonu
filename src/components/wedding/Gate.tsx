@@ -34,15 +34,16 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
         aria-label="Tap to open the invitation"
         className="group absolute inset-0 h-full w-full cursor-pointer"
       >
-        {/* Mobile-first full-screen cover treatment */}
+        {/* Mobile-first full-screen portrait cover treatment */}
         <div className="absolute inset-0 sm:hidden">
           <motion.img
             src={gateBg.url}
             alt="Holy Matrimony — Sunday, 18 October 2026 — By God's Grace"
-            initial={{ opacity: 0, scale: 1.06 }}
+            initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.6, ease: "easeOut" }}
             className="absolute inset-0 h-full w-full select-none object-cover object-center"
+            style={{ transformOrigin: "center center" }}
             draggable={false}
           />
 
@@ -51,17 +52,17 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(246,236,216,0.16) 0%, rgba(246,236,216,0.08) 18%, rgba(246,236,216,0.42) 42%, rgba(246,236,216,0.3) 62%, rgba(246,236,216,0.64) 100%)",
+                "linear-gradient(180deg, rgba(246,236,216,0.38) 0%, rgba(246,236,216,0.22) 18%, rgba(246,236,216,0.44) 45%, rgba(246,236,216,0.28) 68%, rgba(246,236,216,0.58) 100%)",
+              backdropFilter: "blur(10px)",
             }}
           />
 
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-y-[5%] left-1/2 w-[92%] -translate-x-1/2"
+            className="pointer-events-none absolute inset-y-0 inset-x-[8%]"
             style={{
               background:
-                "linear-gradient(180deg, rgba(251,248,241,0.78) 0%, rgba(251,248,241,0.56) 16%, rgba(251,248,241,0.74) 38%, rgba(251,248,241,0.52) 60%, rgba(251,248,241,0.72) 100%)",
-              filter: "blur(2px)",
+                "radial-gradient(ellipse at center, rgba(251,248,241,0.52) 0%, rgba(251,248,241,0.26) 48%, rgba(251,248,241,0.06) 82%, transparent 100%)",
             }}
           />
 
@@ -101,15 +102,15 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             </p>
           </div>
 
-          {/* Mobile seal cue aligned to the visible full-screen crop */}
+          {/* Mobile seal cue */}
           <span
             aria-hidden
             className="pointer-events-none absolute rounded-full border border-[rgba(201,179,126,0.6)]"
             style={{
               left: "50%",
               top: `${mobileSealY}%`,
-              width: "clamp(88px, 24vw, 118px)",
-              height: "clamp(88px, 24vw, 118px)",
+              width: "clamp(100px, 27vw, 128px)",
+              height: "clamp(100px, 27vw, 128px)",
               transform: "translate(-50%, -50%)",
               animation: "seal-ring 2.6s ease-out infinite",
             }}
@@ -121,8 +122,8 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             style={{
               left: "50%",
               top: `${mobileSealY}%`,
-              width: "clamp(102px, 28vw, 132px)",
-              height: "clamp(102px, 28vw, 132px)",
+              width: "clamp(116px, 31vw, 146px)",
+              height: "clamp(116px, 31vw, 146px)",
               transform: "translate(-50%, -50%)",
               background:
                 "radial-gradient(circle, rgba(201,179,126,0.55) 0%, rgba(201,179,126,0.25) 45%, rgba(201,179,126,0) 75%)",
@@ -130,15 +131,37 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             }}
           />
 
+          <span
+            aria-hidden
+            className="pointer-events-none absolute flex items-center justify-center rounded-full"
+            style={{
+              left: "50%",
+              top: `${mobileSealY}%`,
+              width: "clamp(88px, 23vw, 112px)",
+              height: "clamp(88px, 23vw, 112px)",
+              transform: "translate(-50%, -50%)",
+              background:
+                "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.98), rgba(248,240,224,0.95) 58%, rgba(231,214,182,0.96) 100%)",
+              border: "1px solid rgba(201,179,126,0.6)",
+              boxShadow:
+                "0 10px 28px rgba(201,179,126,0.22), inset 0 0 0 6px rgba(255,255,255,0.58), inset 0 0 0 1px rgba(201,179,126,0.35)",
+              color: "#c9a052",
+              fontSize: "clamp(2rem, 8vw, 2.5rem)",
+              lineHeight: 1,
+            }}
+          >
+            ✝
+          </span>
+
           <div
             className="absolute inset-x-0 flex flex-col items-center px-5 text-center"
             style={{ bottom: "max(calc(env(safe-area-inset-bottom) + 2svh), 22px)" }}
           >
-            <p className="font-display text-[clamp(0.9rem,3.8vw,1rem)] tracking-[0.32em] text-[#5a4a32]">
-              TAP TO OPEN THE INVITATION
-            </p>
             <p className="font-script mt-4 text-[clamp(1.8rem,7.4vw,2.35rem)] leading-none text-[#5a4a32]">
               Save the Date · 18 October 2026
+            </p>
+            <p className="font-display mt-5 text-[clamp(0.82rem,3.5vw,0.96rem)] tracking-[0.3em] text-[#5a4a32]">
+              TAP TO OPEN THE INVITATION
             </p>
           </div>
         </div>
