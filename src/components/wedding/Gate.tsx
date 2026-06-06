@@ -4,10 +4,10 @@ import { Petals } from "./Petals";
 
 /**
  * Welcome gate. The artwork is rendered inside a container locked to its
- * native 1719x915 aspect ratio so the cross seal (at ~50%, 66.5%) stays
- * perfectly aligned with the pulsing glow regardless of viewport size.
- * The container is sized with `min` so it always covers the viewport
- * (object-cover-equivalent) without ever clipping the seal off-screen.
+ * native 1719x915 aspect ratio so the cross seal stays perfectly aligned
+ * with the pulsing glow regardless of viewport size.
+ * The container is sized with `max` so mobile gets a true full-screen cover
+ * presentation instead of a contained, square-looking frame.
  */
 export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }) {
   const SEAL_X = 50; // %
@@ -33,17 +33,17 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
         aria-label="Tap to open the invitation"
         className="group absolute inset-0 h-full w-full cursor-pointer"
       >
-        {/* Aspect-locked artwork stage: centered, always covers the viewport.
-            Using min-w/min-h with aspect ratio = CSS object-cover, but lets
-            us place absolute children at exact image coordinates. */}
+        {/* Aspect-locked artwork stage: centered, always fills the viewport.
+            Using max-w/max-h with aspect ratio = CSS object-cover, while still
+            letting us place absolute children at exact image coordinates. */}
         <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           style={{
             aspectRatio: "1719 / 915",
-            // Contain behavior: whole artwork always visible, no cropping.
-            // Whichever dimension is the binding constraint wins.
-            width: "min(100vw, calc(100svh * 1719 / 915))",
-            height: "min(100svh, calc(100vw * 915 / 1719))",
+            // Cover behavior: mobile fills the full viewport instead of
+            // appearing like a centered square card with letterboxing.
+            width: "max(100vw, calc(100svh * 1719 / 915))",
+            height: "max(100svh, calc(100vw * 915 / 1719))",
             containerType: "size",
           }}
         >
