@@ -27,7 +27,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
 
       <motion.button
         onClick={onOpen}
-        initial={{ opacity: 0 }}
+        initial={false}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
         whileTap={{ scale: 0.98 }}
@@ -39,7 +39,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
           <motion.img
             src={gateBg.url}
             alt="Holy Matrimony — Sunday, 18 October 2026 — By God's Grace"
-            initial={{ opacity: 0, scale: 1.1 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.6, ease: "easeOut" }}
             className="absolute inset-0 h-full w-full select-none object-cover object-center"
@@ -179,7 +179,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
           <motion.img
             src={gateBg.url}
             alt="Holy Matrimony — Sunday, 18 October 2026 — By God's Grace"
-            initial={{ opacity: 0, scale: 1.04 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.6, ease: "easeOut" }}
             className="absolute inset-0 h-full w-full select-none"
