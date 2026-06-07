@@ -9,7 +9,7 @@ const events = [
     time: "9:00 AM",
     venue: "CSI Kanthi Church",
     address: "Anandapura, South Coorg, Karnataka",
-    map: "https://www.google.com/maps/search/CSI+Kanthi+Church+Anandapura+Coorg",
+    map: "https://maps.app.goo.gl/TWTM3PtCATfNpP7PA",
   },
   {
     n: "02",
@@ -18,7 +18,7 @@ const events = [
     time: "12:00 Noon onwards",
     venue: "Church Hall",
     address: "Siddapura, South Coorg, Karnataka",
-    map: "https://www.google.com/maps/search/CSI+Church+Hall+Siddapura+Coorg",
+    map: "https://maps.app.goo.gl/MQvLuRsfRmm8VZ8y8",
   },
 ];
 
