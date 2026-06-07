@@ -2,6 +2,8 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Ornament } from "./Ornament";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getBlessings } from "@/lib/blessings.functions";
 
 const verses = [
   {
@@ -15,6 +17,33 @@ export function Blessings() {
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [passcode, setPasscode] = useState("");
+  const [loadingList, setLoadingList] = useState(false);
+  const [listError, setListError] = useState<string | null>(null);
+  const [blessings, setBlessings] = useState<Array<{ id: string; name: string; note: string; created_at: string }> | null>(null);
+  const fetchBlessings = useServerFn(getBlessings);
+
+  const handleUnlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoadingList(true);
+    setListError(null);
+    try {
+      const res = await fetchBlessings({ data: { passcode } });
+      setBlessings(res.blessings);
+    } catch (err) {
+      setListError("Incorrect passcode. Please try again.");
+    } finally {
+      setLoadingList(false);
+    }
+  };
+
+  const closeView = () => {
+    setViewOpen(false);
+    setPasscode("");
+    setBlessings(null);
+    setListError(null);
+  };
 
   return (
     <section className="bg-lux-warm relative overflow-hidden py-14 md:py-20">
@@ -108,7 +137,88 @@ export function Blessings() {
             </>
           )}
         </form>
+
+        <button
+          type="button"
+          onClick={() => setViewOpen(true)}
+          className="mt-6 inline-block rounded border border-gold/60 px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
+        >
+          VIEW BLESSINGS
+        </button>
       </div>
+
+      {viewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm">
+          <div className="relative max-h-[85vh] w-full max-w-lg overflow-hidden rounded-md border border-gold/60 bg-[oklch(0.97_0.012_90)] shadow-gold">
+            <button
+              type="button"
+              onClick={closeView}
+              aria-label="Close"
+              className="absolute right-3 top-3 z-10 rounded-full border border-gold/50 bg-white/90 px-2 py-0.5 font-display text-xs text-gold-gradient hover:bg-gold/10"
+            >
+              ✕
+            </button>
+            <div className="max-h-[85vh] overflow-y-auto p-6 md:p-8">
+              <p className="text-center font-display text-[10px] tracking-[0.45em] text-gold-gradient">
+                ✦  BLESSINGS RECEIVED  ✦
+              </p>
+              <h3 className="mt-2 text-center font-script text-2xl italic text-gold-gradient md:text-3xl">
+                Prayers for the Couple
+              </h3>
+              <Ornament className="mt-4" />
+
+              {blessings === null ? (
+                <form onSubmit={handleUnlock} className="mt-6">
+                  <label className="block text-center font-display text-[11px] tracking-[0.35em] ink-soft">
+                    ENTER PASSCODE
+                  </label>
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    autoFocus
+                    value={passcode}
+                    onChange={(e) => setPasscode(e.target.value)}
+                    maxLength={20}
+                    className="mx-auto mt-3 block w-40 border-b border-gold/60 bg-transparent py-2 text-center font-display text-lg tracking-[0.5em] ink outline-none focus:border-gold"
+                  />
+                  {listError && (
+                    <p className="mt-3 text-center font-script italic text-sm text-[oklch(0.45_0.15_25)]">
+                      {listError}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={loadingList || !passcode}
+                    className="mx-auto mt-6 block rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+                  >
+                    {loadingList ? "UNLOCKING…" : "UNLOCK"}
+                  </button>
+                </form>
+              ) : (
+                <div className="mt-6 space-y-4">
+                  {blessings.length === 0 ? (
+                    <p className="text-center font-script italic ink-soft">No blessings yet.</p>
+                  ) : (
+                    blessings.map((b) => (
+                      <div
+                        key={b.id}
+                        className="rounded-md border border-gold/40 bg-white/90 p-4 text-left shadow-gold backdrop-blur"
+                      >
+                        <p className="font-display text-[10px] font-semibold tracking-[0.35em] text-gold-gradient">
+                          — {b.name.toUpperCase()}
+                        </p>
+                        <p className="mt-2 font-script text-base italic leading-relaxed ink">
+                          “{b.note}”
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
