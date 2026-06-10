@@ -15,11 +15,12 @@ import floralBg from "@/assets/floral-bg.jpg";
 
 export function WeddingInvitation() {
   const [opened, setOpened] = useState(false);
+
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-[oklch(0.97_0.012_90)] text-[oklch(0.28_0.03_60)]">
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 opacity-[0.18] mix-blend-multiply"
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.16] mix-blend-multiply"
         style={{
           backgroundImage: `url(${floralBg})`,
           backgroundRepeat: "repeat",
@@ -27,18 +28,22 @@ export function WeddingInvitation() {
         }}
       />
       <div className="relative z-10">
-      <Gate opened={opened} onOpen={() => setOpened(true)} />
-      {opened && <Petals />}
-      {opened && <MusicPlayer />}
-      {opened && <BackToTop />}
-      <Hero />
-      <Welcome />
-      <Journey />
-      <Countdown />
-      <Families />
-      <Ceremonies />
-      <Blessings />
-      <Closing />
+        <Gate opened={opened} onOpen={() => setOpened(true)} />
+        {opened && (
+          <>
+            <Petals />
+            <MusicPlayer />
+            <BackToTop />
+            <Hero />
+            <Welcome />
+            <Journey />
+            <Countdown />
+            <Families />
+            <Ceremonies />
+            <Blessings />
+            <Closing />
+          </>
+        )}
       </div>
     </main>
   );
