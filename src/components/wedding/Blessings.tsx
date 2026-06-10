@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Ornament } from "./Ornament";
+import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { getBlessings, submitBlessing } from "@/lib/blessings.functions";
+import { getBlessings } from "@/lib/blessings.functions";
 
 const verses = [
   {
@@ -22,7 +23,6 @@ export function Blessings() {
   const [listError, setListError] = useState<string | null>(null);
   const [blessings, setBlessings] = useState<Array<{ id: string; name: string; note: string; created_at: string }> | null>(null);
   const fetchBlessings = useServerFn(getBlessings);
-  const sendBlessing = useServerFn(submitBlessing);
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,15 +88,15 @@ export function Blessings() {
             if (!name || !note) return;
             setSubmitting(true);
             setError(null);
-            try {
-              await sendBlessing({ data: { name, note } });
-              setSent(true);
-              setForm({ name: "", note: "" });
-            } catch (err) {
+            const { error: insertError } = await supabase
+              .from("blessings")
+              .insert({ name, note });
+            setSubmitting(false);
+            if (insertError) {
               setError("Sorry, something went wrong. Please try again.");
-            } finally {
-              setSubmitting(false);
+              return;
             }
+            setSent(true);
           }}
           className="mt-8 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
         >
