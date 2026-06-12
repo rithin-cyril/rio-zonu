@@ -10,6 +10,9 @@ export function Hero() {
         alt=""
         width={1920}
         height={1080}
+        fetchPriority="high"
+        decoding="async"
+        sizes="100vw"
         className="absolute inset-0 h-full w-full object-cover opacity-40"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-[#FBF8F1]/80 via-[#FBF8F1]/85 to-[#F2EADA]" />
