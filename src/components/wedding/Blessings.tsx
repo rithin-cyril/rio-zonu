@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 import { Ornament } from "./Ornament";
 import { useServerFn } from "@tanstack/react-start";
-import { getApprovedBlessings, getBlessings, moderateBlessing, submitBlessing } from "@/lib/blessings.functions";
+import { getBlessings, moderateBlessing, submitBlessing } from "@/lib/blessings.functions";
 
 const verses = [
   {
@@ -24,16 +24,8 @@ export function Blessings() {
   const [blessings, setBlessings] = useState<Array<{ id: string; name: string; note: string; created_at: string; approved: boolean; rejected: boolean }> | null>(null);
   const fetchBlessings = useServerFn(getBlessings);
   const sendBlessing = useServerFn(submitBlessing);
-  const fetchApproved = useServerFn(getApprovedBlessings);
   const moderate = useServerFn(moderateBlessing);
   const [pendingId, setPendingId] = useState<string | null>(null);
-  const [approved, setApproved] = useState<Array<{ id: string; name: string; note: string; approved_at: string | null }>>([]);
-
-  useEffect(() => {
-    fetchApproved()
-      .then((r) => setApproved(r.blessings))
-      .catch(() => {});
-  }, [fetchApproved]);
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,12 +39,6 @@ export function Blessings() {
     } finally {
       setLoadingList(false);
     }
-  };
-
-  const refreshApproved = () => {
-    fetchApproved()
-      .then((r) => setApproved(r.blessings))
-      .catch(() => {});
   };
 
   const handleModerate = async (id: string, action: "approve" | "hide") => {
@@ -72,7 +58,6 @@ export function Blessings() {
             )
           : prev,
       );
-      refreshApproved();
       toast.success(action === "approve" ? "Blessing approved" : "Blessing hidden");
     } catch {
       toast.error("Action failed. Please try again.");
@@ -122,24 +107,6 @@ export function Blessings() {
             </motion.div>
           ))}
         </div>
-
-        {approved.length > 0 && (
-          <div className="mt-8 space-y-4 text-left">
-            {approved.map((b) => (
-              <div
-                key={b.id}
-                className="rounded-md border border-gold/40 bg-white/90 p-4 shadow-gold backdrop-blur"
-              >
-                <p className="font-display text-[10px] font-semibold tracking-[0.35em] text-gold-gradient">
-                  — {b.name.toUpperCase()}
-                </p>
-                <p className="mt-2 font-script text-base italic leading-relaxed ink">
-                  “{b.note}”
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
 
         <form
           onSubmit={async (e) => {
