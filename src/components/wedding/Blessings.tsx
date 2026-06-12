@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Ornament } from "./Ornament";
-import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { getBlessings } from "@/lib/blessings.functions";
+import { getApprovedBlessings, getBlessings, submitBlessing } from "@/lib/blessings.functions";
 
 const verses = [
   {
@@ -23,6 +22,15 @@ export function Blessings() {
   const [listError, setListError] = useState<string | null>(null);
   const [blessings, setBlessings] = useState<Array<{ id: string; name: string; note: string; created_at: string }> | null>(null);
   const fetchBlessings = useServerFn(getBlessings);
+  const sendBlessing = useServerFn(submitBlessing);
+  const fetchApproved = useServerFn(getApprovedBlessings);
+  const [approved, setApproved] = useState<Array<{ id: string; name: string; note: string; approved_at: string | null }>>([]);
+
+  useEffect(() => {
+    fetchApproved()
+      .then((r) => setApproved(r.blessings))
+      .catch(() => {});
+  }, [fetchApproved]);
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,14 +96,14 @@ export function Blessings() {
             if (!name || !note) return;
             setSubmitting(true);
             setError(null);
-            const { error: insertError } = await supabase
-              .from("blessings")
-              .insert({ name, note });
-            setSubmitting(false);
-            if (insertError) {
+            try {
+              await sendBlessing({ data: { name, note } });
+            } catch {
+              setSubmitting(false);
               setError("Sorry, something went wrong. Please try again.");
               return;
             }
+            setSubmitting(false);
             setSent(true);
           }}
           className="mt-8 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
@@ -105,7 +113,7 @@ export function Blessings() {
           </p>
           {sent ? (
             <p className="mt-4 font-script text-lg italic ink">
-              Your blessing has been recorded. Thank you for praying with us ✦
+              Thank you for your blessing. It has been received and will appear after approval.
             </p>
           ) : (
             <>
