@@ -7,6 +7,7 @@ import { Countdown } from "./Countdown";
 import { Families } from "./Families";
 import { Ceremonies } from "./Ceremonies";
 import { Blessings } from "./Blessings";
+import { BlessingsWall } from "./BlessingsWall";
 import { Closing } from "./Closing";
 import { Petals } from "./Petals";
 import { MusicPlayer } from "./MusicPlayer";
@@ -38,6 +39,7 @@ export function WeddingInvitation() {
       <Families />
       <Ceremonies />
       <Blessings />
+      <BlessingsWall />
       <Closing />
       </div>
     </main>
