@@ -88,6 +88,24 @@ export function Blessings() {
           ))}
         </div>
 
+        {approved.length > 0 && (
+          <div className="mt-8 space-y-4 text-left">
+            {approved.map((b) => (
+              <div
+                key={b.id}
+                className="rounded-md border border-gold/40 bg-white/90 p-4 shadow-gold backdrop-blur"
+              >
+                <p className="font-display text-[10px] font-semibold tracking-[0.35em] text-gold-gradient">
+                  — {b.name.toUpperCase()}
+                </p>
+                <p className="mt-2 font-script text-base italic leading-relaxed ink">
+                  “{b.note}”
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
         <form
           onSubmit={async (e) => {
             e.preventDefault();
