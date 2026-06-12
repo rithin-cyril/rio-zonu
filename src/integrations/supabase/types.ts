@@ -16,28 +16,40 @@ export type Database = {
     Tables: {
       blessings: {
         Row: {
+          approved: boolean
+          approved_at: string | null
           created_at: string
           email_sent: boolean
           id: string
+          moderation_token: string
           name: string
           note: string
           recipient_email: string
+          rejected: boolean
         }
         Insert: {
+          approved?: boolean
+          approved_at?: string | null
           created_at?: string
           email_sent?: boolean
           id?: string
+          moderation_token: string
           name: string
           note: string
           recipient_email?: string
+          rejected?: boolean
         }
         Update: {
+          approved?: boolean
+          approved_at?: string | null
           created_at?: string
           email_sent?: boolean
           id?: string
+          moderation_token?: string
           name?: string
           note?: string
           recipient_email?: string
+          rejected?: boolean
         }
         Relationships: []
       }
