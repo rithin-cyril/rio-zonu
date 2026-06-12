@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicBlessingsIdRejectRouteImport } from './routes/api/public/blessings/$id/reject'
 import { Route as ApiPublicBlessingsIdApproveRouteImport } from './routes/api/public/blessings/$id/approve'
 
 const IndexRoute = IndexRouteImport.update({
@@ -17,6 +18,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBlessingsIdRejectRoute =
+  ApiPublicBlessingsIdRejectRouteImport.update({
+    id: '/api/public/blessings/$id/reject',
+    path: '/api/public/blessings/$id/reject',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicBlessingsIdApproveRoute =
   ApiPublicBlessingsIdApproveRouteImport.update({
     id: '/api/public/blessings/$id/approve',
@@ -27,27 +34,41 @@ const ApiPublicBlessingsIdApproveRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
+  '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
+  '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
+  '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/blessings/$id/approve'
+  fullPaths:
+    | '/'
+    | '/api/public/blessings/$id/approve'
+    | '/api/public/blessings/$id/reject'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/blessings/$id/approve'
-  id: '__root__' | '/' | '/api/public/blessings/$id/approve'
+  to:
+    | '/'
+    | '/api/public/blessings/$id/approve'
+    | '/api/public/blessings/$id/reject'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/public/blessings/$id/approve'
+    | '/api/public/blessings/$id/reject'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiPublicBlessingsIdApproveRoute: typeof ApiPublicBlessingsIdApproveRoute
+  ApiPublicBlessingsIdRejectRoute: typeof ApiPublicBlessingsIdRejectRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -57,6 +78,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/blessings/$id/reject': {
+      id: '/api/public/blessings/$id/reject'
+      path: '/api/public/blessings/$id/reject'
+      fullPath: '/api/public/blessings/$id/reject'
+      preLoaderRoute: typeof ApiPublicBlessingsIdRejectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/blessings/$id/approve': {
@@ -72,6 +100,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiPublicBlessingsIdApproveRoute: ApiPublicBlessingsIdApproveRoute,
+  ApiPublicBlessingsIdRejectRoute: ApiPublicBlessingsIdRejectRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
