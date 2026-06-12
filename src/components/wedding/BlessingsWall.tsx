@@ -109,7 +109,7 @@ export function BlessingsWall() {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: (i % 3) * 0.05 }}
                   whileHover={{ y: -3 }}
-                  className="group relative flex h-full flex-col rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur transition-shadow duration-300 hover:shadow-[0_10px_30px_-12px_oklch(0.72_0.12_75_/_0.55)]"
+                  className="group relative flex h-full min-w-0 flex-col rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur transition-shadow duration-300 hover:shadow-[0_10px_30px_-12px_oklch(0.72_0.12_75_/_0.55)]"
                 >
                   <span
                     className="font-script text-2xl text-gold-gradient"
@@ -117,7 +117,7 @@ export function BlessingsWall() {
                   >
                     ✝
                   </span>
-                  <p className="mt-2 whitespace-pre-wrap break-words font-script text-base italic leading-relaxed ink md:text-lg">
+                  <p className="mt-2 whitespace-pre-wrap break-words hyphens-auto font-script text-base italic leading-relaxed ink md:text-lg [overflow-wrap:anywhere]">
                     “{b.note}”
                   </p>
                   <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-gold/30 pt-3">
@@ -142,7 +142,7 @@ export function BlessingsWall() {
                 <button
                   type="button"
                   onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                  className="inline-block rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
+                  className="inline-flex min-h-11 items-center rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
                 >
                   LOAD MORE
                 </button>

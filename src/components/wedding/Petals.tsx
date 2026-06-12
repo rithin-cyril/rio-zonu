@@ -25,7 +25,8 @@ export function Petals({ count = 24 }: { count?: number }) {
             animationDuration: `${p.duration}s`,
             width: p.size,
             height: p.size,
-            transform: `rotate(${p.rot}deg)`,
+            transform: `rotate(${p.rot}deg) translateZ(0)`,
+            willChange: "transform, opacity",
           }}
         >
           {p.kind === "rose" ? (

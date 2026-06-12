@@ -26,6 +26,10 @@ export function BackToTop() {
           whileTap={{ scale: 0.92 }}
           transition={{ duration: 0.35 }}
           className="fixed bottom-5 right-4 z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-gold bg-white/85 shadow-gold backdrop-blur md:bottom-6 md:right-6 md:h-12 md:w-12"
+          style={{
+            bottom: "max(1.25rem, env(safe-area-inset-bottom))",
+            right: "max(1rem, env(safe-area-inset-right))",
+          }}
         >
           <ChevronUp className="h-5 w-5 text-[oklch(0.42_0.1_70)]" strokeWidth={1.8} />
         </motion.button>

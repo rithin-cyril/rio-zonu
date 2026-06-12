@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 import { Ornament } from "./Ornament";
@@ -26,6 +26,25 @@ export function Blessings() {
   const sendBlessing = useServerFn(submitBlessing);
   const moderate = useServerFn(moderateBlessing);
   const [pendingId, setPendingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!viewOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [viewOpen]);
+
+  useEffect(() => {
+    if (!viewOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeView();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewOpen]);
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,25 +145,34 @@ export function Blessings() {
             setSubmitting(false);
             setSent(true);
           }}
-          className="mt-8 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
+          className="mt-8 min-h-[320px] scroll-mt-24 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
         >
           <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient">
             LEAVE A BLESSING FOR THE COUPLE
           </p>
           {sent ? (
-            <p className="mt-4 font-script text-lg italic ink">
+            <p role="status" aria-live="polite" className="mt-4 font-script text-lg italic ink">
               Your wishes have been received with joy and gratitude. Thank you for being part of our story.
             </p>
           ) : (
             <>
+              <label htmlFor="blessing-name" className="sr-only">Your name</label>
               <input
+                id="blessing-name"
+                name="name"
+                autoComplete="name"
+                enterKeyHint="next"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Your Name"
                 maxLength={80}
-                className="mt-4 w-full border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
+                className="mt-4 w-full min-h-11 border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
               />
+              <label htmlFor="blessing-note" className="sr-only">Your blessing</label>
               <textarea
+                id="blessing-note"
+                name="note"
+                enterKeyHint="send"
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
                 placeholder="Share your blessing, prayer, or wishes for Rithin & Harshita..."
@@ -158,7 +186,7 @@ export function Blessings() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="mt-6 inline-block rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+                className="mt-6 inline-flex min-h-11 items-center rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
               >
                 {submitting ? "SENDING…" : "SEND BLESSING"}
               </button>
@@ -169,45 +197,61 @@ export function Blessings() {
         <button
           type="button"
           onClick={() => setViewOpen(true)}
-          className="mt-6 inline-block rounded border border-gold/60 px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
+          className="mt-6 inline-flex min-h-11 items-center rounded border border-gold/60 px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
         >
           VIEW BLESSINGS
         </button>
       </div>
 
       {viewOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm">
-          <div className="relative max-h-[85vh] w-full max-w-lg overflow-hidden rounded-md border border-gold/60 bg-[oklch(0.97_0.012_90)] shadow-gold">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm"
+          onClick={closeView}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="blessings-modal-title"
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[85dvh] w-full max-w-lg overflow-hidden rounded-md border border-gold/60 bg-[oklch(0.97_0.012_90)] shadow-gold"
+          >
             <button
               type="button"
               onClick={closeView}
               aria-label="Close"
-              className="absolute right-3 top-3 z-10 rounded-full border border-gold/50 bg-white/90 px-2 py-0.5 font-display text-xs text-gold-gradient hover:bg-gold/10"
+              className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-full border border-gold/50 bg-white/90 font-display text-base text-gold-gradient hover:bg-gold/10"
             >
               ✕
             </button>
-            <div className="max-h-[85vh] overflow-y-auto p-6 md:p-8">
+            <div className="max-h-[85dvh] overflow-y-auto overscroll-contain p-6 md:p-8">
               <p className="text-center font-display text-[10px] tracking-[0.45em] text-gold-gradient">
                 ✦  BLESSINGS RECEIVED  ✦
               </p>
-              <h3 className="mt-2 text-center font-script text-2xl italic text-gold-gradient md:text-3xl">
+              <h3
+                id="blessings-modal-title"
+                className="mt-2 text-center font-script text-2xl italic text-gold-gradient md:text-3xl"
+              >
                 Prayers for the Couple
               </h3>
               <Ornament className="mt-4" />
 
               {blessings === null ? (
                 <form onSubmit={handleUnlock} className="mt-6">
-                  <label className="block text-center font-display text-[11px] tracking-[0.35em] ink-soft">
+                  <label htmlFor="blessings-passcode" className="block text-center font-display text-[11px] tracking-[0.35em] ink-soft">
                     ENTER PASSCODE
                   </label>
                   <input
+                    id="blessings-passcode"
+                    name="passcode"
                     type="password"
                     inputMode="numeric"
+                    autoComplete="off"
+                    enterKeyHint="go"
                     autoFocus
                     value={passcode}
                     onChange={(e) => setPasscode(e.target.value)}
                     maxLength={20}
-                    className="mx-auto mt-3 block w-40 border-b border-gold/60 bg-transparent py-2 text-center font-display text-lg tracking-[0.5em] ink outline-none focus:border-gold"
+                    className="mx-auto mt-3 block w-40 min-h-11 border-b border-gold/60 bg-transparent py-2 text-center font-display text-lg tracking-[0.5em] ink outline-none focus:border-gold"
                   />
                   {listError && (
                     <p className="mt-3 text-center font-script italic text-sm text-[oklch(0.45_0.15_25)]">
@@ -217,7 +261,7 @@ export function Blessings() {
                   <button
                     type="submit"
                     disabled={loadingList || !passcode}
-                    className="mx-auto mt-6 block rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+                    className="mx-auto mt-6 inline-flex min-h-11 items-center rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
                   >
                     {loadingList ? "UNLOCKING…" : "UNLOCK"}
                   </button>
@@ -238,17 +282,17 @@ export function Blessings() {
                         <p className="mt-2 font-script text-base italic leading-relaxed ink">
                           “{b.note}”
                         </p>
-                        <div className="mt-3 flex items-center justify-between gap-3 border-t border-gold/30 pt-3">
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-gold/30 pt-3">
                           <span className="font-display text-[9px] tracking-[0.3em] ink-soft">
                             {b.approved ? "VISIBLE" : b.rejected ? "HIDDEN" : "PENDING"}
                           </span>
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <button
                               type="button"
                               onClick={() => handleModerate(b.id, "approve")}
                               disabled={pendingId === b.id || b.approved}
                               aria-label="Approve blessing"
-                              className="rounded border border-gold px-3 py-1 font-display text-[10px] font-semibold tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+                              className="inline-flex min-h-11 items-center rounded border border-gold px-4 py-2 font-display text-[10px] font-semibold tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
                             >
                               ➕ APPROVE
                             </button>
@@ -257,7 +301,7 @@ export function Blessings() {
                               onClick={() => handleModerate(b.id, "hide")}
                               disabled={pendingId === b.id || b.rejected}
                               aria-label="Hide blessing"
-                              className="rounded border border-gold/60 px-3 py-1 font-display text-[10px] font-semibold tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+                              className="inline-flex min-h-11 items-center rounded border border-gold/60 px-4 py-2 font-display text-[10px] font-semibold tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
                             >
                               ➖ HIDE
                             </button>
