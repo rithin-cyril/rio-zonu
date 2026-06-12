@@ -87,21 +87,9 @@ export function BlessingsWall() {
         ) : items.length === 0 ? (
           <div className="mt-12 flex justify-center">
             <div className="relative w-full max-w-xl rounded-lg border border-gold/40 bg-[#FBF8F1]/95 px-10 py-12 text-center shadow-[0_8px_30px_-12px_rgba(122,111,99,0.25)]">
-              <span
-                className="font-script absolute left-4 top-2 text-5xl leading-none text-gold-gradient/60"
-                aria-hidden
-              >
-                “
-              </span>
               <p className="font-script text-xl italic ink md:text-2xl">
                 Be the first to leave a blessing for the couple.
               </p>
-              <span
-                className="font-script absolute bottom-0 right-4 text-5xl leading-none text-gold-gradient/60"
-                aria-hidden
-              >
-                ”
-              </span>
             </div>
           </div>
         ) : (
@@ -120,13 +108,7 @@ export function BlessingsWall() {
                   whileHover={{ y: -2 }}
                   className="group relative flex h-full min-w-0 flex-col rounded-lg border border-gold/40 bg-[#FBF8F1]/95 p-7 text-left shadow-[0_6px_24px_-14px_rgba(122,111,99,0.35)] transition-shadow duration-300 hover:shadow-[0_14px_36px_-14px_rgba(184,154,90,0.45)] md:p-8"
                 >
-                  <span
-                    className="font-script pointer-events-none absolute left-4 top-1 text-5xl leading-none text-gold-gradient/40 select-none"
-                    aria-hidden
-                  >
-                    “
-                  </span>
-                  <p className="relative mt-3 whitespace-pre-wrap break-words hyphens-auto font-script text-lg italic leading-relaxed ink md:text-xl [overflow-wrap:anywhere]">
+                  <p className="relative whitespace-pre-wrap break-words hyphens-auto font-script text-lg italic leading-relaxed ink md:text-xl [overflow-wrap:anywhere]">
                     {b.note}
                   </p>
                   <div className="mt-auto pt-5">
