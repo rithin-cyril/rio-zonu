@@ -145,25 +145,34 @@ export function Blessings() {
             setSubmitting(false);
             setSent(true);
           }}
-          className="mt-8 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
+          className="mt-8 min-h-[320px] scroll-mt-24 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
         >
           <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient">
             LEAVE A BLESSING FOR THE COUPLE
           </p>
           {sent ? (
-            <p className="mt-4 font-script text-lg italic ink">
+            <p role="status" aria-live="polite" className="mt-4 font-script text-lg italic ink">
               Your wishes have been received with joy and gratitude. Thank you for being part of our story.
             </p>
           ) : (
             <>
+              <label htmlFor="blessing-name" className="sr-only">Your name</label>
               <input
+                id="blessing-name"
+                name="name"
+                autoComplete="name"
+                enterKeyHint="next"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Your Name"
                 maxLength={80}
-                className="mt-4 w-full border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
+                className="mt-4 w-full min-h-11 border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
               />
+              <label htmlFor="blessing-note" className="sr-only">Your blessing</label>
               <textarea
+                id="blessing-note"
+                name="note"
+                enterKeyHint="send"
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
                 placeholder="Share your blessing, prayer, or wishes for Rithin & Harshita..."
@@ -177,7 +186,7 @@ export function Blessings() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="mt-6 inline-block rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+                className="mt-6 inline-flex min-h-11 items-center rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
               >
                 {submitting ? "SENDING…" : "SEND BLESSING"}
               </button>
@@ -188,7 +197,7 @@ export function Blessings() {
         <button
           type="button"
           onClick={() => setViewOpen(true)}
-          className="mt-6 inline-block rounded border border-gold/60 px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
+          className="mt-6 inline-flex min-h-11 items-center rounded border border-gold/60 px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
         >
           VIEW BLESSINGS
         </button>
