@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { motion } from "motion/react";
 import { Ornament } from "./Ornament";
 import { useServerFn } from "@tanstack/react-start";
-import { getApprovedBlessings, getBlessings, submitBlessing } from "@/lib/blessings.functions";
+import { getApprovedBlessings, getBlessings, moderateBlessing, submitBlessing } from "@/lib/blessings.functions";
 
 const verses = [
   {
@@ -20,10 +21,12 @@ export function Blessings() {
   const [passcode, setPasscode] = useState("");
   const [loadingList, setLoadingList] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
-  const [blessings, setBlessings] = useState<Array<{ id: string; name: string; note: string; created_at: string }> | null>(null);
+  const [blessings, setBlessings] = useState<Array<{ id: string; name: string; note: string; created_at: string; approved: boolean; rejected: boolean }> | null>(null);
   const fetchBlessings = useServerFn(getBlessings);
   const sendBlessing = useServerFn(submitBlessing);
   const fetchApproved = useServerFn(getApprovedBlessings);
+  const moderate = useServerFn(moderateBlessing);
+  const [pendingId, setPendingId] = useState<string | null>(null);
   const [approved, setApproved] = useState<Array<{ id: string; name: string; note: string; approved_at: string | null }>>([]);
 
   useEffect(() => {
@@ -43,6 +46,38 @@ export function Blessings() {
       setListError("Incorrect passcode. Please try again.");
     } finally {
       setLoadingList(false);
+    }
+  };
+
+  const refreshApproved = () => {
+    fetchApproved()
+      .then((r) => setApproved(r.blessings))
+      .catch(() => {});
+  };
+
+  const handleModerate = async (id: string, action: "approve" | "hide") => {
+    setPendingId(id);
+    try {
+      await moderate({ data: { passcode, id, action } });
+      setBlessings((prev) =>
+        prev
+          ? prev.map((b) =>
+              b.id === id
+                ? {
+                    ...b,
+                    approved: action === "approve",
+                    rejected: action === "hide",
+                  }
+                : b,
+            )
+          : prev,
+      );
+      refreshApproved();
+      toast.success(action === "approve" ? "Blessing approved" : "Blessing hidden");
+    } catch {
+      toast.error("Action failed. Please try again.");
+    } finally {
+      setPendingId(null);
     }
   };
 
