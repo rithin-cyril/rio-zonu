@@ -53,7 +53,7 @@ export function BlessingsWall() {
   return (
     <section
       aria-labelledby="blessings-wall-heading"
-      className="bg-lux-warm relative overflow-hidden py-14 md:py-20"
+      className="bg-lux-warm relative overflow-hidden py-10 md:py-14"
     >
       <div className="mx-auto max-w-5xl px-5 sm:px-6">
         <div className="text-center">
@@ -62,31 +62,31 @@ export function BlessingsWall() {
           </p>
           <h2
             id="blessings-wall-heading"
-            className="font-script mt-3 text-3xl italic text-gold-gradient md:text-5xl"
+            className="font-script mt-2 text-3xl italic text-gold-gradient md:text-5xl"
           >
             Blessings from Friends &amp; Family
           </h2>
-          <p className="mx-auto mt-3 max-w-xl font-script text-base italic ink-soft md:text-lg">
+          <p className="mx-auto mt-2 max-w-xl font-script text-base italic ink-soft md:text-lg">
             Your love, prayers, and heartfelt wishes mean the world to us.
           </p>
-          <Ornament className="mt-5" />
+          <Ornament className="mt-3" />
         </div>
 
         {loading ? (
           <div
-            className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2"
+            className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-8"
             aria-busy="true"
           >
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="h-44 animate-pulse rounded-lg border border-gold/20 bg-white/70"
+                className="h-28 animate-pulse rounded-lg border border-gold/20 bg-white/70"
               />
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="mt-12 flex justify-center">
-            <div className="relative w-full max-w-xl rounded-lg border border-gold/40 bg-[#FBF8F1]/95 px-10 py-12 text-center shadow-[0_8px_30px_-12px_rgba(122,111,99,0.25)]">
+          <div className="mt-7 flex justify-center md:mt-8">
+            <div className="relative w-full max-w-xl rounded-lg border border-gold/40 bg-[#FBF8F1]/95 px-8 py-8 text-center shadow-[0_8px_30px_-12px_rgba(122,111,99,0.25)]">
               <p className="font-script text-xl italic ink md:text-2xl">
                 Be the first to leave a blessing for the couple.
               </p>
@@ -96,7 +96,7 @@ export function BlessingsWall() {
           <>
             <ul
               role="list"
-              className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-7"
+              className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-8 md:gap-5"
             >
               {shown.map((b, i) => (
                 <motion.li
@@ -106,20 +106,20 @@ export function BlessingsWall() {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: (i % 2) * 0.05 }}
                   whileHover={{ y: -2 }}
-                  className="group relative flex h-full min-w-0 flex-col rounded-lg border border-gold/40 bg-[#FBF8F1]/95 p-7 text-left shadow-[0_6px_24px_-14px_rgba(122,111,99,0.35)] transition-shadow duration-300 hover:shadow-[0_14px_36px_-14px_rgba(184,154,90,0.45)] md:p-8"
+                  className="group relative flex h-full min-w-0 flex-col rounded-lg border border-gold/40 bg-[#FBF8F1]/95 p-5 text-left shadow-[0_6px_24px_-14px_rgba(122,111,99,0.35)] transition-shadow duration-300 hover:shadow-[0_14px_36px_-14px_rgba(184,154,90,0.45)] md:p-6"
                 >
                   <p className="relative whitespace-pre-wrap break-words hyphens-auto font-script text-lg italic leading-relaxed ink md:text-xl [overflow-wrap:anywhere]">
                     {b.note}
                   </p>
-                  <div className="mt-auto pt-5">
-                    <div className="mb-3 h-px w-12 bg-[oklch(0.72_0.11_80)]/60" />
+                  <div className="mt-3 pt-3">
+                    <div className="mb-2 h-px w-10 bg-[oklch(0.72_0.11_80)]/60" />
                     <p className="font-display text-[11px] font-semibold tracking-[0.38em] text-gold-gradient">
                       — {b.name.toUpperCase()}
                     </p>
                     {b.approved_at && (
                       <time
                         dateTime={b.approved_at}
-                        className="mt-1 block font-script text-xs italic ink-soft md:text-sm"
+                        className="mt-0.5 block font-script text-xs italic ink-soft"
                       >
                         {formatDate(b.approved_at)}
                       </time>
@@ -130,7 +130,7 @@ export function BlessingsWall() {
             </ul>
 
             {hasMore && (
-              <div className="mt-8 text-center">
+              <div className="mt-6 text-center">
                 <button
                   type="button"
                   onClick={() => setVisible((v) => v + PAGE_SIZE)}
