@@ -50,7 +50,7 @@ export function Ceremonies() {
                 <span className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gold bg-white shadow-gold" />
 
                 <div
-                  className={`mx-auto max-w-md rounded border border-gold/40 bg-white/80 p-6 text-left backdrop-blur md:max-w-sm ${
+                  className={`mx-auto max-w-md rounded border border-gold/40 bg-white/80 p-5 sm:p-6 text-left backdrop-blur md:max-w-sm ${
                     i % 2 === 0 ? "md:mr-auto md:ml-0" : "md:ml-auto md:mr-0"
                   }`}
                 >
@@ -77,7 +77,7 @@ export function Ceremonies() {
                     href={e.map}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-4 inline-block rounded border border-gold/60 px-4 py-1.5 font-display text-[10px] tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10"
+                    className="mt-4 inline-flex min-h-11 items-center rounded border border-gold/60 px-5 py-3 font-display text-[10px] tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10 md:min-h-0 md:px-4 md:py-1.5"
                   >
                     OPEN IN MAPS
                   </a>
