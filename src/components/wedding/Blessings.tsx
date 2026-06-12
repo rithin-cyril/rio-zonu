@@ -166,7 +166,7 @@ export function Blessings() {
           </p>
           {sent ? (
             <p className="mt-4 font-script text-lg italic ink">
-              Thank you for your blessing. It has been received and will appear after approval.
+              Your wishes have been received with joy and gratitude. Thank you for being part of our story.
             </p>
           ) : (
             <>
