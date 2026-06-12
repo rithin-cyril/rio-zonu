@@ -271,6 +271,31 @@ export function Blessings() {
                         <p className="mt-2 font-script text-base italic leading-relaxed ink">
                           “{b.note}”
                         </p>
+                        <div className="mt-3 flex items-center justify-between gap-3 border-t border-gold/30 pt-3">
+                          <span className="font-display text-[9px] tracking-[0.3em] ink-soft">
+                            {b.approved ? "VISIBLE" : b.rejected ? "HIDDEN" : "PENDING"}
+                          </span>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleModerate(b.id, "approve")}
+                              disabled={pendingId === b.id || b.approved}
+                              aria-label="Approve blessing"
+                              className="rounded border border-gold px-3 py-1 font-display text-[10px] font-semibold tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+                            >
+                              ➕ APPROVE
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleModerate(b.id, "hide")}
+                              disabled={pendingId === b.id || b.rejected}
+                              aria-label="Hide blessing"
+                              className="rounded border border-gold/60 px-3 py-1 font-display text-[10px] font-semibold tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+                            >
+                              ➖ HIDE
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     ))
                   )}
