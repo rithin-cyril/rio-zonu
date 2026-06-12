@@ -1,70 +1,88 @@
 ## Goal
-Add a Discord-based moderation workflow to the existing "Leave a Blessing" feature. No visual or UX changes to the rest of the site.
 
-## Reconciling with the existing schema
-The `blessings` table already exists with columns `id, name, note, recipient_email, email_sent, created_at`. Rather than create a second table (which would orphan existing rows and break the current insert/view code), I'll extend it:
+Make the site feel smoother and more comfortable on phones while leaving content, copy, fonts, colors, layout, animations, and the desktop experience untouched. All changes are additive CSS/Tailwind tweaks plus a few small behavior fixes.
 
-Add columns:
-- `approved boolean not null default false`
-- `rejected boolean not null default false`
-- `approved_at timestamptz`
-- `moderation_token text unique` (backfilled with `gen_random_uuid()::text` for existing rows, then set NOT NULL)
+## Scope of changes (mobile-first, desktop preserved)
 
-The existing `note` column will be used as the message body (spec calls it `message` — same data, no rename needed to avoid breaking current code).
+### 1. Global shell & viewport
+- `src/components/wedding/WeddingInvitation.tsx`: swap `min-h-screen` for `min-h-dvh` so iOS chrome bars don't cause layout jumps. Keep `overflow-x-hidden`.
+- `src/styles.css`: add a small base layer:
+  - `html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }`
+  - `body { overflow-x: hidden; overscroll-behavior-y: none; }`
+  - `* { -webkit-tap-highlight-color: transparent; }`
+  - `:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }`
+  - `@media (prefers-reduced-motion: reduce) { .petal, .glow-pulse, [class*="animate-"] { animation: none !important; } }`
+  - Drop `background-attachment: fixed` on `body` for mobile only (`@media (max-width: 640px)`) — it's a known iOS Safari jank source. Desktop keeps the fixed paper texture.
 
-Tighten RLS:
-- Keep "Anyone can insert blessings" policy.
-- Add `SELECT` policy for `anon` + `authenticated` limited to `approved = true AND rejected = false`.
-- Revoke/avoid broad SELECT; admin views go through the service-role server function.
-- Add `GRANT SELECT` to `anon` (currently only INSERT works).
+### 2. Safe-area insets for floating controls
+- `MusicPlayer.tsx` and `BackToTop.tsx`: add `style={{ top/right/bottom: 'max(<existing>, env(safe-area-inset-*))' }}` so notch / dynamic island / home indicator don't overlap the buttons. Sizes already 44×44 on mobile — keep.
 
-## Secret
-Add `DISCORD_WEBHOOK_URL` via the secrets tool (server-only).
+### 3. Touch-target minimums (44×44)
+Bump padding only on mobile; desktop styling unchanged via `md:` overrides where needed.
+- `Ceremonies.tsx` "OPEN IN MAPS" anchor: increase to `min-h-11 px-5 py-3` with `inline-flex items-center` on mobile; keep current compact look at `md:`. Add `inline-block` → `inline-flex` to vertically center.
+- `Blessings.tsx` "VIEW BLESSINGS", "SEND BLESSING", "UNLOCK" buttons: ensure `min-h-11`. They're already close; just guarantee.
+- Admin "➕ APPROVE" / "➖ HIDE" buttons: bump to `min-h-11 px-4 py-2` and stack `flex-wrap` so they don't overflow on narrow modal widths.
+- Modal close `✕` button: enlarge to `h-10 w-10 grid place-items-center` (was ~24px square) and keep visual style.
 
-## Submission flow (server-side)
-Replace the current direct `supabase.from("blessings").insert(...)` in `src/components/wedding/Blessings.tsx` with a new `createServerFn` `submitBlessing` (in `src/lib/blessings.functions.ts`):
-1. Validate name (1–80) and note (1–500) with zod.
-2. Generate `moderation_token` via `crypto.randomUUID()`.
-3. Insert row via `supabaseAdmin` with `approved=false, rejected=false, moderation_token=...`.
-4. POST to `process.env.DISCORD_WEBHOOK_URL` with the spec's message format and approve/reject links pointing at `/api/public/blessings/{id}/approve?token=...` and `.../reject?token=...`. Use the published origin `https://rio-zonu.lovable.app` (configurable via `PUBLIC_SITE_URL` env, falling back to request origin).
-5. If Discord POST fails: `console.error`, still return success.
-6. Return `{ ok: true }`.
+### 4. Forms (Blessings submission + passcode unlock)
+- Inputs: add `autoComplete="name"` / `autoComplete="off"`, keep current text size ≥16px so iOS doesn't zoom on focus (already met).
+- Add `enterKeyHint="send"` to textarea; `inputMode="numeric"` already set on passcode ✓.
+- Wrap the submission form in `scroll-mt-24` and call `inputEl.scrollIntoView({ block: 'center' })` on focus only when the on-screen keyboard would cover it (use a tiny effect with `visualViewport` listener, mobile-only) — prevents the textarea hiding under the keyboard. Conservative: only attach listener on touch devices.
+- Add visible focus rings (covered by global `:focus-visible` rule).
+- Prevent layout jump after submit success: keep the form's min-height equal to its previous height so the success message doesn't collapse the card.
 
-After successful submission, the form shows: "Thank you for your blessing. It has been received and will appear after approval." (replacing current "Your blessing has been recorded…" text).
+### 5. Blessings modal (View Blessings)
+- Replace `max-h-[85vh]` with `max-h-[85dvh]` on the panel and its inner scroll container so the iOS keyboard doesn't push it off-screen.
+- Outer wrapper: add `overscroll-contain` on the scroll body so scrolling the list doesn't drag the page underneath.
+- Click on the backdrop closes the modal (currently only the ✕ closes).
+- Lock body scroll while modal is open (`document.body.style.overflow = 'hidden'` in an effect tied to `viewOpen`).
+- Add `role="dialog" aria-modal="true" aria-labelledby` to the panel and wire the heading id.
 
-## Moderation endpoints (TanStack server routes)
-Create under `src/routes/api/public/` so they bypass auth on the published site (spec requires links work directly from Discord):
+### 6. Blessings Wall cards
+- Add `break-words overflow-wrap-anywhere` (`break-words` is already there) and `hyphens-auto` for tidy wrapping of long names/messages on narrow screens.
+- Ensure grid columns can shrink: add `min-w-0` to the `<li>` items and `grid-cols-1` is fine; nothing else to do.
+- "LOAD MORE" button: `min-h-11`.
 
-- `src/routes/api/public/blessings/$id/approve.ts` — GET handler:
-  1. Read `id` from params, `token` from query.
-  2. Load row via `supabaseAdmin`; 404 if missing.
-  3. Timing-safe compare `moderation_token`; 401 if mismatch.
-  4. Update `approved=true, rejected=false, approved_at=now()`.
-  5. Return an inline HTML success page: "✅ Blessing Approved — This blessing is now visible on the wedding website." (styled minimally, matches site warm tone but self-contained — does not touch other pages).
+### 7. Ceremonies timeline alignment on mobile
+- Existing timeline puts a vertical line at `left-1/2` but the card is `mx-auto max-w-md`, which looks fine. Add `px-1` inside the card on mobile so text never touches the gold border on the smallest devices.
 
-- `src/routes/api/public/blessings/$id/reject.ts` — GET handler: same shape, sets `rejected=true, approved=false`, renders "❌ Blessing Rejected — This blessing will not be displayed publicly."
+### 8. Hero & Countdown polish
+- Hero `<img>`: add `fetchPriority="high"`, `decoding="async"`, and `sizes="100vw"`; already has explicit width/height ✓ — reduces CLS.
+- Countdown circles: already responsive; just verify `min-w-0` on each cell to prevent overflow on 320px width.
 
-Both load `supabaseAdmin` inside the handler (per project's import-graph rules).
+### 9. Animation / perf tuning
+- `Petals.tsx`: reduce default `count` on mobile via `useMediaQuery`-like check or simply pass `count={window.matchMedia('(max-width:640px)').matches ? 10 : 24}` from `WeddingInvitation.tsx`. Wrap petal spans with `will-change: transform; transform: translateZ(0)` to keep them on the compositor and off the main thread.
+- Respect `prefers-reduced-motion` (handled by global rule in §1).
+- Pause music & countdown work when tab hidden (`document.visibilitychange`) — countdown re-render is cheap, but pausing the 1s tick when hidden is free perf.
 
-## Public display
-Currently the Blessings section has no public list — blessings are only visible behind passcode 1810. The spec says approved blessings should "appear publicly in the Blessings section."
+### 10. Accessibility quick wins
+- Add `id="main"` to the `<main>` and ensure exactly one `<main>` (already the case ✓).
+- `lang="en"` on `<html>` (already set in `__root.tsx` ✓).
+- Form inputs get associated `<label className="sr-only">` since current placeholders are the only label.
+- Admin modal heading gets an `id` and the dialog references it via `aria-labelledby`.
 
-Plan:
-- Add a public approved-blessings list rendered inside the existing Blessings section, using the same card styling already used inside the passcode modal (so visual design is unchanged in spirit — same `Ornament`, same gold-border cards, same fonts). It will appear below the verse and above the submission form.
-- New `createServerFn` `getApprovedBlessings` (no auth) using `supabaseAdmin`, selecting `id, name, note, approved_at` where `approved=true AND rejected=false`, ordered by `approved_at DESC`.
-- Fetch on mount via `useEffect` + `useServerFn` (keeps the section client-rendered to avoid changing route-level data flow). Empty state: render nothing (no new heading/text) so the section looks identical when there are no approved blessings yet.
-- The existing passcode "VIEW BLESSINGS" modal stays untouched but its `getBlessings` query will now also include `approved`/`rejected` so admins can see status.
+## Out of scope (explicit)
+- No copy, name, date, scripture, address, or content changes.
+- No font, color, gradient, or imagery swaps.
+- No section reordering, restyling, or layout overhaul.
+- No changes to the moderation API, server functions, or DB.
+- Desktop (`md:`+) breakpoints and animations remain visually identical.
 
-## Files
-- Migration: extend `blessings`, backfill tokens, add SELECT policy + GRANT.
-- `src/lib/blessings.functions.ts` — add `submitBlessing` and `getApprovedBlessings`; keep `getBlessings`.
-- `src/components/wedding/Blessings.tsx` — swap insert call for `submitBlessing`, update success copy, add approved-list rendering above the form.
-- `src/routes/api/public/blessings/$id/approve.ts` — new.
-- `src/routes/api/public/blessings/$id/reject.ts` — new.
-- Secrets: add `DISCORD_WEBHOOK_URL`.
+## Verification
 
-## Explicitly NOT changing
-Hero, Gate, Ceremonies, Countdown, Families, Journey, Welcome, Closing, MusicPlayer, BackToTop, Petals, Ornament, WeddingInvitation, styles, colors, fonts, animations, maps, scriptures, layout, responsive behaviour. Only `Blessings.tsx` is touched, and only to (a) call the new server fn, (b) update one success string, (c) render the approved list using existing styles.
+- Set preview to mobile (375×812 and 360×800) and walk through: Gate → Hero → Welcome → Journey → Countdown → Families → Ceremonies → Blessings form → Blessings Wall → Closing.
+- Check: no horizontal scroll at any width, all tap targets ≥44px, modal opens/closes cleanly with backdrop tap and body scroll locked, focus rings visible, form textarea remains visible when focused with on-screen keyboard, floating buttons clear of notch/home indicator.
+- Spot-check desktop at 1280 and 1440 to confirm visuals unchanged.
 
-## Open question
-The current passcode-protected "VIEW BLESSINGS" admin view — keep as is (showing all blessings with approve/reject status visible), or remove now that Discord is the moderation surface? Default: keep it untouched.
+## Files touched
+
+- `src/styles.css` — base mobile rules, focus ring, reduced-motion
+- `src/components/wedding/WeddingInvitation.tsx` — `min-h-dvh`, petal count prop
+- `src/components/wedding/MusicPlayer.tsx` — safe-area insets
+- `src/components/wedding/BackToTop.tsx` — safe-area insets
+- `src/components/wedding/Ceremonies.tsx` — maps button touch target
+- `src/components/wedding/Blessings.tsx` — modal dvh/backdrop/scroll-lock, button sizes, form labels, focus behavior
+- `src/components/wedding/BlessingsWall.tsx` — wrapping & LOAD MORE size
+- `src/components/wedding/Petals.tsx` — `will-change`, reduced-motion friendly
+- `src/components/wedding/Hero.tsx` — `fetchPriority`/`sizes` on hero image
+- `src/components/wedding/Countdown.tsx` — pause tick when hidden, `min-w-0`
