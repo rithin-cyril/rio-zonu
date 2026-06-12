@@ -73,68 +73,79 @@ export function BlessingsWall() {
         </div>
 
         {loading ? (
-          <div
-            className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
-            aria-busy="true"
-          >
+          <div className="mt-12 flex flex-col items-center gap-6" aria-busy="true">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="h-40 animate-pulse rounded-md border border-gold/30 bg-white/70"
+                className="h-28 w-full max-w-2xl animate-pulse rounded-[2px] bg-white/60"
               />
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="mt-10 flex flex-col items-center text-center">
-            <div className="rounded-md border border-gold/50 bg-white/90 px-8 py-10 shadow-gold backdrop-blur">
-              <span className="font-script text-4xl text-gold-gradient" aria-hidden>
-                ✝
+          <div className="mt-12 flex flex-col items-center text-center">
+            <div className="relative mx-auto max-w-xl px-10 py-12">
+              <span
+                className="font-script absolute left-2 top-0 text-6xl leading-none text-gold-gradient/70"
+                aria-hidden
+              >
+                “
               </span>
-              <p className="mt-3 font-script text-lg italic ink md:text-xl">
+              <p className="font-script text-xl italic ink md:text-2xl">
                 Be the first to leave a blessing for the couple.
               </p>
+              <span
+                className="font-script absolute -bottom-4 right-2 text-6xl leading-none text-gold-gradient/70"
+                aria-hidden
+              >
+                ”
+              </span>
+              <div className="mx-auto mt-8 h-px w-24 bg-gradient-to-r from-transparent via-[oklch(0.72_0.11_80)]/60 to-transparent" />
             </div>
           </div>
         ) : (
           <>
             <ul
               role="list"
-              className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
+              className="mx-auto mt-14 flex max-w-3xl flex-col gap-12 md:gap-16"
             >
-              {shown.map((b, i) => (
+              {shown.map((b, i) => {
+                const side = i % 2 === 0 ? "left" : "right";
+                return (
                 <motion.li
                   key={b.id}
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.5, delay: (i % 3) * 0.05 }}
-                  whileHover={{ y: -3 }}
-                  className="group relative flex h-full min-w-0 flex-col rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur transition-shadow duration-300 hover:shadow-[0_10px_30px_-12px_oklch(0.72_0.12_75_/_0.55)]"
+                  transition={{ duration: 0.6, delay: 0.05 }}
+                  className={`relative min-w-0 md:w-[88%] ${side === "right" ? "md:ml-auto md:text-right" : "md:mr-auto md:text-left"}`}
                 >
                   <span
-                    className="font-script text-2xl text-gold-gradient"
+                    className={`pointer-events-none absolute -top-6 font-script text-[5rem] leading-none text-gold-gradient/40 select-none ${side === "right" ? "right-0" : "left-0"}`}
                     aria-hidden
                   >
-                    ✝
+                    “
                   </span>
-                  <p className="mt-2 whitespace-pre-wrap break-words hyphens-auto font-script text-base italic leading-relaxed ink md:text-lg [overflow-wrap:anywhere]">
-                    “{b.note}”
+                  <p className="relative whitespace-pre-wrap break-words hyphens-auto px-2 font-script text-lg italic leading-relaxed ink md:text-2xl [overflow-wrap:anywhere]">
+                    {b.note}
                   </p>
-                  <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-gold/30 pt-3">
-                    <p className="font-display text-[10px] font-semibold tracking-[0.35em] text-gold-gradient">
-                      — {b.name.toUpperCase()}
+                  <div
+                    className={`mt-5 flex items-baseline gap-4 ${side === "right" ? "justify-end" : "justify-start"}`}
+                  >
+                    <span className="h-px w-10 bg-[oklch(0.72_0.11_80)]/60" />
+                    <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient">
+                      {b.name.toUpperCase()}
                     </p>
-                    {b.approved_at && (
-                      <time
-                        dateTime={b.approved_at}
-                        className="font-display text-[9px] tracking-[0.2em] ink-soft"
-                      >
-                        {formatDate(b.approved_at)}
-                      </time>
-                    )}
                   </div>
+                  {b.approved_at && (
+                    <time
+                      dateTime={b.approved_at}
+                      className={`mt-1 block font-script text-xs italic ink-soft md:text-sm ${side === "right" ? "text-right" : "text-left"}`}
+                    >
+                      {formatDate(b.approved_at)}
+                    </time>
+                  )}
                 </motion.li>
-              ))}
+              );})}
             </ul>
 
             {hasMore && (
