@@ -10,8 +10,6 @@
   @font-face { font-family: "Cormorant"; font-style: italic; font-weight: 400 700; font-display: swap; src: url("https://fonts.gstatic.com/s/cormorantgaramond/v16/63oqEAv6tlS1S2BWGGSefqg.woff2") format("woff2"); }
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Marcellus&family=Pinyon+Script&display=swap");
-
 /*
  * Design system definition.
  *
