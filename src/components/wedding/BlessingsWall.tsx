@@ -55,7 +55,7 @@ export function BlessingsWall() {
       aria-labelledby="blessings-wall-heading"
       className="bg-lux-warm relative overflow-hidden py-14 md:py-20"
     >
-      <div className="mx-auto max-w-6xl px-5 sm:px-6">
+      <div className="mx-auto max-w-5xl px-5 sm:px-6">
         <div className="text-center">
           <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
             ✦  WITH LOVE FROM OUR LOVED ONES  ✦
@@ -73,19 +73,22 @@ export function BlessingsWall() {
         </div>
 
         {loading ? (
-          <div className="mt-12 flex flex-col items-center gap-6" aria-busy="true">
-            {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2"
+            aria-busy="true"
+          >
+            {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="h-28 w-full max-w-2xl animate-pulse rounded-[2px] bg-white/60"
+                className="h-44 animate-pulse rounded-lg border border-gold/20 bg-white/70"
               />
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="mt-12 flex flex-col items-center text-center">
-            <div className="relative mx-auto max-w-xl px-10 py-12">
+          <div className="mt-12 flex justify-center">
+            <div className="relative w-full max-w-xl rounded-lg border border-gold/40 bg-[#FBF8F1]/95 px-10 py-12 text-center shadow-[0_8px_30px_-12px_rgba(122,111,99,0.25)]">
               <span
-                className="font-script absolute left-2 top-0 text-6xl leading-none text-gold-gradient/70"
+                className="font-script absolute left-4 top-2 text-5xl leading-none text-gold-gradient/60"
                 aria-hidden
               >
                 “
@@ -94,58 +97,54 @@ export function BlessingsWall() {
                 Be the first to leave a blessing for the couple.
               </p>
               <span
-                className="font-script absolute -bottom-4 right-2 text-6xl leading-none text-gold-gradient/70"
+                className="font-script absolute bottom-0 right-4 text-5xl leading-none text-gold-gradient/60"
                 aria-hidden
               >
                 ”
               </span>
-              <div className="mx-auto mt-8 h-px w-24 bg-gradient-to-r from-transparent via-[oklch(0.72_0.11_80)]/60 to-transparent" />
             </div>
           </div>
         ) : (
           <>
             <ul
               role="list"
-              className="mx-auto mt-14 flex max-w-3xl flex-col gap-12 md:gap-16"
+              className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-7"
             >
-              {shown.map((b, i) => {
-                const side = i % 2 === 0 ? "left" : "right";
-                return (
+              {shown.map((b, i) => (
                 <motion.li
                   key={b.id}
-                  initial={{ opacity: 0, y: 18 }}
+                  initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.6, delay: 0.05 }}
-                  className={`relative min-w-0 md:w-[88%] ${side === "right" ? "md:ml-auto md:text-right" : "md:mr-auto md:text-left"}`}
+                  transition={{ duration: 0.5, delay: (i % 2) * 0.05 }}
+                  whileHover={{ y: -2 }}
+                  className="group relative flex h-full min-w-0 flex-col rounded-lg border border-gold/40 bg-[#FBF8F1]/95 p-7 text-left shadow-[0_6px_24px_-14px_rgba(122,111,99,0.35)] transition-shadow duration-300 hover:shadow-[0_14px_36px_-14px_rgba(184,154,90,0.45)] md:p-8"
                 >
                   <span
-                    className={`pointer-events-none absolute -top-6 font-script text-[5rem] leading-none text-gold-gradient/40 select-none ${side === "right" ? "right-0" : "left-0"}`}
+                    className="font-script pointer-events-none absolute left-4 top-1 text-5xl leading-none text-gold-gradient/40 select-none"
                     aria-hidden
                   >
                     “
                   </span>
-                  <p className="relative whitespace-pre-wrap break-words hyphens-auto px-2 font-script text-lg italic leading-relaxed ink md:text-2xl [overflow-wrap:anywhere]">
+                  <p className="relative mt-3 whitespace-pre-wrap break-words hyphens-auto font-script text-lg italic leading-relaxed ink md:text-xl [overflow-wrap:anywhere]">
                     {b.note}
                   </p>
-                  <div
-                    className={`mt-5 flex items-baseline gap-4 ${side === "right" ? "justify-end" : "justify-start"}`}
-                  >
-                    <span className="h-px w-10 bg-[oklch(0.72_0.11_80)]/60" />
-                    <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient">
-                      {b.name.toUpperCase()}
+                  <div className="mt-auto pt-5">
+                    <div className="mb-3 h-px w-12 bg-[oklch(0.72_0.11_80)]/60" />
+                    <p className="font-display text-[11px] font-semibold tracking-[0.38em] text-gold-gradient">
+                      — {b.name.toUpperCase()}
                     </p>
+                    {b.approved_at && (
+                      <time
+                        dateTime={b.approved_at}
+                        className="mt-1 block font-script text-xs italic ink-soft md:text-sm"
+                      >
+                        {formatDate(b.approved_at)}
+                      </time>
+                    )}
                   </div>
-                  {b.approved_at && (
-                    <time
-                      dateTime={b.approved_at}
-                      className={`mt-1 block font-script text-xs italic ink-soft md:text-sm ${side === "right" ? "text-right" : "text-left"}`}
-                    >
-                      {formatDate(b.approved_at)}
-                    </time>
-                  )}
                 </motion.li>
-              );})}
+              ))}
             </ul>
 
             {hasMore && (
