@@ -117,7 +117,7 @@ export function BlessingsWall() {
                   >
                     ✝
                   </span>
-                  <p className="mt-2 whitespace-pre-wrap break-words font-script text-base italic leading-relaxed ink md:text-lg">
+                  <p className="mt-2 whitespace-pre-wrap break-words hyphens-auto font-script text-base italic leading-relaxed ink md:text-lg [overflow-wrap:anywhere]">
                     “{b.note}”
                   </p>
                   <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-gold/30 pt-3">
@@ -142,7 +142,7 @@ export function BlessingsWall() {
                 <button
                   type="button"
                   onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                  className="inline-block rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
+                  className="inline-flex min-h-11 items-center rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10"
                 >
                   LOAD MORE
                 </button>
