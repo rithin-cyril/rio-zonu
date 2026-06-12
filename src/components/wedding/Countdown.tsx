@@ -41,7 +41,7 @@ export function Countdown() {
 
         <Ornament className="mt-6 md:mt-8" />
 
-        <div className="mt-7 grid grid-cols-4 gap-3 sm:gap-4 md:mt-10 md:gap-8">
+        <div className="mt-7 grid grid-cols-4 gap-2 sm:gap-4 md:mt-10 md:gap-8">
           {parts.map((p, i) => (
             <motion.div
               key={p.label}
@@ -49,7 +49,7 @@ export function Countdown() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="flex flex-col items-center"
+              className="flex min-w-0 flex-col items-center"
             >
               <div className="relative aspect-square w-full max-w-[88px] sm:max-w-[110px] md:max-w-[120px]">
                 <div className="absolute inset-0 rounded-full border-2 border-gold shadow-gold bg-white/85 backdrop-blur" />
