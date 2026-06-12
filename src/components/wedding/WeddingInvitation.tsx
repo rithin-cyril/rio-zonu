@@ -51,9 +51,9 @@ export function WeddingInvitation() {
       <SectionDivider />
       <Ceremonies />
       <SectionDivider variant="warm" />
-      <BlessingsWall />
-      <SectionDivider variant="warm" />
       <Blessings />
+      <SectionDivider variant="warm" />
+      <BlessingsWall />
       <SectionDivider variant="dark" />
       <Closing />
       </div>
