@@ -16,8 +16,14 @@ import floralBg from "@/assets/floral-bg.jpg";
 
 export function WeddingInvitation() {
   const [opened, setOpened] = useState(false);
+  const isMobile =
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 640px)").matches;
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-[oklch(0.97_0.012_90)] text-[oklch(0.28_0.03_60)]">
+    <main
+      id="main"
+      className="relative min-h-dvh overflow-x-hidden bg-[oklch(0.97_0.012_90)] text-[oklch(0.28_0.03_60)]"
+    >
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0 opacity-[0.18] mix-blend-multiply"
@@ -29,7 +35,7 @@ export function WeddingInvitation() {
       />
       <div className="relative z-10">
       <Gate opened={opened} onOpen={() => setOpened(true)} />
-      {opened && <Petals />}
+      {opened && <Petals count={isMobile ? 10 : 24} />}
       {opened && <MusicPlayer />}
       {opened && <BackToTop />}
       <Hero />
