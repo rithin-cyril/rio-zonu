@@ -32,6 +32,10 @@ export function MusicPlayer() {
         whileTap={{ scale: 0.92 }}
         transition={{ duration: 0.6 }}
         className="fixed right-4 top-4 z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-gold bg-white/85 shadow-gold backdrop-blur md:right-6 md:top-6 md:h-12 md:w-12"
+        style={{
+          top: "max(1rem, env(safe-area-inset-top))",
+          right: "max(1rem, env(safe-area-inset-right))",
+        }}
       >
         {muted ? (
           <VolumeX className="h-5 w-5 text-[oklch(0.42_0.1_70)]" strokeWidth={1.6} />
