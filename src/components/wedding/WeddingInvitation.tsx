@@ -9,6 +9,7 @@ import { Ceremonies } from "./Ceremonies";
 import { Blessings } from "./Blessings";
 import { BlessingsWall } from "./BlessingsWall";
 import { Closing } from "./Closing";
+import { SectionDivider } from "./SectionDivider";
 import { Petals } from "./Petals";
 import { MusicPlayer } from "./MusicPlayer";
 import { BackToTop } from "./BackToTop";
@@ -39,13 +40,21 @@ export function WeddingInvitation() {
       {opened && <MusicPlayer />}
       {opened && <BackToTop />}
       <Hero />
+      <SectionDivider />
       <Welcome />
+      <SectionDivider variant="warm" />
       <Journey />
+      <SectionDivider />
       <Countdown />
+      <SectionDivider variant="warm" />
       <Families />
+      <SectionDivider />
       <Ceremonies />
-      <Blessings />
+      <SectionDivider variant="warm" />
       <BlessingsWall />
+      <SectionDivider variant="warm" />
+      <Blessings />
+      <SectionDivider variant="dark" />
       <Closing />
       </div>
     </main>
