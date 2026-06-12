@@ -109,7 +109,7 @@ export function BlessingsWall() {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: (i % 3) * 0.05 }}
                   whileHover={{ y: -3 }}
-                  className="group relative flex h-full flex-col rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur transition-shadow duration-300 hover:shadow-[0_10px_30px_-12px_oklch(0.72_0.12_75_/_0.55)]"
+                  className="group relative flex h-full min-w-0 flex-col rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur transition-shadow duration-300 hover:shadow-[0_10px_30px_-12px_oklch(0.72_0.12_75_/_0.55)]"
                 >
                   <span
                     className="font-script text-2xl text-gold-gradient"
