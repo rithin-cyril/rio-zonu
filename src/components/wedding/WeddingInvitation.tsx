@@ -13,6 +13,7 @@ import { SectionDivider } from "./SectionDivider";
 import { Petals } from "./Petals";
 import { MusicPlayer } from "./MusicPlayer";
 import { BackToTop } from "./BackToTop";
+import { FloralFrame } from "./FloralFrame";
 import floralBg from "@/assets/floral-bg.jpg";
 
 export function WeddingInvitation() {
@@ -39,6 +40,7 @@ export function WeddingInvitation() {
       {opened && <Petals count={isMobile ? 10 : 24} />}
       {opened && <MusicPlayer />}
       {opened && <BackToTop />}
+      {opened && <FloralFrame />}
       <Hero />
       <SectionDivider />
       <Welcome />
