@@ -1,0 +1,125 @@
+import { useState } from "react";
+import { motion } from "motion/react";
+import { useServerFn } from "@tanstack/react-start";
+import { Ornament } from "./Ornament";
+import { submitBlessing } from "@/lib/blessings.functions";
+
+const verses = [
+  {
+    ref: "1 Corinthians 13:4,7",
+    text: "Love is patient, love is kind. It always protects, always trusts, always hopes, always perseveres.",
+  },
+];
+
+export function Blessings() {
+  const [form, setForm] = useState({ name: "", note: "" });
+  const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const sendBlessing = useServerFn(submitBlessing);
+
+  return (
+    <section className="bg-lux-warm relative overflow-hidden py-14 md:py-20">
+      <div className="mx-auto max-w-2xl px-5 text-center sm:px-6">
+        <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
+          ✦  HIS WORD UPON US  ✦
+        </p>
+        <h2 className="font-script mt-3 text-3xl italic text-gold-gradient md:text-5xl">
+          Leave Your Blessings
+        </h2>
+        <p className="mx-auto mt-3 max-w-xl font-script text-base italic ink-soft md:text-lg">
+          Your prayers, blessings, and heartfelt wishes mean the world to us as we begin this beautiful journey together.
+        </p>
+        <Ornament className="mt-5" />
+
+        <div className="mt-8 space-y-5 text-left">
+          {verses.map((v, i) => (
+            <motion.div
+              key={v.ref}
+              initial={{ opacity: 0, x: i % 2 ? 20 : -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative rounded-md border border-gold/50 bg-white/90 p-6 shadow-gold backdrop-blur"
+            >
+              <span className="font-script text-2xl text-gold-gradient" aria-hidden>✝</span>
+              <p className="mt-2 font-script text-lg italic leading-relaxed ink md:text-xl">
+                “{v.text}”
+              </p>
+              <p className="mt-4 font-display text-[11px] font-semibold tracking-[0.35em] text-gold-gradient">
+                — {v.ref.toUpperCase()}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const name = form.name.trim();
+            const note = form.note.trim();
+            if (!name || !note) return;
+            setSubmitting(true);
+            setError(null);
+            try {
+              await sendBlessing({ data: { name, note } });
+            } catch {
+              setSubmitting(false);
+              setError("Sorry, something went wrong. Please try again.");
+              return;
+            }
+            setSubmitting(false);
+            setSent(true);
+          }}
+          className="mt-8 min-h-[320px] scroll-mt-24 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
+        >
+          <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient">
+            LEAVE A BLESSING FOR THE COUPLE
+          </p>
+          {sent ? (
+            <p role="status" aria-live="polite" className="mt-4 font-script text-lg italic ink">
+              Your wishes have been received with joy and gratitude. Thank you for being part of our story.
+            </p>
+          ) : (
+            <>
+              <label htmlFor="blessing-name" className="sr-only">Your name</label>
+              <input
+                id="blessing-name"
+                name="name"
+                autoComplete="name"
+                enterKeyHint="next"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Your Name"
+                maxLength={80}
+                className="mt-4 w-full min-h-11 border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
+              />
+              <label htmlFor="blessing-note" className="sr-only">Your blessing</label>
+              <textarea
+                id="blessing-note"
+                name="note"
+                enterKeyHint="send"
+                value={form.note}
+                onChange={(e) => setForm({ ...form, note: e.target.value })}
+                placeholder="Share your blessing, prayer, or wishes for Rithin & Harshita..."
+                rows={3}
+                maxLength={500}
+                className="mt-3 w-full border-b border-gold/50 bg-transparent py-2 font-script text-lg italic ink outline-none placeholder:text-[oklch(0.55_0.03_60)]/70 focus:border-gold"
+              />
+              {error && (
+                <p className="mt-3 font-script italic text-sm text-[oklch(0.45_0.15_25)]">{error}</p>
+              )}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mt-6 inline-flex min-h-11 items-center rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
+              >
+                {submitting ? "SENDING…" : "SEND BLESSING"}
+              </button>
+            </>
+          )}
+        </form>
+      </div>
+    </section>
+  );
+}
