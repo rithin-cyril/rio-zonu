@@ -1,4 +1,5 @@
 import { Ornament } from "./Ornament";
+import { Link } from "@tanstack/react-router";
 
 export function Closing() {
   return (
@@ -14,6 +15,16 @@ export function Closing() {
         <p className="font-display mt-8 text-[10px] font-semibold tracking-[0.4em]" style={{ color: "#C9B37E" }}>
           RITHIN &amp; HARSHITA · 2026
         </p>
+        <div className="mt-6">
+          <Link
+            to="/admin"
+            aria-label="Admin"
+            className="inline-flex items-center gap-1 font-display text-[9px] tracking-[0.35em] opacity-50 transition hover:opacity-90"
+            style={{ color: "#C9B37E" }}
+          >
+            <span aria-hidden>⚙</span> ADMIN
+          </Link>
+        </div>
       </div>
     </footer>
   );

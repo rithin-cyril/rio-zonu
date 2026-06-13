@@ -20,6 +20,19 @@ export const submitBlessing = createServerFn({ method: "POST" })
       .single();
     if (error || !row) throw new Error(error?.message ?? "Insert failed");
 
+    try {
+      await supabaseAdmin.from("moderation_logs").insert({
+        blessing_id: row.id,
+        guest_name: row.name,
+        action: "submitted",
+        administrator: "guest",
+        previous_status: null,
+        new_status: "pending",
+      });
+    } catch (e) {
+      console.error("[blessings] log submitted failed", e);
+    }
+
     const webhook = process.env.DISCORD_WEBHOOK_URL;
     const siteUrl = process.env.PUBLIC_SITE_URL ?? "https://rio-zonu.lovable.app";
     if (webhook) {
@@ -74,6 +87,7 @@ export const getApprovedBlessings = createServerFn({ method: "GET" })
       .select("id, name, note, approved_at")
       .eq("approved", true)
       .eq("rejected", false)
+      .eq("hidden", false)
       .order("approved_at", { ascending: false });
     if (error) throw new Error(error.message);
     return { blessings: data ?? [] };
