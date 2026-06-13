@@ -39,6 +39,19 @@ export const Route = createFileRoute("/api/public/blessings/$id/approve")({
           approvedAt,
         });
 
+        try {
+          await supabaseAdmin.from("moderation_logs").insert({
+            blessing_id: row.id,
+            guest_name: row.name,
+            action: "approved",
+            administrator: "discord",
+            previous_status: "pending",
+            new_status: "approved",
+          });
+        } catch (e) {
+          console.error("[blessings] log approve failed", e);
+        }
+
         return htmlPage(
           "Blessing Approved",
           `<p class="eyebrow">✦ Moderation ✦</p>
