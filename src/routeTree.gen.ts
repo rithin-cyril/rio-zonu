@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminBlessingsRouteImport } from './routes/_authenticated/admin.blessings'
 import { Route as ApiPublicBlessingsIdRejectRouteImport } from './routes/api/public/blessings/$id/reject'
 import { Route as ApiPublicBlessingsIdApproveRouteImport } from './routes/api/public/blessings/$id/approve'
 
@@ -41,6 +42,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminBlessingsRoute =
+  AuthenticatedAdminBlessingsRouteImport.update({
+    id: '/blessings',
+    path: '/blessings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicBlessingsIdRejectRoute =
   ApiPublicBlessingsIdRejectRouteImport.update({
     id: '/api/public/blessings/$id/reject',
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin/blessings': typeof AuthenticatedAdminBlessingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
@@ -65,6 +73,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin/blessings': typeof AuthenticatedAdminBlessingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
@@ -75,6 +84,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/admin/blessings': typeof AuthenticatedAdminBlessingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/admin/blessings'
     | '/admin/'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
@@ -92,6 +103,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/admin/blessings'
     | '/admin'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
@@ -101,6 +113,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/_authenticated/admin/blessings'
     | '/_authenticated/admin/'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/blessings': {
+      id: '/_authenticated/admin/blessings'
+      path: '/blessings'
+      fullPath: '/admin/blessings'
+      preLoaderRoute: typeof AuthenticatedAdminBlessingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/blessings/$id/reject': {
       id: '/api/public/blessings/$id/reject'
       path: '/api/public/blessings/$id/reject'
@@ -169,10 +189,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBlessingsRoute: typeof AuthenticatedAdminBlessingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBlessingsRoute: AuthenticatedAdminBlessingsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
