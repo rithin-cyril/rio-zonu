@@ -5,13 +5,13 @@ const families = [
   {
     side: "THE GROOM’S FAMILY",
     line1: "Mr. (Late) Regin Cyril",
-    line2: "& Mrs. Elizabeth Pushpalatha Cyril",
+    line2: "Mrs. Elizabeth Pushpalatha Cyril",
     glyph: "✝",
   },
   {
     side: "THE BRIDE’S FAMILY",
     line1: "Mr. V. R. Raju",
-    line2: "& Mrs. V. Nirmala",
+    line2: "Mrs. V. Nirmala",
     glyph: "✝",
   },
 ];
@@ -49,9 +49,12 @@ export function Families() {
               <h3 className="font-display text-lg font-semibold ink md:text-2xl">
                 {f.line1}
               </h3>
-              <p className="font-script text-lg italic ink-soft md:text-xl">
-                {f.line2}
+              <p className="font-display text-[10px] font-semibold tracking-[0.35em] ink-soft">
+                &amp;
               </p>
+              <h3 className="font-display text-lg font-semibold ink md:text-2xl">
+                {f.line2}
+              </h3>
             </motion.div>
           ))}
         </div>
