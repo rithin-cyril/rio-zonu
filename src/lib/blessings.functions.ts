@@ -74,6 +74,7 @@ export const getApprovedBlessings = createServerFn({ method: "GET" })
       .select("id, name, note, approved_at")
       .eq("approved", true)
       .eq("rejected", false)
+      .eq("hidden", false)
       .order("approved_at", { ascending: false });
     if (error) throw new Error(error.message);
     return { blessings: data ?? [] };
