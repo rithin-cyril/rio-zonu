@@ -14,7 +14,7 @@ const events = [
   {
     n: "02",
     title: "Wedding Reception",
-    date: "Sunday, 18 October 2026",
+    date: "Sunday, October 18th, 2026",
     time: "12:00 Noon onwards",
     venue: "Church Hall",
     address: "Siddapura, South Coorg, Karnataka",
