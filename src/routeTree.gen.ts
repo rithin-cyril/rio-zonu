@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicBlessingsIdRejectRouteImport } from './routes/api/public/blessings/$id/reject'
 import { Route as ApiPublicBlessingsIdApproveRouteImport } from './routes/api/public/blessings/$id/approve'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -33,17 +39,20 @@ const ApiPublicBlessingsIdApproveRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
 }
@@ -51,28 +60,39 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   ApiPublicBlessingsIdApproveRoute: typeof ApiPublicBlessingsIdApproveRoute
   ApiPublicBlessingsIdRejectRoute: typeof ApiPublicBlessingsIdRejectRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -99,9 +119,20 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   ApiPublicBlessingsIdApproveRoute: ApiPublicBlessingsIdApproveRoute,
   ApiPublicBlessingsIdRejectRoute: ApiPublicBlessingsIdRejectRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
