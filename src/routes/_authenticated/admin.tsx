@@ -62,7 +62,7 @@ function AdminShell() {
             <h1 className="font-script text-2xl italic text-gold-gradient">Rithin &amp; Harshita</h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline font-script italic text-sm ink-soft">{email}</span>
+            <span className="hidden sm:inline font-script italic text-sm ink-soft">Rithin</span>
             <button
               onClick={onLogout}
               className="inline-flex min-h-10 items-center rounded border border-gold/60 px-4 py-2 font-display text-[10px] font-semibold tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10"
