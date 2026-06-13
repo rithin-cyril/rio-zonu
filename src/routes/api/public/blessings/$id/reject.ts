@@ -111,6 +111,20 @@ export const Route = createFileRoute("/api/public/blessings/$id/reject")({
           rejection_reason: reason,
         });
 
+        try {
+          await supabaseAdmin.from("moderation_logs").insert({
+            blessing_id: row.id,
+            guest_name: row.name,
+            action: "rejected",
+            administrator: "discord",
+            previous_status: "pending",
+            new_status: "rejected",
+            reason,
+          });
+        } catch (e) {
+          console.error("[blessings] log reject failed", e);
+        }
+
         return htmlPage(
           "Blessing Rejected",
           `<p class="eyebrow">✦ Moderation ✦</p>
