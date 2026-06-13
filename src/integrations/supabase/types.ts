@@ -26,6 +26,8 @@ export type Database = {
           note: string
           recipient_email: string
           rejected: boolean
+          rejected_at: string | null
+          rejection_reason: string | null
         }
         Insert: {
           approved?: boolean
@@ -38,6 +40,8 @@ export type Database = {
           note: string
           recipient_email?: string
           rejected?: boolean
+          rejected_at?: string | null
+          rejection_reason?: string | null
         }
         Update: {
           approved?: boolean
@@ -50,6 +54,8 @@ export type Database = {
           note?: string
           recipient_email?: string
           rejected?: boolean
+          rejected_at?: string | null
+          rejection_reason?: string | null
         }
         Relationships: []
       }

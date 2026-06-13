@@ -25,18 +25,33 @@ export const submitBlessing = createServerFn({ method: "POST" })
     if (webhook) {
       const approveUrl = `${siteUrl}/api/public/blessings/${row.id}/approve?token=${encodeURIComponent(moderation_token)}`;
       const rejectUrl = `${siteUrl}/api/public/blessings/${row.id}/reject?token=${encodeURIComponent(moderation_token)}`;
-      const content =
-        `🎉 **New Wedding Blessing Pending Approval**\n\n` +
-        `**Name:**\n${row.name}\n\n` +
-        `**Message:**\n${row.note}\n\n` +
-        `**Submitted:**\n${row.created_at}\n\n` +
-        `**Approve:**\n${approveUrl}\n\n` +
-        `**Reject:**\n${rejectUrl}`;
+      const submitted = new Date(row.created_at);
+      const submittedStr = submitted.toUTCString();
+      const embed = {
+        title: "💒 New Wedding Blessing Awaiting Review",
+        description:
+          `A new blessing has been submitted for **Rithin & Harshita**.\n\n` +
+          `[🟢 **Approve Blessing**](${approveUrl})  •  [🔴 **Reject Blessing**](${rejectUrl})`,
+        color: 0xb89b5e,
+        fields: [
+          { name: "👤 Guest Name", value: row.name.slice(0, 256), inline: true },
+          { name: "✉️ Message Length", value: `${row.note.length} characters`, inline: true },
+          { name: "🕊️ Blessing Message", value: row.note.length > 1024 ? row.note.slice(0, 1021) + "..." : row.note },
+          { name: "📅 Submitted", value: submittedStr, inline: false },
+        ],
+        footer: { text: "Rithin & Harshita • Wedding Blessings" },
+        timestamp: submitted.toISOString(),
+      };
+      const payload = {
+        username: "Wedding Blessings",
+        embeds: [embed],
+        allowed_mentions: { parse: [] },
+      };
       try {
         const res = await fetch(webhook, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content }),
+          body: JSON.stringify(payload),
         });
         if (!res.ok) {
           console.error("[blessings] Discord webhook failed", res.status, await res.text());
