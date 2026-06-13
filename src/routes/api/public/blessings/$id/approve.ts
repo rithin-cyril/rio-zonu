@@ -32,7 +32,10 @@ export const Route = createFileRoute("/api/public/blessings/$id/approve")({
           .eq("id", params.id)
           .eq("approved", false)
           .eq("rejected", false);
-        if (error) return new Response(error.message, { status: 500 });
+        if (error) {
+          console.error("[blessings] approve update failed", error);
+          return new Response("Internal server error", { status: 500 });
+        }
 
         console.info("[blessings] moderation: APPROVED", {
           blessingId: row.id,

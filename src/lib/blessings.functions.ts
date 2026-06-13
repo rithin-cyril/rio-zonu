@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const PASSCODE = "1810";
-
 const submitSchema = z.object({
   name: z.string().trim().min(1).max(80),
   note: z.string().trim().min(1).max(500),
@@ -91,49 +89,4 @@ export const getApprovedBlessings = createServerFn({ method: "GET" })
       .order("approved_at", { ascending: false });
     if (error) throw new Error(error.message);
     return { blessings: data ?? [] };
-  });
-
-export const getBlessings = createServerFn({ method: "POST" })
-  .inputValidator((data: { passcode: string }) => {
-    if (typeof data?.passcode !== "string" || data.passcode.length > 20) {
-      throw new Error("Invalid passcode");
-    }
-    return { passcode: data.passcode };
-  })
-  .handler(async ({ data }) => {
-    if (data.passcode !== PASSCODE) {
-      throw new Error("Incorrect passcode");
-    }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin
-      .from("blessings")
-      .select("id, name, note, created_at, approved, rejected")
-      .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    return { blessings: rows ?? [] };
-  });
-
-const moderateSchema = z.object({
-  passcode: z.string().max(20),
-  id: z.string().uuid(),
-  action: z.enum(["approve", "hide"]),
-});
-
-export const moderateBlessing = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => moderateSchema.parse(data))
-  .handler(async ({ data }) => {
-    if (data.passcode !== PASSCODE) {
-      throw new Error("Incorrect passcode");
-    }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const update =
-      data.action === "approve"
-        ? { approved: true, rejected: false, approved_at: new Date().toISOString() }
-        : { approved: false, rejected: true };
-    const { error } = await supabaseAdmin
-      .from("blessings")
-      .update(update)
-      .eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
   });
