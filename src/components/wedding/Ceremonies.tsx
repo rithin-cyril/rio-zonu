@@ -5,8 +5,8 @@ const events = [
   {
     n: "01",
     title: "Holy Matrimony",
-    date: "Sunday, 18 October 2026",
-    time: "9:00 AM",
+    date: "Sunday, October 18th, 2026",
+    time: "10:30 AM",
     venue: "CSI Kanthi Church",
     address: "Anandapura, South Coorg, Karnataka",
     map: "https://maps.app.goo.gl/TWTM3PtCATfNpP7PA",
