@@ -46,15 +46,14 @@ export function Families() {
               <p className="font-display text-[10px] font-semibold tracking-[0.4em] ink-soft">
                 {f.side}
               </p>
-              <h3 className="font-display text-lg font-semibold ink md:text-2xl">
-                {f.line1}
-              </h3>
-              <p className="font-display text-[10px] font-semibold tracking-[0.35em] ink-soft">
-                &amp;
-              </p>
-              <h3 className="font-display text-lg font-semibold ink md:text-2xl">
-                {f.line2}
-              </h3>
+              <div className="space-y-1">
+                <h3 className="font-display text-base font-semibold tracking-[0.15em] ink md:text-xl">
+                  {f.line1}
+                </h3>
+                <p className="font-display text-[13px] font-medium tracking-[0.12em] ink md:text-[15px]">
+                  {f.line2}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>
