@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { motion } from "motion/react";
 import { Ornament } from "./Ornament";
 import { useServerFn } from "@tanstack/react-start";
-import { getBlessings, moderateBlessing, submitBlessing } from "@/lib/blessings.functions";
+import { submitBlessing } from "@/lib/blessings.functions";
 
 const verses = [
   {
