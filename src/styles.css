@@ -265,6 +265,19 @@
     position: relative;
   }
   .bg-lux-footer { background-color: #2E2A26; }
+
+  /* Unified semi-transparent content layer for sections above the background artwork */
+  .lux-section {
+    position: relative;
+    background-color: color-mix(in oklab, #FBF8F1 82%, transparent);
+    background-image:
+      linear-gradient(180deg,
+        color-mix(in oklab, #FFFDF6 90%, transparent) 0%,
+        color-mix(in oklab, #FBF8F1 80%, transparent) 100%);
+    backdrop-filter: blur(10px) saturate(108%);
+    border-top: 1px solid color-mix(in oklab, #C9B37E 22%, transparent);
+  }
+
   /* Legacy alias mapping to keep older usages cohesive */
   .bg-royal { background-color: #FBF8F1; }
   .bg-sage-veil { background-color: #F2EADA; }

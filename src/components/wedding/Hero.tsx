@@ -4,7 +4,7 @@ import { Ornament } from "./Ornament";
 
 export function Hero() {
   return (
-    <section className="bg-lux-hero lux-glow lux-hero-halo relative flex min-h-[88svh] items-center justify-center overflow-hidden py-14 md:py-20">
+    <section className="bg-lux-hero lux-glow lux-hero-halo relative flex min-h-[88svh] items-center justify-center overflow-hidden py-11 md:py-16">
       <img
         src={namesBg}
         alt=""
@@ -15,7 +15,7 @@ export function Hero() {
         sizes="100vw"
         className="absolute inset-0 h-full w-full object-cover opacity-40"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#FBF8F1]/80 via-[#FBF8F1]/85 to-[#F2EADA]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#FBF8F1]/60 via-[#FBF8F1]/70 to-[#F2EADA]/90" />
 
       <div className="relative z-10 mx-auto max-w-3xl px-5 text-center sm:px-6">
         <motion.p

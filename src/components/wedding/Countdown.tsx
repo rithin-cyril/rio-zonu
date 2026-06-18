@@ -49,7 +49,7 @@ export function Countdown() {
   const parts = useCountdown();
 
   return (
-    <section className="bg-lux-champagne relative overflow-hidden py-14 md:py-20">
+    <section className="lux-section overflow-hidden py-11 md:py-16">
       <div className="mx-auto max-w-4xl px-5 text-center sm:px-6">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
           IN HIS PERFECT TIME
