@@ -312,8 +312,9 @@ export const adminListBlessings = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await requireAdmin(context as any);
     const { data, error } = await supabaseAdmin
       .from("blessings")
-      .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason")
-      .order("created_at", { ascending: false });
+      .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason, sort_order, last_edited_at, last_edited_by")
+      .order("sort_order", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
     return {
       blessings: (data ?? []).map((b: any) => ({ ...b, status: computeStatus(b) })),
@@ -338,7 +339,7 @@ const idInput = z.object({ id: z.string().uuid() });
 async function loadBlessing(supabaseAdmin: any, id: string) {
   const { data, error } = await supabaseAdmin
     .from("blessings")
-    .select("id, name, approved, rejected, hidden")
+    .select("id, name, note, approved, rejected, hidden, sort_order")
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(error.message);
