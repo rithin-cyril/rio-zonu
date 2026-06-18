@@ -86,7 +86,7 @@ export function BlessingsWall() {
           </div>
         ) : items.length === 0 ? (
           <div className="mt-7 flex justify-center md:mt-8">
-            <div className="relative w-full max-w-xl rounded-lg border border-gold/40 bg-[#FBF8F1]/95 px-8 py-8 text-center shadow-[0_8px_30px_-12px_rgba(122,111,99,0.25)]">
+            <div className="lux-card relative w-full max-w-xl rounded-xl px-8 py-8 text-center">
               <p className="font-script text-xl italic ink md:text-2xl">
                 Be the first to leave a blessing for the couple.
               </p>
@@ -106,7 +106,7 @@ export function BlessingsWall() {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: (i % 2) * 0.05 }}
                   whileHover={{ y: -2 }}
-                  className="group relative flex h-full min-w-0 flex-col rounded-lg border border-gold/40 bg-[#FBF8F1]/95 p-5 text-left shadow-[0_6px_24px_-14px_rgba(122,111,99,0.35)] transition-shadow duration-300 hover:shadow-[0_14px_36px_-14px_rgba(184,154,90,0.45)] md:p-6"
+                  className="lux-card group relative flex h-full min-w-0 flex-col rounded-xl p-5 text-left md:p-6"
                 >
                   <p className="relative whitespace-pre-wrap break-words hyphens-auto font-script text-lg italic leading-relaxed ink md:text-xl [overflow-wrap:anywhere]">
                     {b.note}
