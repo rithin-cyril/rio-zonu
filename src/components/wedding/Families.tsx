@@ -18,7 +18,7 @@ const families = [
 
 export function Families() {
   return (
-    <section className="lux-section overflow-hidden py-10 md:py-16">
+    <section className="lux-section overflow-hidden py-11 md:py-16">
       <div className="mx-auto max-w-4xl px-5 text-center sm:px-6">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
           IN CHRIST’S NAME

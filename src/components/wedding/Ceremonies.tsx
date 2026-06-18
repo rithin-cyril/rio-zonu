@@ -24,7 +24,7 @@ const events = [
 
 export function Ceremonies() {
   return (
-    <section className="lux-section overflow-hidden py-8 md:py-12">
+    <section className="lux-section overflow-hidden py-8 md:py-11">
       <div className="mx-auto max-w-3xl px-5 text-center sm:px-6">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
           ORDER OF CELEBRATION
