@@ -312,8 +312,9 @@ export const adminListBlessings = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await requireAdmin(context as any);
     const { data, error } = await supabaseAdmin
       .from("blessings")
-      .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason")
-      .order("created_at", { ascending: false });
+      .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason, sort_order, last_edited_at, last_edited_by")
+      .order("sort_order", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
     return {
       blessings: (data ?? []).map((b: any) => ({ ...b, status: computeStatus(b) })),
@@ -338,7 +339,7 @@ const idInput = z.object({ id: z.string().uuid() });
 async function loadBlessing(supabaseAdmin: any, id: string) {
   const { data, error } = await supabaseAdmin
     .from("blessings")
-    .select("id, name, approved, rejected, hidden")
+    .select("id, name, note, approved, rejected, hidden, sort_order")
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(error.message);
@@ -453,4 +454,189 @@ export const adminRestoreBlessing = createServerFn({ method: "POST" })
       reason: "restored",
     });
     return { ok: true };
+  });
+
+// ---- Version history helpers ----
+async function ensureOriginalVersion(
+  supabaseAdmin: any,
+  blessing: { id: string; name: string; note: string },
+  status: Status,
+) {
+  const { count } = await supabaseAdmin
+    .from("blessing_versions")
+    .select("id", { count: "exact", head: true })
+    .eq("blessing_id", blessing.id);
+  if ((count ?? 0) > 0) return;
+  await supabaseAdmin.from("blessing_versions").insert({
+    blessing_id: blessing.id,
+    version: 1,
+    name: blessing.name,
+    note: blessing.note,
+    status,
+    edited_by: null,
+    edited_by_label: "guest",
+    change_type: "original",
+  });
+}
+
+async function nextVersionNumber(supabaseAdmin: any, blessing_id: string): Promise<number> {
+  const { data } = await supabaseAdmin
+    .from("blessing_versions")
+    .select("version")
+    .eq("blessing_id", blessing_id)
+    .order("version", { ascending: false })
+    .limit(1);
+  const top = data?.[0]?.version ?? 0;
+  return top + 1;
+}
+
+// ---- Edit blessing ----
+const editSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().trim().min(1).max(80),
+  note: z.string().trim().min(1).max(2000),
+  status: z.enum(["pending", "approved", "hidden", "rejected"]).optional(),
+});
+
+export const adminEditBlessing = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => editSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const prev = await loadBlessing(supabaseAdmin, data.id);
+    const prevStatus = computeStatus(prev);
+
+    await ensureOriginalVersion(supabaseAdmin, prev as any, prevStatus);
+
+    const nameChanged = prev.name !== data.name;
+    const noteChanged = prev.note !== data.note;
+    const nextStatus: Status = data.status ?? prevStatus;
+    const statusChanged = nextStatus !== prevStatus;
+
+    const flags: Record<string, any> = {};
+    if (statusChanged) {
+      flags.approved = nextStatus === "approved";
+      flags.rejected = nextStatus === "rejected";
+      flags.hidden = nextStatus === "hidden";
+      if (nextStatus === "approved") flags.approved_at = new Date().toISOString();
+    }
+
+    const nowIso = new Date().toISOString();
+    const { error } = await supabaseAdmin
+      .from("blessings")
+      .update({
+        name: data.name,
+        note: data.note,
+        last_edited_at: nowIso,
+        last_edited_by: adminId,
+        ...flags,
+      })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+
+    const v = await nextVersionNumber(supabaseAdmin, data.id);
+    await supabaseAdmin.from("blessing_versions").insert({
+      blessing_id: data.id,
+      version: v,
+      name: data.name,
+      note: data.note,
+      status: nextStatus,
+      edited_by: adminId,
+      edited_by_label: adminEmail,
+      change_type: statusChanged ? "edited_with_status" : "edited",
+    });
+
+    await writeLog({
+      supabaseAdmin,
+      blessing_id: data.id,
+      guest_name: data.name,
+      action: "edited",
+      administrator: adminEmail,
+      administrator_id: adminId,
+      previous_status: prevStatus,
+      new_status: nextStatus,
+      reason: [
+        nameChanged ? `name: "${prev.name}" → "${data.name}"` : null,
+        noteChanged ? `message updated (${prev.note.length}→${data.note.length} chars)` : null,
+        statusChanged ? `status: ${prevStatus} → ${nextStatus}` : null,
+      ].filter(Boolean).join("; ") || "no changes",
+    });
+
+    return { ok: true };
+  });
+
+// ---- Version history ----
+export const adminListBlessingVersions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => idInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await requireAdmin(context as any);
+    const prev = await loadBlessing(supabaseAdmin, data.id);
+    await ensureOriginalVersion(supabaseAdmin, prev as any, computeStatus(prev));
+    const { data: versions, error } = await supabaseAdmin
+      .from("blessing_versions")
+      .select("*")
+      .eq("blessing_id", data.id)
+      .order("version", { ascending: false });
+    if (error) throw new Error(error.message);
+    return { versions: versions ?? [] };
+  });
+
+// ---- Reordering ----
+const reorderSchema = z.object({
+  orderedIds: z.array(z.string().uuid()).min(1).max(1000),
+});
+
+export const adminReorderBlessings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => reorderSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+
+    const { data: existing, error: exErr } = await supabaseAdmin
+      .from("blessings")
+      .select("id, name, sort_order");
+    if (exErr) throw new Error(exErr.message);
+    const prevMap = new Map<string, { name: string; sort_order: number | null }>(
+      (existing ?? []).map((r: any) => [r.id, { name: r.name, sort_order: r.sort_order }]),
+    );
+
+    // Validate all ids exist
+    for (const id of data.orderedIds) {
+      if (!prevMap.has(id)) throw new Error(`Unknown blessing id: ${id}`);
+    }
+
+    // Update each row; use 1..N
+    const changes: Array<{ id: string; name: string; from: number | null; to: number }> = [];
+    for (let i = 0; i < data.orderedIds.length; i++) {
+      const id = data.orderedIds[i];
+      const to = i + 1;
+      const prev = prevMap.get(id)!;
+      if (prev.sort_order === to) continue;
+      const { error } = await supabaseAdmin
+        .from("blessings")
+        .update({ sort_order: to })
+        .eq("id", id);
+      if (error) throw new Error(error.message);
+      changes.push({ id, name: prev.name, from: prev.sort_order, to });
+    }
+
+    if (changes.length > 0) {
+      await writeLog({
+        supabaseAdmin,
+        blessing_id: null,
+        guest_name: null,
+        action: "reordered",
+        administrator: adminEmail,
+        administrator_id: adminId,
+        previous_status: null,
+        new_status: null,
+        reason: changes
+          .slice(0, 20)
+          .map((c) => `${c.name}: ${c.from ?? "—"}→${c.to}`)
+          .join("; ") + (changes.length > 20 ? ` …(+${changes.length - 20} more)` : ""),
+      });
+    }
+
+    return { ok: true, changed: changes.length };
   });

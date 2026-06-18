@@ -86,7 +86,8 @@ export const getApprovedBlessings = createServerFn({ method: "GET" })
       .eq("approved", true)
       .eq("rejected", false)
       .eq("hidden", false)
-      .order("approved_at", { ascending: false });
+      .order("sort_order", { ascending: true, nullsFirst: false })
+      .order("approved_at", { ascending: true });
     if (error) throw new Error(error.message);
     return { blessings: data ?? [] };
   });
