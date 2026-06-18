@@ -28,6 +28,8 @@ const actionColors: Record<string, string> = {
   deleted: "bg-red-200 text-red-900 border-red-400",
   login: "bg-amber-50 text-amber-800 border-amber-200",
   logout: "bg-amber-50 text-amber-800 border-amber-200",
+  edited: "bg-indigo-100 text-indigo-800 border-indigo-300",
+  reordered: "bg-purple-100 text-purple-800 border-purple-300",
 };
 
 function AdminLogs() {
