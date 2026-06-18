@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      blessing_versions: {
+        Row: {
+          blessing_id: string
+          change_type: string
+          created_at: string
+          edited_by: string | null
+          edited_by_label: string | null
+          id: string
+          name: string
+          note: string
+          status: string
+          version: number
+        }
+        Insert: {
+          blessing_id: string
+          change_type: string
+          created_at?: string
+          edited_by?: string | null
+          edited_by_label?: string | null
+          id?: string
+          name: string
+          note: string
+          status: string
+          version: number
+        }
+        Update: {
+          blessing_id?: string
+          change_type?: string
+          created_at?: string
+          edited_by?: string | null
+          edited_by_label?: string | null
+          id?: string
+          name?: string
+          note?: string
+          status?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blessing_versions_blessing_id_fkey"
+            columns: ["blessing_id"]
+            isOneToOne: false
+            referencedRelation: "blessings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blessings: {
         Row: {
           approved: boolean
@@ -22,6 +69,8 @@ export type Database = {
           email_sent: boolean
           hidden: boolean
           id: string
+          last_edited_at: string | null
+          last_edited_by: string | null
           moderation_token: string
           name: string
           note: string
@@ -29,6 +78,7 @@ export type Database = {
           rejected: boolean
           rejected_at: string | null
           rejection_reason: string | null
+          sort_order: number | null
         }
         Insert: {
           approved?: boolean
@@ -37,6 +87,8 @@ export type Database = {
           email_sent?: boolean
           hidden?: boolean
           id?: string
+          last_edited_at?: string | null
+          last_edited_by?: string | null
           moderation_token: string
           name: string
           note: string
@@ -44,6 +96,7 @@ export type Database = {
           rejected?: boolean
           rejected_at?: string | null
           rejection_reason?: string | null
+          sort_order?: number | null
         }
         Update: {
           approved?: boolean
@@ -52,6 +105,8 @@ export type Database = {
           email_sent?: boolean
           hidden?: boolean
           id?: string
+          last_edited_at?: string | null
+          last_edited_by?: string | null
           moderation_token?: string
           name?: string
           note?: string
@@ -59,6 +114,7 @@ export type Database = {
           rejected?: boolean
           rejected_at?: string | null
           rejection_reason?: string | null
+          sort_order?: number | null
         }
         Relationships: []
       }
