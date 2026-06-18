@@ -269,13 +269,17 @@
   /* Unified semi-transparent content layer for sections above the background artwork */
   .lux-section {
     position: relative;
-    background-color: color-mix(in oklab, #FBF8F1 82%, transparent);
+    background-color: color-mix(in oklab, #FBF8F1 62%, transparent);
     background-image:
       linear-gradient(180deg,
-        color-mix(in oklab, #FFFDF6 90%, transparent) 0%,
-        color-mix(in oklab, #FBF8F1 80%, transparent) 100%);
-    backdrop-filter: blur(10px) saturate(108%);
-    border-top: 1px solid color-mix(in oklab, #C9B37E 22%, transparent);
+        color-mix(in oklab, #FFFDF6 70%, transparent) 0%,
+        color-mix(in oklab, #FBF8F1 60%, transparent) 100%);
+    backdrop-filter: blur(14px) saturate(112%);
+    border-top: 1px solid color-mix(in oklab, #C9B37E 28%, transparent);
+    border-bottom: 1px solid color-mix(in oklab, #C9B37E 14%, transparent);
+    box-shadow:
+      0 1px 0 rgba(255, 253, 246, 0.6) inset,
+      0 0 60px -20px color-mix(in oklab, #C9B37E 20%, transparent) inset;
   }
 
   /* Legacy alias mapping to keep older usages cohesive */
@@ -322,44 +326,44 @@
    * should float above the parchment background.
    */
   .lux-card {
-    background-color: color-mix(in oklab, #FBF8F1 88%, transparent);
+    background-color: color-mix(in oklab, #FBF8F1 68%, transparent);
     background-image:
       linear-gradient(180deg,
-        color-mix(in oklab, #FFFDF6 92%, transparent) 0%,
-        color-mix(in oklab, #FBF8F1 86%, transparent) 100%);
-    backdrop-filter: blur(14px) saturate(115%);
-    border: 1px solid color-mix(in oklab, #C9B37E 55%, transparent);
+        color-mix(in oklab, #FFFDF6 78%, transparent) 0%,
+        color-mix(in oklab, #FBF8F1 66%, transparent) 100%);
+    backdrop-filter: blur(16px) saturate(118%);
+    border: 1px solid color-mix(in oklab, #C9B37E 42%, transparent);
     box-shadow:
-      0 1px 0 rgba(255, 253, 246, 0.9) inset,
-      0 0 0 1px rgba(255, 253, 246, 0.35) inset,
-      0 0 36px -10px color-mix(in oklab, #C9B37E 28%, transparent) inset,
-      0 14px 36px -18px rgba(80, 60, 30, 0.28),
-      0 30px 60px -32px rgba(80, 60, 30, 0.22);
+      0 1px 0 rgba(255, 253, 246, 0.75) inset,
+      0 0 0 1px rgba(255, 253, 246, 0.28) inset,
+      0 0 40px -12px color-mix(in oklab, #C9B37E 22%, transparent) inset,
+      0 10px 30px -20px rgba(80, 60, 30, 0.18),
+      0 24px 60px -36px rgba(80, 60, 30, 0.16);
     transition: box-shadow 400ms ease, transform 400ms ease;
   }
   .lux-card:hover {
     box-shadow:
-      0 1px 0 rgba(255, 253, 246, 0.9) inset,
-      0 0 0 1px rgba(255, 253, 246, 0.4) inset,
-      0 0 46px -10px color-mix(in oklab, #C9B37E 38%, transparent) inset,
-      0 22px 44px -18px rgba(80, 60, 30, 0.34),
-      0 40px 80px -34px rgba(80, 60, 30, 0.28);
+      0 1px 0 rgba(255, 253, 246, 0.85) inset,
+      0 0 0 1px rgba(255, 253, 246, 0.32) inset,
+      0 0 52px -12px color-mix(in oklab, #C9B37E 32%, transparent) inset,
+      0 16px 38px -20px rgba(80, 60, 30, 0.22),
+      0 32px 70px -36px rgba(80, 60, 30, 0.18);
   }
   .lux-card-strong {
-    background-color: color-mix(in oklab, #FFFDF6 90%, transparent);
+    background-color: color-mix(in oklab, #FFFDF6 72%, transparent);
     background-image:
-      radial-gradient(ellipse at 50% 0%, rgba(201, 179, 126, 0.18), transparent 65%),
+      radial-gradient(ellipse at 50% 0%, rgba(201, 179, 126, 0.16), transparent 65%),
       linear-gradient(180deg,
-        color-mix(in oklab, #FFFDF6 94%, transparent) 0%,
-        color-mix(in oklab, #F7F1E6 88%, transparent) 100%);
-    backdrop-filter: blur(18px) saturate(120%);
-    border: 1px solid color-mix(in oklab, #C9B37E 60%, transparent);
+        color-mix(in oklab, #FFFDF6 80%, transparent) 0%,
+        color-mix(in oklab, #F7F1E6 70%, transparent) 100%);
+    backdrop-filter: blur(20px) saturate(122%);
+    border: 1px solid color-mix(in oklab, #C9B37E 48%, transparent);
     box-shadow:
-      0 1px 0 rgba(255, 253, 246, 1) inset,
-      0 0 0 1px rgba(255, 253, 246, 0.5) inset,
-      0 0 60px -14px color-mix(in oklab, #C9B37E 35%, transparent) inset,
-      0 24px 60px -24px rgba(80, 60, 30, 0.32),
-      0 50px 100px -40px rgba(80, 60, 30, 0.28);
+      0 1px 0 rgba(255, 253, 246, 0.85) inset,
+      0 0 0 1px rgba(255, 253, 246, 0.4) inset,
+      0 0 66px -16px color-mix(in oklab, #C9B37E 28%, transparent) inset,
+      0 18px 48px -26px rgba(80, 60, 30, 0.22),
+      0 38px 90px -42px rgba(80, 60, 30, 0.2);
   }
 
   /* Refined ornamental section divider (flourish-style) */
