@@ -50,7 +50,7 @@ export function Ceremonies() {
                 <span className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gold bg-white shadow-gold" />
 
                 <div
-                  className={`mx-auto max-w-md rounded border border-gold/40 bg-white/80 px-5 py-4 sm:px-6 sm:py-5 text-left backdrop-blur md:max-w-sm ${
+                  className={`lux-card mx-auto max-w-md rounded-xl px-5 py-4 sm:px-6 sm:py-5 text-left md:max-w-sm ${
                     i % 2 === 0 ? "md:mr-auto md:ml-0" : "md:ml-auto md:mr-0"
                   }`}
                 >

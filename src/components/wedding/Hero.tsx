@@ -4,7 +4,7 @@ import { Ornament } from "./Ornament";
 
 export function Hero() {
   return (
-    <section className="bg-lux-hero lux-glow relative flex min-h-[88svh] items-center justify-center overflow-hidden py-14 md:py-20">
+    <section className="bg-lux-hero lux-glow lux-hero-halo relative flex min-h-[88svh] items-center justify-center overflow-hidden py-14 md:py-20">
       <img
         src={namesBg}
         alt=""
