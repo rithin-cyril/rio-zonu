@@ -40,7 +40,7 @@ export function Blessings() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="relative rounded-md border border-gold/50 bg-white/90 p-6 shadow-gold backdrop-blur"
+              className="lux-card relative rounded-xl p-6"
             >
               <span className="font-script text-2xl text-gold-gradient" aria-hidden>✝</span>
               <p className="mt-2 font-script text-lg italic leading-relaxed ink md:text-xl">
@@ -71,7 +71,7 @@ export function Blessings() {
             setSubmitting(false);
             setSent(true);
           }}
-          className="mt-8 min-h-[320px] scroll-mt-24 rounded-md border border-gold/50 bg-white/90 p-6 text-left shadow-gold backdrop-blur md:mt-10 md:p-7"
+          className="lux-card mt-8 min-h-[320px] scroll-mt-24 rounded-xl p-6 text-left md:mt-10 md:p-7"
         >
           <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient">
             LEAVE A BLESSING FOR THE COUPLE
