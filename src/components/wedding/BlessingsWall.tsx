@@ -53,7 +53,7 @@ export function BlessingsWall() {
   return (
     <section
       aria-labelledby="blessings-wall-heading"
-      className="bg-lux-warm relative overflow-hidden py-10 md:py-14"
+      className="lux-section overflow-hidden py-8 md:py-12"
     >
       <div className="mx-auto max-w-5xl px-5 sm:px-6">
         <div className="text-center">

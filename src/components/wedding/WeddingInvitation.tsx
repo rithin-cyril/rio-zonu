@@ -42,17 +42,17 @@ export function WeddingInvitation() {
       <Hero />
       <SectionDivider />
       <Welcome />
-      <SectionDivider variant="warm" />
+      <SectionDivider />
       <Journey />
       <SectionDivider />
       <Countdown />
-      <SectionDivider variant="warm" />
+      <SectionDivider />
       <Families />
       <SectionDivider />
       <Ceremonies />
-      <SectionDivider variant="warm" />
+      <SectionDivider />
       <Blessings />
-      <SectionDivider variant="warm" />
+      <SectionDivider />
       <BlessingsWall />
       <Closing />
       </div>
