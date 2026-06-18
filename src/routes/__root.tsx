@@ -10,6 +10,11 @@ import {
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import favicon16 from "../assets/favicon-16x16.png.asset.json";
+import favicon32 from "../assets/favicon-32x32.png.asset.json";
+import favicon180 from "../assets/favicon-180x180.png.asset.json";
+import favicon192 from "../assets/favicon-192x192.png.asset.json";
+import favicon512 from "../assets/favicon-512x512.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -91,6 +96,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/png", sizes: "16x16", href: favicon16.url },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: favicon32.url },
+      { rel: "apple-touch-icon", sizes: "180x180", href: favicon180.url },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: favicon192.url },
+      { rel: "icon", type: "image/png", sizes: "512x512", href: favicon512.url },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
