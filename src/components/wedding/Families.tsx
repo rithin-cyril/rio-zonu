@@ -62,12 +62,28 @@ export function Families() {
           joyfully invite you to witness the Holy Matrimony of
         </p>
 
-        <div className="mt-6 md:mt-8">
-          <p className="font-display text-lg tracking-[0.35em] text-gold-gradient md:text-3xl">
-            RITHIN CYRIL &nbsp;&amp;&nbsp; V. HARSHITA
-          </p>
-          <p className="font-display mt-2.5 text-[10px] font-semibold tracking-[0.4em] ink-soft md:text-[11px]">
-            SUNDAY · 18 OCTOBER 2026
+        <div className="mx-auto mt-6 flex w-full max-w-[90%] flex-col items-center gap-3 md:mt-8">
+          <div className="flex flex-col items-center gap-1 sm:flex-row sm:items-center sm:justify-center sm:gap-3">
+            <span className="font-display whitespace-nowrap text-[clamp(2rem,5vw,4rem)] leading-none tracking-[0.05em] text-gold-gradient sm:tracking-[0.12em]">
+              RITHIN CYRIL
+            </span>
+            <span className="font-display text-[clamp(1.25rem,3vw,2rem)] leading-none tracking-[0.1em] text-gold-gradient">
+              &
+            </span>
+            <span className="font-display whitespace-nowrap text-[clamp(2rem,5vw,4rem)] leading-none tracking-[0.05em] text-gold-gradient sm:tracking-[0.12em]">
+              V. HARSHITA
+            </span>
+          </div>
+
+          <Ornament className="mt-1" />
+
+          <p className="font-display text-[10px] font-semibold tracking-[0.25em] ink-soft sm:tracking-[0.4em] md:text-[11px]">
+            <span className="sm:hidden">
+              SUNDAY
+              <br />
+              18 OCTOBER 2026
+            </span>
+            <span className="hidden sm:inline">SUNDAY · 18 OCTOBER 2026</span>
           </p>
         </div>
       </div>
