@@ -32,25 +32,58 @@ export function SectionDivider({
       className={`${t.bg} relative flex items-center justify-center gap-4 px-6 py-6 sm:py-8 ${className}`}
     >
       <span
-        className={`h-px w-16 max-w-[22vw] bg-gradient-to-r from-transparent ${t.line} to-transparent sm:w-28`}
+        className={`h-px w-20 max-w-[28vw] bg-gradient-to-r from-transparent ${t.line} to-transparent sm:w-40`}
       />
       <svg
-        width="28"
-        height="14"
-        viewBox="0 0 28 14"
+        width="64"
+        height="22"
+        viewBox="0 0 64 22"
         fill="none"
         className={t.glyph}
       >
+        {/* Left flourish */}
         <path
-          d="M1 7 Q7 1 14 7 Q21 13 27 7"
+          d="M2 11 Q9 4 16 11 Q20 14 24 11"
           stroke="currentColor"
-          strokeWidth="0.9"
+          strokeWidth="0.8"
+          strokeLinecap="round"
           fill="none"
         />
-        <circle cx="14" cy="7" r="1.4" fill="currentColor" />
+        <path
+          d="M8 11 Q12 7 16 11"
+          stroke="currentColor"
+          strokeWidth="0.5"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.7"
+        />
+        {/* Centre diamond + dot */}
+        <path
+          d="M28 11 L32 6 L36 11 L32 16 Z"
+          stroke="currentColor"
+          strokeWidth="0.8"
+          fill="none"
+        />
+        <circle cx="32" cy="11" r="1.3" fill="currentColor" />
+        {/* Right flourish (mirror) */}
+        <path
+          d="M62 11 Q55 4 48 11 Q44 14 40 11"
+          stroke="currentColor"
+          strokeWidth="0.8"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M56 11 Q52 7 48 11"
+          stroke="currentColor"
+          strokeWidth="0.5"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.7"
+        />
       </svg>
       <span
-        className={`h-px w-16 max-w-[22vw] bg-gradient-to-l from-transparent ${t.line} to-transparent sm:w-28`}
+        className={`h-px w-20 max-w-[28vw] bg-gradient-to-l from-transparent ${t.line} to-transparent sm:w-40`}
       />
     </div>
   );
