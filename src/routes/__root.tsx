@@ -10,6 +10,11 @@ import {
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import favicon16 from "../assets/favicon-16x16.png.asset.json";
+import favicon32 from "../assets/favicon-32x32.png.asset.json";
+import favicon180 from "../assets/favicon-180x180.png.asset.json";
+import favicon192 from "../assets/favicon-192x192.png.asset.json";
+import favicon512 from "../assets/favicon-512x512.png.asset.json";
 
 function NotFoundComponent() {
   return (
