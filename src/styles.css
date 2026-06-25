@@ -269,17 +269,42 @@
   /* Unified semi-transparent content layer for sections above the background artwork */
   .lux-section {
     position: relative;
-    background-color: color-mix(in oklab, #FBF8F1 62%, transparent);
+    width: calc(100% - 2rem);
+    max-width: 1120px;
+    margin: 1.25rem auto;
+    border-radius: 28px;
+    background-color: color-mix(in oklab, #FBF8F1 84%, transparent);
     background-image:
+      radial-gradient(ellipse at 18% 0%,
+        color-mix(in oklab, #FFFFFF 55%, transparent) 0%, transparent 55%),
       linear-gradient(180deg,
-        color-mix(in oklab, #FFFDF6 70%, transparent) 0%,
-        color-mix(in oklab, #FBF8F1 60%, transparent) 100%);
-    backdrop-filter: blur(14px) saturate(112%);
-    border-top: 1px solid color-mix(in oklab, #C9B37E 28%, transparent);
-    border-bottom: 1px solid color-mix(in oklab, #C9B37E 14%, transparent);
+        color-mix(in oklab, #FFFDF6 88%, transparent) 0%,
+        color-mix(in oklab, #F7F1E6 82%, transparent) 100%);
+    backdrop-filter: blur(16px) saturate(118%);
+    border: 1px solid color-mix(in oklab, #C9B37E 36%, transparent);
     box-shadow:
-      0 1px 0 rgba(255, 253, 246, 0.6) inset,
-      0 0 60px -20px color-mix(in oklab, #C9B37E 20%, transparent) inset;
+      0 1px 0 rgba(255, 253, 246, 0.85) inset,
+      0 0 0 1px rgba(255, 253, 246, 0.32) inset,
+      0 0 70px -18px color-mix(in oklab, #C9B37E 22%, transparent) inset,
+      0 18px 40px -24px rgba(80, 60, 30, 0.22),
+      0 36px 80px -40px rgba(80, 60, 30, 0.18);
+  }
+
+  @media (min-width: 768px) {
+    .lux-section {
+      width: calc(100% - 4rem);
+      margin: 2rem auto;
+      border-radius: 32px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .lux-section {
+      width: calc(100% - 1.25rem);
+      margin: 0.875rem auto;
+      border-radius: 22px;
+      backdrop-filter: blur(10px) saturate(115%);
+    }
   }
 
   /* Legacy alias mapping to keep older usages cohesive */
