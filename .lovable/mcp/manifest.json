@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "rithin-harshita-wedding-mcp",
+      "version": "0.1.0",
+      "title": "Rithin & Harshita Wedding"
+    },
+    "tools": [
+      {
+        "name": "get_wedding_details",
+        "title": "Get wedding details",
+        "description": "Return the couple, wedding date, and location for Rithin & Harshita's wedding.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_events",
+        "title": "Get wedding events",
+        "description": "List the ceremonies for Rithin & Harshita's wedding with date, time, venue, and map link.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_countdown",
+        "title": "Get wedding countdown",
+        "description": "Return days, hours, and minutes remaining until Rithin & Harshita's wedding ceremony.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
