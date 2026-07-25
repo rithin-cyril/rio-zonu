@@ -80,14 +80,23 @@ export const submitBlessing = createServerFn({ method: "POST" })
 export const getApprovedBlessings = createServerFn({ method: "GET" })
   .handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
+    const [{ data, error }, settingsRes] = await Promise.all([
+      supabaseAdmin
       .from("blessings")
       .select("id, name, note, approved_at")
       .eq("approved", true)
       .eq("rejected", false)
       .eq("hidden", false)
       .order("sort_order", { ascending: true, nullsFirst: false })
-      .order("approved_at", { ascending: true });
+        .order("approved_at", { ascending: true }),
+      supabaseAdmin
+        .from("site_settings")
+        .select("value")
+        .eq("key", "public_dates")
+        .maybeSingle(),
+    ]);
     if (error) throw new Error(error.message);
-    return { blessings: data ?? [] };
+    const showDates =
+      (settingsRes.data?.value as { show?: boolean } | null)?.show !== false;
+    return { blessings: data ?? [], showDates };
   });
