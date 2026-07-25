@@ -640,3 +640,47 @@ export const adminReorderBlessings = createServerFn({ method: "POST" })
 
     return { ok: true, changed: changes.length };
   });
+
+// ---- Site settings (admin write, public read) ----
+export const adminGetShowPublicDates = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { data } = await supabaseAdmin
+      .from("site_settings")
+      .select("value")
+      .eq("key", "public_dates")
+      .maybeSingle();
+    const show = (data?.value as { show?: boolean } | null)?.show !== false;
+    return { show };
+  });
+
+export const adminSetShowPublicDates = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ show: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { error } = await supabaseAdmin
+      .from("site_settings")
+      .upsert(
+        {
+          key: "public_dates",
+          value: { show: data.show },
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "key" },
+      );
+    if (error) throw new Error(error.message);
+    await writeLog({
+      supabaseAdmin,
+      blessing_id: null,
+      guest_name: null,
+      action: "settings_updated",
+      administrator: adminEmail,
+      administrator_id: adminId,
+      previous_status: null,
+      new_status: null,
+      reason: `public_dates.show=${data.show ? "true" : "false"}`,
+    });
+    return { ok: true, show: data.show };
+  });
