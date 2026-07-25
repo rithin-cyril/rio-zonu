@@ -29,6 +29,7 @@ function formatDate(iso: string | null) {
 export function BlessingsWall() {
   const fetchApproved = useServerFn(getApprovedBlessings);
   const [items, setItems] = useState<Blessing[]>([]);
+  const [showDates, setShowDates] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(PAGE_SIZE);
 
@@ -36,7 +37,9 @@ export function BlessingsWall() {
     let mounted = true;
     fetchApproved()
       .then((r) => {
-        if (mounted) setItems(r.blessings);
+        if (!mounted) return;
+        setItems(r.blessings);
+        setShowDates(r.showDates !== false);
       })
       .catch(() => {})
       .finally(() => {
@@ -116,7 +119,7 @@ export function BlessingsWall() {
                     <p className="font-display text-[11px] font-semibold tracking-[0.38em] text-gold-gradient">
                       — {b.name.toUpperCase()}
                     </p>
-                    {b.approved_at && (
+                    {showDates && b.approved_at && (
                       <time
                         dateTime={b.approved_at}
                         className="mt-0.5 block font-script text-xs italic ink-soft"
