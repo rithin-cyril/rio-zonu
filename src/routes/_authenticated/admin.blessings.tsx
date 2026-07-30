@@ -28,6 +28,8 @@ import {
   adminListBlessings,
   adminReorderBlessings,
   adminRestoreBlessing,
+  adminReanalyzeBlessing,
+  adminSetRankingMode,
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/blessings")({
@@ -45,6 +47,10 @@ type Row = {
   sort_order: number | null;
   last_edited_at: string | null;
   last_edited_by: string | null;
+  quality_score: number | null;
+  ai_probability: number | null;
+  analysis: any | null;
+  analyzed_at: string | null;
 };
 type Version = {
   id: string;
@@ -59,6 +65,33 @@ type Version = {
 
 const FILTERS = ["all", "pending", "approved", "hidden", "rejected"] as const;
 type Filter = (typeof FILTERS)[number];
+
+const SORTS = {
+  manual: "Manual order",
+  score_desc: "Highest score",
+  score_asc: "Lowest score",
+  ai_desc: "Highest AI probability",
+  ai_asc: "Lowest AI probability",
+  len_desc: "Longest blessing",
+  len_asc: "Shortest blessing",
+  new: "Newest",
+  old: "Oldest",
+} as const;
+type SortKey = keyof typeof SORTS;
+
+function classifyProb(p: number | null) {
+  if (p === null || p === undefined) return { label: "Not analysed", cls: "border-gray-300 text-gray-600" };
+  if (p <= 30) return { label: "🟢 Likely Human", cls: "border-emerald-300 text-emerald-700" };
+  if (p <= 70) return { label: "🟡 Mixed / Uncertain", cls: "border-amber-300 text-amber-700" };
+  return { label: "🔴 Likely AI-Generated", cls: "border-rose-300 text-rose-700" };
+}
+
+function scoreCls(s: number | null) {
+  if (s === null || s === undefined) return "border-gray-300 text-gray-600";
+  if (s >= 80) return "border-emerald-400 text-emerald-700";
+  if (s >= 55) return "border-amber-400 text-amber-700";
+  return "border-rose-300 text-rose-700";
+}
 
 function StatusBadge({ status }: { status: Status | string }) {
   const cls =
@@ -84,20 +117,26 @@ function AdminBlessings() {
   const edit = useServerFn(adminEditBlessing);
   const reorder = useServerFn(adminReorderBlessings);
   const listVersions = useServerFn(adminListBlessingVersions);
+  const reanalyze = useServerFn(adminReanalyzeBlessing);
+  const setRanking = useServerFn(adminSetRankingMode);
 
   const [rows, setRows] = useState<Row[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
+  const [sort, setSort] = useState<SortKey>("manual");
+  const [rankingMode, setRankingMode] = useState<"ai" | "manual">("ai");
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [historyId, setHistoryId] = useState<string | null>(null);
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
       const r = await list();
       setRows(r.blessings as any);
+      setRankingMode(((r as any).rankingMode ?? "ai") as "ai" | "manual");
       setDirty(false);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to load");
@@ -170,7 +209,7 @@ function AdminBlessings() {
     setSavingOrder(true);
     try {
       await reorder({ data: { orderedIds: rows.map((r) => r.id) } });
-      toast.success("Order saved");
+      toast.success("Manual order saved — it now overrides AI ranking");
       await refresh();
     } catch (e: any) {
       toast.error(e?.message ?? "Could not save order");
@@ -179,7 +218,41 @@ function AdminBlessings() {
     }
   }
 
+  async function resetToAiRanking() {
+    try {
+      await setRanking({ data: { mode: "ai" } });
+      toast.success("Public ordering reset to AI ranking");
+      await refresh();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not reset ranking");
+    }
+  }
+
   const editingRow = useMemo(() => rows.find((r) => r.id === editingId) ?? null, [rows, editingId]);
+  const analysisRow = useMemo(
+    () => rows.find((r) => r.id === analysisId) ?? null,
+    [rows, analysisId],
+  );
+
+  const displayRows = useMemo(() => {
+    if (sort === "manual") return rows;
+    const s = [...rows];
+    const n = (v: number | null | undefined, d: number) => (v === null || v === undefined ? d : v);
+    s.sort((a, b) => {
+      switch (sort) {
+        case "score_desc": return n(b.quality_score, -1) - n(a.quality_score, -1);
+        case "score_asc": return n(a.quality_score, 101) - n(b.quality_score, 101);
+        case "ai_desc": return n(b.ai_probability, -1) - n(a.ai_probability, -1);
+        case "ai_asc": return n(a.ai_probability, 101) - n(b.ai_probability, 101);
+        case "len_desc": return b.note.length - a.note.length;
+        case "len_asc": return a.note.length - b.note.length;
+        case "new": return b.created_at.localeCompare(a.created_at);
+        case "old": return a.created_at.localeCompare(b.created_at);
+        default: return 0;
+      }
+    });
+    return s;
+  }, [rows, sort]);
 
   return (
     <div className="space-y-4">
@@ -198,6 +271,16 @@ function AdminBlessings() {
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            aria-label="Sort blessings"
+            className="rounded-md border border-gold/40 bg-white px-2 py-1.5 font-display text-[10px] tracking-[0.2em] uppercase ink-soft"
+          >
+            {Object.entries(SORTS).map(([k, label]) => (
+              <option key={k} value={k}>{label}</option>
+            ))}
+          </select>
           {dirty && (
             <span className="font-script text-xs italic text-amber-700">
               Unsaved order changes
@@ -219,10 +302,25 @@ function AdminBlessings() {
         </div>
       </div>
 
-      <p className="font-script text-xs italic ink-soft">
-        Drag the handle (⋮⋮) to reorder. The order applies to the public website
-        after you save. Filtering hides cards but keeps the underlying order.
-      </p>
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-gold/30 bg-white/80 px-4 py-3">
+        <span className={`rounded-full border px-2 py-0.5 font-display text-[9px] font-semibold tracking-[0.25em] uppercase ${rankingMode === "manual" ? "border-indigo-300 text-indigo-700" : "border-emerald-300 text-emerald-700"}`}>
+          {rankingMode === "manual" ? "Manual order active" : "AI ranking active"}
+        </span>
+        <p className="font-script text-xs italic ink-soft">
+          {rankingMode === "manual"
+            ? "The public wall uses your saved manual order."
+            : "The public wall shows the highest Blessing Quality Scores first."}{" "}
+          Drag the handle (⋮⋮) or use the move buttons, then save to override.
+          Sorting the list above is a view only — it does not change the public order.
+        </p>
+        <button
+          onClick={resetToAiRanking}
+          disabled={rankingMode === "ai"}
+          className="ml-auto rounded-md border border-gold/50 px-3 py-1.5 font-display text-[10px] font-semibold tracking-[0.3em] uppercase text-gold-gradient transition hover:bg-gold/5 disabled:opacity-40"
+        >
+          ✨ Reset to AI ranking
+        </button>
+      </div>
 
       {loading ? (
         <p className="font-script italic ink-soft">Loading…</p>
@@ -232,17 +330,19 @@ function AdminBlessings() {
         </p>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={displayRows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
             <ul className="grid grid-cols-1 gap-4">
-              {rows.map((b, position) => {
+              {displayRows.map((b) => {
                 const hidden = filter !== "all" && b.status !== filter;
                 if (hidden) return null;
+                const position = rows.findIndex((r) => r.id === b.id) + 1;
                 return (
                   <SortableCard
                     key={b.id}
                     row={b}
-                    position={position + 1}
+                    position={position}
                     total={rows.length}
+                    draggable={sort === "manual"}
                     pending={pending === b.id}
                     onApprove={() =>
                       run(
@@ -266,6 +366,10 @@ function AdminBlessings() {
                     }}
                     onEdit={() => setEditingId(b.id)}
                     onHistory={() => setHistoryId(b.id)}
+                    onAnalysis={() => setAnalysisId(b.id)}
+                    onReanalyze={() =>
+                      run(b.id, () => reanalyze({ data: { id: b.id } }), "Re-analysed")
+                    }
                     onMove={(where) => move(b.id, where)}
                   />
                 );
@@ -298,6 +402,10 @@ function AdminBlessings() {
           load={async () => (await listVersions({ data: { id: historyId } })).versions as any}
           onClose={() => setHistoryId(null)}
         />
+      )}
+
+      {analysisRow && (
+        <AnalysisModal row={analysisRow} onClose={() => setAnalysisId(null)} />
       )}
     </div>
   );
