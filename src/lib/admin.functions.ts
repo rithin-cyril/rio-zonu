@@ -575,6 +575,15 @@ export const adminEditBlessing = createServerFn({ method: "POST" })
       ].filter(Boolean).join("; ") || "no changes",
     });
 
+    if (noteChanged) {
+      try {
+        const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+        await analyzeAndStore(supabaseAdmin, { id: data.id, name: data.name, note: data.note });
+      } catch (e) {
+        console.error("[admin] analysis on edit failed", e);
+      }
+    }
+
     return { ok: true };
   });
 
@@ -651,7 +660,69 @@ export const adminReorderBlessings = createServerFn({ method: "POST" })
       });
     }
 
+    // Saving a manual order overrides automatic score-based ranking.
+    await supabaseAdmin.from("site_settings").upsert(
+      {
+        key: "blessings_ranking",
+        value: { mode: "manual" },
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "key" },
+    );
+
     return { ok: true, changed: changes.length };
+  });
+
+// ---- Analysis & ranking mode ----
+export const adminReanalyzeBlessing = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => idInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const prev = await loadBlessing(supabaseAdmin, data.id);
+    const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+    const analysis = await analyzeAndStore(supabaseAdmin, prev as any);
+    if (!analysis) throw new Error("Analysis failed. Please try again.");
+    await writeLog({
+      supabaseAdmin,
+      blessing_id: data.id,
+      guest_name: prev.name,
+      action: "reanalyzed",
+      administrator: adminEmail,
+      administrator_id: adminId,
+      previous_status: null,
+      new_status: null,
+      reason: `score ${analysis.quality_score}/100 • AI ${analysis.ai_probability}%`,
+    });
+    return { ok: true, analysis };
+  });
+
+export const adminSetRankingMode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ mode: z.enum(["ai", "manual"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { error } = await supabaseAdmin.from("site_settings").upsert(
+      {
+        key: "blessings_ranking",
+        value: { mode: data.mode },
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "key" },
+    );
+    if (error) throw new Error(error.message);
+    await writeLog({
+      supabaseAdmin,
+      blessing_id: null,
+      guest_name: null,
+      action: "settings_updated",
+      administrator: adminEmail,
+      administrator_id: adminId,
+      previous_status: null,
+      new_status: null,
+      reason: `blessings_ranking.mode=${data.mode}`,
+    });
+    return { ok: true, mode: data.mode };
   });
 
 // ---- Site settings (admin write, public read) ----
