@@ -689,6 +689,98 @@ function EditModal({
   );
 }
 
+function Bar({ label, value }: { label: string; value: number | null | undefined }) {
+  const v = value ?? 0;
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <span className="font-display text-[10px] tracking-[0.25em] uppercase ink-soft">{label}</span>
+        <span className="font-display text-[10px] font-semibold ink">{value ?? "—"}/100</span>
+      </div>
+      <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-gold/10">
+        <div
+          className="h-full rounded-full bg-[oklch(0.72_0.11_80)]"
+          style={{ width: `${Math.max(0, Math.min(100, v))}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function AnalysisModal({ row, onClose }: { row: Row; onClose: () => void }) {
+  const a = row.analysis ?? null;
+  const b = a?.breakdown ?? {};
+  const cls = classifyProb(row.ai_probability);
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="dialog" aria-modal="true">
+      <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-gold/40 bg-white p-6 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="font-script text-2xl italic text-gold-gradient">Blessing analysis</h3>
+          <button onClick={onClose} className="rounded px-2 py-1 ink-soft hover:bg-gold/5">✕</button>
+        </div>
+
+        {!a ? (
+          <p className="font-script italic ink-soft">
+            This blessing has not been analysed yet. Use ♻️ Re-analyse on the card.
+          </p>
+        ) : (
+          <div className="space-y-5">
+            <div className="rounded-lg border border-gold/30 bg-[#FBF8F1]/60 p-4">
+              <p className="font-display text-[10px] tracking-[0.3em] uppercase ink-soft">
+                Overall blessing score
+              </p>
+              <p className="font-script text-3xl italic text-gold-gradient">
+                {row.quality_score ?? "—"}/100
+              </p>
+              <p className="mt-1 font-script text-sm italic ink-soft">{a.summary}</p>
+            </div>
+
+            <div className="space-y-3">
+              <p className="font-display text-[10px] tracking-[0.3em] uppercase ink-soft">Breakdown</p>
+              <Bar label="❤️ Emotional quality" value={b.emotional_quality} />
+              <Bar label="💍 Wedding relevance" value={b.wedding_relevance} />
+              <Bar label="✨ Originality" value={b.originality} />
+              <Bar label="📝 Writing quality" value={b.writing_quality} />
+              <Bar label="😊 Positive sentiment" value={b.positive_sentiment} />
+              <Bar label="📏 Character count contribution" value={b.length_contribution} />
+              <Bar label="🚫 Spam penalty" value={b.spam_penalty} />
+            </div>
+
+            <div className="rounded-lg border border-gold/30 p-4">
+              <p className="font-display text-[10px] tracking-[0.3em] uppercase ink-soft">🤖 AI analysis</p>
+              <p className="mt-1 font-script text-xl italic ink">
+                AI content probability: {row.ai_probability ?? "—"}%
+              </p>
+              <span className={`mt-1 inline-block rounded-full border px-2 py-0.5 font-display text-[9px] font-semibold tracking-[0.25em] uppercase ${cls.cls}`}>
+                {cls.label}
+              </span>
+              <ul className="mt-3 list-disc space-y-1 pl-5 font-script text-sm italic ink-soft">
+                {(a.ai_indicators ?? []).map((i: string, idx: number) => (
+                  <li key={idx}>{i}</li>
+                ))}
+              </ul>
+              <p className="mt-3 font-script text-xs italic ink-soft">
+                Advisory only — this estimate never changes the quality score or moderation status.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 font-script text-sm italic ink-soft">
+              <p>📏 Characters: {row.note.length}</p>
+              <p>🗓 Submitted: {new Date(row.created_at).toLocaleString()}</p>
+              <p>✅ Status: {row.status}</p>
+              <p>
+                🔍 Analysed:{" "}
+                {row.analyzed_at ? new Date(row.analyzed_at).toLocaleString() : "—"}
+                {a.source === "heuristic" ? " (offline scoring)" : ""}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function HistoryModal({
   id,
   load,
