@@ -416,22 +416,28 @@ function SortableCard({
   position,
   total,
   pending,
+  draggable,
   onApprove,
   onHide,
   onDelete,
   onEdit,
   onHistory,
+  onAnalysis,
+  onReanalyze,
   onMove,
 }: {
   row: Row;
   position: number;
   total: number;
   pending: boolean;
+  draggable: boolean;
   onApprove: () => void;
   onHide: () => void;
   onDelete: () => void;
   onEdit: () => void;
   onHistory: () => void;
+  onAnalysis: () => void;
+  onReanalyze: () => void;
   onMove: (where: "top" | "up" | "down" | "bottom") => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -453,8 +459,10 @@ function SortableCard({
         <button
           {...attributes}
           {...listeners}
+          disabled={!draggable}
           aria-label="Drag to reorder"
-          className="mt-1 cursor-grab select-none rounded border border-gold/30 px-2 py-1 font-mono text-xs ink-soft hover:bg-gold/5 active:cursor-grabbing"
+          title={draggable ? "Drag to reorder" : "Switch the list to Manual order to drag"}
+          className="mt-1 cursor-grab select-none rounded border border-gold/30 px-2 py-1 font-mono text-xs ink-soft hover:bg-gold/5 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-30"
         >
           ⋮⋮
         </button>
@@ -479,6 +487,17 @@ function SortableCard({
               </span>
             )}
           </div>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className={`rounded-full border px-2 py-0.5 font-display text-[9px] font-semibold tracking-[0.2em] uppercase ${scoreCls(row.quality_score)}`}>
+              ⭐ {row.quality_score ?? "—"}/100
+            </span>
+            <span className={`rounded-full border px-2 py-0.5 font-display text-[9px] font-semibold tracking-[0.2em] uppercase ${classifyProb(row.ai_probability).cls}`}>
+              🤖 {row.ai_probability ?? "—"}% • {classifyProb(row.ai_probability).label}
+            </span>
+            <span className="rounded-full border border-gold/30 px-2 py-0.5 font-display text-[9px] tracking-[0.2em] uppercase ink-soft">
+              📏 {row.note.length} chars
+            </span>
+          </div>
           <p className="mt-2 whitespace-pre-wrap break-words font-script text-base italic leading-relaxed ink [overflow-wrap:anywhere]">
             {row.note}
           </p>
@@ -501,6 +520,19 @@ function SortableCard({
           <MoveBtn label="⤓ Bottom" disabled={position === total} onClick={() => onMove("bottom")} />
         </div>
         <div className="ml-auto flex flex-wrap gap-2">
+          <button
+            onClick={onAnalysis}
+            className="inline-flex min-h-10 items-center rounded border border-sky-600 px-3 py-1.5 font-display text-[10px] font-semibold tracking-[0.3em] text-sky-700 hover:bg-sky-50"
+          >
+            📊 ANALYSIS
+          </button>
+          <button
+            onClick={onReanalyze}
+            disabled={pending}
+            className="inline-flex min-h-10 items-center rounded border border-sky-400 px-3 py-1.5 font-display text-[10px] font-semibold tracking-[0.3em] text-sky-700 hover:bg-sky-50 disabled:opacity-50"
+          >
+            ♻️ RE-ANALYSE
+          </button>
           <button
             onClick={onEdit}
             disabled={pending}
