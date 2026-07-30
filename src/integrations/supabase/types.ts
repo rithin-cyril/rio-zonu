@@ -63,6 +63,9 @@ export type Database = {
       }
       blessings: {
         Row: {
+          ai_probability: number | null
+          analysis: Json | null
+          analyzed_at: string | null
           approved: boolean
           approved_at: string | null
           created_at: string
@@ -74,6 +77,7 @@ export type Database = {
           moderation_token: string
           name: string
           note: string
+          quality_score: number | null
           recipient_email: string
           rejected: boolean
           rejected_at: string | null
@@ -81,6 +85,9 @@ export type Database = {
           sort_order: number | null
         }
         Insert: {
+          ai_probability?: number | null
+          analysis?: Json | null
+          analyzed_at?: string | null
           approved?: boolean
           approved_at?: string | null
           created_at?: string
@@ -92,6 +99,7 @@ export type Database = {
           moderation_token: string
           name: string
           note: string
+          quality_score?: number | null
           recipient_email?: string
           rejected?: boolean
           rejected_at?: string | null
@@ -99,6 +107,9 @@ export type Database = {
           sort_order?: number | null
         }
         Update: {
+          ai_probability?: number | null
+          analysis?: Json | null
+          analyzed_at?: string | null
           approved?: boolean
           approved_at?: string | null
           created_at?: string
@@ -110,6 +121,7 @@ export type Database = {
           moderation_token?: string
           name?: string
           note?: string
+          quality_score?: number | null
           recipient_email?: string
           rejected?: boolean
           rejected_at?: string | null
