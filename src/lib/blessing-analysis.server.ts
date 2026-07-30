@@ -26,6 +26,13 @@ export type BlessingAnalysis = {
 const clamp = (n: number, min = 0, max = 100) =>
   Math.max(min, Math.min(max, Math.round(Number.isFinite(n) ? n : 0)));
 
+// Models sometimes answer with 0-1 fractions instead of 0-100.
+const score = (v: any, fallbackValue = 0) => {
+  const n = typeof v === "number" ? v : Number(v);
+  if (!Number.isFinite(n)) return clamp(fallbackValue);
+  return clamp(n > 0 && n <= 1 ? n * 100 : n);
+};
+
 export function classify(p: number): BlessingAnalysis["classification"] {
   if (p <= 30) return "likely_human";
   if (p <= 70) return "mixed";
@@ -181,21 +188,22 @@ export async function analyzeBlessing(name: string, note: string): Promise<Bless
     if (!raw) return fallback;
     const parsed = JSON.parse(typeof raw === "string" ? raw : JSON.stringify(raw));
 
-    const ai_probability = clamp(parsed.ai_probability);
+    const ai_probability = score(parsed.ai_probability, fallback.ai_probability);
     return {
-      quality_score: clamp(parsed.quality_score),
+      quality_score: score(parsed.quality_score, fallback.quality_score),
       ai_probability,
       classification: classify(ai_probability),
       breakdown: {
-        emotional_quality: clamp(parsed.emotional_quality ?? fallback.breakdown.emotional_quality),
-        wedding_relevance: clamp(parsed.wedding_relevance ?? fallback.breakdown.wedding_relevance),
-        originality: clamp(parsed.originality ?? fallback.breakdown.originality),
-        writing_quality: clamp(parsed.writing_quality ?? fallback.breakdown.writing_quality),
-        positive_sentiment: clamp(parsed.positive_sentiment ?? fallback.breakdown.positive_sentiment),
-        length_contribution: clamp(
-          parsed.length_contribution ?? fallback.breakdown.length_contribution,
+        emotional_quality: score(parsed.emotional_quality, fallback.breakdown.emotional_quality),
+        wedding_relevance: score(parsed.wedding_relevance, fallback.breakdown.wedding_relevance),
+        originality: score(parsed.originality, fallback.breakdown.originality),
+        writing_quality: score(parsed.writing_quality, fallback.breakdown.writing_quality),
+        positive_sentiment: score(parsed.positive_sentiment, fallback.breakdown.positive_sentiment),
+        length_contribution: score(
+          parsed.length_contribution,
+          fallback.breakdown.length_contribution,
         ),
-        spam_penalty: clamp(parsed.spam_penalty ?? fallback.breakdown.spam_penalty),
+        spam_penalty: score(parsed.spam_penalty, fallback.breakdown.spam_penalty),
       },
       ai_indicators: Array.isArray(parsed.ai_indicators)
         ? parsed.ai_indicators.slice(0, 6).map((s: any) => String(s).slice(0, 160))
