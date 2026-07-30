@@ -312,12 +312,19 @@ export const adminListBlessings = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await requireAdmin(context as any);
     const { data, error } = await supabaseAdmin
       .from("blessings")
-      .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason, sort_order, last_edited_at, last_edited_by")
+      .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason, sort_order, last_edited_at, last_edited_by, quality_score, ai_probability, analysis, analyzed_at")
       .order("sort_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
+    const { data: rankingRow } = await supabaseAdmin
+      .from("site_settings")
+      .select("value")
+      .eq("key", "blessings_ranking")
+      .maybeSingle();
     return {
       blessings: (data ?? []).map((b: any) => ({ ...b, status: computeStatus(b) })),
+      rankingMode:
+        (rankingRow?.value as { mode?: string } | null)?.mode === "manual" ? "manual" : "ai",
     };
   });
 
@@ -375,6 +382,12 @@ export const adminApproveBlessing = createServerFn({ method: "POST" })
       previous_status: prevStatus,
       new_status: "approved",
     });
+    try {
+      const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+      await analyzeAndStore(supabaseAdmin, prev as any);
+    } catch (e) {
+      console.error("[admin] analysis on approve failed", e);
+    }
     return { ok: true };
   });
 
@@ -562,6 +575,15 @@ export const adminEditBlessing = createServerFn({ method: "POST" })
       ].filter(Boolean).join("; ") || "no changes",
     });
 
+    if (noteChanged) {
+      try {
+        const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+        await analyzeAndStore(supabaseAdmin, { id: data.id, name: data.name, note: data.note });
+      } catch (e) {
+        console.error("[admin] analysis on edit failed", e);
+      }
+    }
+
     return { ok: true };
   });
 
@@ -638,7 +660,69 @@ export const adminReorderBlessings = createServerFn({ method: "POST" })
       });
     }
 
+    // Saving a manual order overrides automatic score-based ranking.
+    await supabaseAdmin.from("site_settings").upsert(
+      {
+        key: "blessings_ranking",
+        value: { mode: "manual" },
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "key" },
+    );
+
     return { ok: true, changed: changes.length };
+  });
+
+// ---- Analysis & ranking mode ----
+export const adminReanalyzeBlessing = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => idInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const prev = await loadBlessing(supabaseAdmin, data.id);
+    const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+    const analysis = await analyzeAndStore(supabaseAdmin, prev as any);
+    if (!analysis) throw new Error("Analysis failed. Please try again.");
+    await writeLog({
+      supabaseAdmin,
+      blessing_id: data.id,
+      guest_name: prev.name,
+      action: "reanalyzed",
+      administrator: adminEmail,
+      administrator_id: adminId,
+      previous_status: null,
+      new_status: null,
+      reason: `score ${analysis.quality_score}/100 • AI ${analysis.ai_probability}%`,
+    });
+    return { ok: true, analysis };
+  });
+
+export const adminSetRankingMode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ mode: z.enum(["ai", "manual"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { error } = await supabaseAdmin.from("site_settings").upsert(
+      {
+        key: "blessings_ranking",
+        value: { mode: data.mode },
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "key" },
+    );
+    if (error) throw new Error(error.message);
+    await writeLog({
+      supabaseAdmin,
+      blessing_id: null,
+      guest_name: null,
+      action: "settings_updated",
+      administrator: adminEmail,
+      administrator_id: adminId,
+      previous_status: null,
+      new_status: null,
+      reason: `blessings_ranking.mode=${data.mode}`,
+    });
+    return { ok: true, mode: data.mode };
   });
 
 // ---- Site settings (admin write, public read) ----

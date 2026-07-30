@@ -28,6 +28,8 @@ import {
   adminListBlessings,
   adminReorderBlessings,
   adminRestoreBlessing,
+  adminReanalyzeBlessing,
+  adminSetRankingMode,
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/blessings")({
@@ -45,6 +47,10 @@ type Row = {
   sort_order: number | null;
   last_edited_at: string | null;
   last_edited_by: string | null;
+  quality_score: number | null;
+  ai_probability: number | null;
+  analysis: any | null;
+  analyzed_at: string | null;
 };
 type Version = {
   id: string;
@@ -59,6 +65,33 @@ type Version = {
 
 const FILTERS = ["all", "pending", "approved", "hidden", "rejected"] as const;
 type Filter = (typeof FILTERS)[number];
+
+const SORTS = {
+  manual: "Manual order",
+  score_desc: "Highest score",
+  score_asc: "Lowest score",
+  ai_desc: "Highest AI probability",
+  ai_asc: "Lowest AI probability",
+  len_desc: "Longest blessing",
+  len_asc: "Shortest blessing",
+  new: "Newest",
+  old: "Oldest",
+} as const;
+type SortKey = keyof typeof SORTS;
+
+function classifyProb(p: number | null) {
+  if (p === null || p === undefined) return { label: "Not analysed", cls: "border-gray-300 text-gray-600" };
+  if (p <= 30) return { label: "🟢 Likely Human", cls: "border-emerald-300 text-emerald-700" };
+  if (p <= 70) return { label: "🟡 Mixed / Uncertain", cls: "border-amber-300 text-amber-700" };
+  return { label: "🔴 Likely AI-Generated", cls: "border-rose-300 text-rose-700" };
+}
+
+function scoreCls(s: number | null) {
+  if (s === null || s === undefined) return "border-gray-300 text-gray-600";
+  if (s >= 80) return "border-emerald-400 text-emerald-700";
+  if (s >= 55) return "border-amber-400 text-amber-700";
+  return "border-rose-300 text-rose-700";
+}
 
 function StatusBadge({ status }: { status: Status | string }) {
   const cls =
@@ -84,20 +117,26 @@ function AdminBlessings() {
   const edit = useServerFn(adminEditBlessing);
   const reorder = useServerFn(adminReorderBlessings);
   const listVersions = useServerFn(adminListBlessingVersions);
+  const reanalyze = useServerFn(adminReanalyzeBlessing);
+  const setRanking = useServerFn(adminSetRankingMode);
 
   const [rows, setRows] = useState<Row[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
+  const [sort, setSort] = useState<SortKey>("manual");
+  const [rankingMode, setRankingMode] = useState<"ai" | "manual">("ai");
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [historyId, setHistoryId] = useState<string | null>(null);
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
       const r = await list();
       setRows(r.blessings as any);
+      setRankingMode(((r as any).rankingMode ?? "ai") as "ai" | "manual");
       setDirty(false);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to load");
@@ -170,7 +209,7 @@ function AdminBlessings() {
     setSavingOrder(true);
     try {
       await reorder({ data: { orderedIds: rows.map((r) => r.id) } });
-      toast.success("Order saved");
+      toast.success("Manual order saved — it now overrides AI ranking");
       await refresh();
     } catch (e: any) {
       toast.error(e?.message ?? "Could not save order");
@@ -179,7 +218,41 @@ function AdminBlessings() {
     }
   }
 
+  async function resetToAiRanking() {
+    try {
+      await setRanking({ data: { mode: "ai" } });
+      toast.success("Public ordering reset to AI ranking");
+      await refresh();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not reset ranking");
+    }
+  }
+
   const editingRow = useMemo(() => rows.find((r) => r.id === editingId) ?? null, [rows, editingId]);
+  const analysisRow = useMemo(
+    () => rows.find((r) => r.id === analysisId) ?? null,
+    [rows, analysisId],
+  );
+
+  const displayRows = useMemo(() => {
+    if (sort === "manual") return rows;
+    const s = [...rows];
+    const n = (v: number | null | undefined, d: number) => (v === null || v === undefined ? d : v);
+    s.sort((a, b) => {
+      switch (sort) {
+        case "score_desc": return n(b.quality_score, -1) - n(a.quality_score, -1);
+        case "score_asc": return n(a.quality_score, 101) - n(b.quality_score, 101);
+        case "ai_desc": return n(b.ai_probability, -1) - n(a.ai_probability, -1);
+        case "ai_asc": return n(a.ai_probability, 101) - n(b.ai_probability, 101);
+        case "len_desc": return b.note.length - a.note.length;
+        case "len_asc": return a.note.length - b.note.length;
+        case "new": return b.created_at.localeCompare(a.created_at);
+        case "old": return a.created_at.localeCompare(b.created_at);
+        default: return 0;
+      }
+    });
+    return s;
+  }, [rows, sort]);
 
   return (
     <div className="space-y-4">
@@ -198,6 +271,16 @@ function AdminBlessings() {
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            aria-label="Sort blessings"
+            className="rounded-md border border-gold/40 bg-white px-2 py-1.5 font-display text-[10px] tracking-[0.2em] uppercase ink-soft"
+          >
+            {Object.entries(SORTS).map(([k, label]) => (
+              <option key={k} value={k}>{label}</option>
+            ))}
+          </select>
           {dirty && (
             <span className="font-script text-xs italic text-amber-700">
               Unsaved order changes
@@ -219,10 +302,25 @@ function AdminBlessings() {
         </div>
       </div>
 
-      <p className="font-script text-xs italic ink-soft">
-        Drag the handle (⋮⋮) to reorder. The order applies to the public website
-        after you save. Filtering hides cards but keeps the underlying order.
-      </p>
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-gold/30 bg-white/80 px-4 py-3">
+        <span className={`rounded-full border px-2 py-0.5 font-display text-[9px] font-semibold tracking-[0.25em] uppercase ${rankingMode === "manual" ? "border-indigo-300 text-indigo-700" : "border-emerald-300 text-emerald-700"}`}>
+          {rankingMode === "manual" ? "Manual order active" : "AI ranking active"}
+        </span>
+        <p className="font-script text-xs italic ink-soft">
+          {rankingMode === "manual"
+            ? "The public wall uses your saved manual order."
+            : "The public wall shows the highest Blessing Quality Scores first."}{" "}
+          Drag the handle (⋮⋮) or use the move buttons, then save to override.
+          Sorting the list above is a view only — it does not change the public order.
+        </p>
+        <button
+          onClick={resetToAiRanking}
+          disabled={rankingMode === "ai"}
+          className="ml-auto rounded-md border border-gold/50 px-3 py-1.5 font-display text-[10px] font-semibold tracking-[0.3em] uppercase text-gold-gradient transition hover:bg-gold/5 disabled:opacity-40"
+        >
+          ✨ Reset to AI ranking
+        </button>
+      </div>
 
       {loading ? (
         <p className="font-script italic ink-soft">Loading…</p>
@@ -232,17 +330,19 @@ function AdminBlessings() {
         </p>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={displayRows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
             <ul className="grid grid-cols-1 gap-4">
-              {rows.map((b, position) => {
+              {displayRows.map((b) => {
                 const hidden = filter !== "all" && b.status !== filter;
                 if (hidden) return null;
+                const position = rows.findIndex((r) => r.id === b.id) + 1;
                 return (
                   <SortableCard
                     key={b.id}
                     row={b}
-                    position={position + 1}
+                    position={position}
                     total={rows.length}
+                    draggable={sort === "manual"}
                     pending={pending === b.id}
                     onApprove={() =>
                       run(
@@ -266,6 +366,10 @@ function AdminBlessings() {
                     }}
                     onEdit={() => setEditingId(b.id)}
                     onHistory={() => setHistoryId(b.id)}
+                    onAnalysis={() => setAnalysisId(b.id)}
+                    onReanalyze={() =>
+                      run(b.id, () => reanalyze({ data: { id: b.id } }), "Re-analysed")
+                    }
                     onMove={(where) => move(b.id, where)}
                   />
                 );
@@ -299,6 +403,10 @@ function AdminBlessings() {
           onClose={() => setHistoryId(null)}
         />
       )}
+
+      {analysisRow && (
+        <AnalysisModal row={analysisRow} onClose={() => setAnalysisId(null)} />
+      )}
     </div>
   );
 }
@@ -308,22 +416,28 @@ function SortableCard({
   position,
   total,
   pending,
+  draggable,
   onApprove,
   onHide,
   onDelete,
   onEdit,
   onHistory,
+  onAnalysis,
+  onReanalyze,
   onMove,
 }: {
   row: Row;
   position: number;
   total: number;
   pending: boolean;
+  draggable: boolean;
   onApprove: () => void;
   onHide: () => void;
   onDelete: () => void;
   onEdit: () => void;
   onHistory: () => void;
+  onAnalysis: () => void;
+  onReanalyze: () => void;
   onMove: (where: "top" | "up" | "down" | "bottom") => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -345,8 +459,10 @@ function SortableCard({
         <button
           {...attributes}
           {...listeners}
+          disabled={!draggable}
           aria-label="Drag to reorder"
-          className="mt-1 cursor-grab select-none rounded border border-gold/30 px-2 py-1 font-mono text-xs ink-soft hover:bg-gold/5 active:cursor-grabbing"
+          title={draggable ? "Drag to reorder" : "Switch the list to Manual order to drag"}
+          className="mt-1 cursor-grab select-none rounded border border-gold/30 px-2 py-1 font-mono text-xs ink-soft hover:bg-gold/5 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-30"
         >
           ⋮⋮
         </button>
@@ -371,6 +487,17 @@ function SortableCard({
               </span>
             )}
           </div>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className={`rounded-full border px-2 py-0.5 font-display text-[9px] font-semibold tracking-[0.2em] uppercase ${scoreCls(row.quality_score)}`}>
+              ⭐ {row.quality_score ?? "—"}/100
+            </span>
+            <span className={`rounded-full border px-2 py-0.5 font-display text-[9px] font-semibold tracking-[0.2em] uppercase ${classifyProb(row.ai_probability).cls}`}>
+              🤖 {row.ai_probability ?? "—"}% • {classifyProb(row.ai_probability).label}
+            </span>
+            <span className="rounded-full border border-gold/30 px-2 py-0.5 font-display text-[9px] tracking-[0.2em] uppercase ink-soft">
+              📏 {row.note.length} chars
+            </span>
+          </div>
           <p className="mt-2 whitespace-pre-wrap break-words font-script text-base italic leading-relaxed ink [overflow-wrap:anywhere]">
             {row.note}
           </p>
@@ -393,6 +520,19 @@ function SortableCard({
           <MoveBtn label="⤓ Bottom" disabled={position === total} onClick={() => onMove("bottom")} />
         </div>
         <div className="ml-auto flex flex-wrap gap-2">
+          <button
+            onClick={onAnalysis}
+            className="inline-flex min-h-10 items-center rounded border border-sky-600 px-3 py-1.5 font-display text-[10px] font-semibold tracking-[0.3em] text-sky-700 hover:bg-sky-50"
+          >
+            📊 ANALYSIS
+          </button>
+          <button
+            onClick={onReanalyze}
+            disabled={pending}
+            className="inline-flex min-h-10 items-center rounded border border-sky-400 px-3 py-1.5 font-display text-[10px] font-semibold tracking-[0.3em] text-sky-700 hover:bg-sky-50 disabled:opacity-50"
+          >
+            ♻️ RE-ANALYSE
+          </button>
           <button
             onClick={onEdit}
             disabled={pending}
@@ -544,6 +684,98 @@ function EditModal({
             {saving ? "Saving…" : "Save changes"}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function Bar({ label, value }: { label: string; value: number | null | undefined }) {
+  const v = value ?? 0;
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <span className="font-display text-[10px] tracking-[0.25em] uppercase ink-soft">{label}</span>
+        <span className="font-display text-[10px] font-semibold ink">{value ?? "—"}/100</span>
+      </div>
+      <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-gold/10">
+        <div
+          className="h-full rounded-full bg-[oklch(0.72_0.11_80)]"
+          style={{ width: `${Math.max(0, Math.min(100, v))}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function AnalysisModal({ row, onClose }: { row: Row; onClose: () => void }) {
+  const a = row.analysis ?? null;
+  const b = a?.breakdown ?? {};
+  const cls = classifyProb(row.ai_probability);
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="dialog" aria-modal="true">
+      <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-gold/40 bg-white p-6 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="font-script text-2xl italic text-gold-gradient">Blessing analysis</h3>
+          <button onClick={onClose} className="rounded px-2 py-1 ink-soft hover:bg-gold/5">✕</button>
+        </div>
+
+        {!a ? (
+          <p className="font-script italic ink-soft">
+            This blessing has not been analysed yet. Use ♻️ Re-analyse on the card.
+          </p>
+        ) : (
+          <div className="space-y-5">
+            <div className="rounded-lg border border-gold/30 bg-[#FBF8F1]/60 p-4">
+              <p className="font-display text-[10px] tracking-[0.3em] uppercase ink-soft">
+                Overall blessing score
+              </p>
+              <p className="font-script text-3xl italic text-gold-gradient">
+                {row.quality_score ?? "—"}/100
+              </p>
+              <p className="mt-1 font-script text-sm italic ink-soft">{a.summary}</p>
+            </div>
+
+            <div className="space-y-3">
+              <p className="font-display text-[10px] tracking-[0.3em] uppercase ink-soft">Breakdown</p>
+              <Bar label="❤️ Emotional quality" value={b.emotional_quality} />
+              <Bar label="💍 Wedding relevance" value={b.wedding_relevance} />
+              <Bar label="✨ Originality" value={b.originality} />
+              <Bar label="📝 Writing quality" value={b.writing_quality} />
+              <Bar label="😊 Positive sentiment" value={b.positive_sentiment} />
+              <Bar label="📏 Character count contribution" value={b.length_contribution} />
+              <Bar label="🚫 Spam penalty" value={b.spam_penalty} />
+            </div>
+
+            <div className="rounded-lg border border-gold/30 p-4">
+              <p className="font-display text-[10px] tracking-[0.3em] uppercase ink-soft">🤖 AI analysis</p>
+              <p className="mt-1 font-script text-xl italic ink">
+                AI content probability: {row.ai_probability ?? "—"}%
+              </p>
+              <span className={`mt-1 inline-block rounded-full border px-2 py-0.5 font-display text-[9px] font-semibold tracking-[0.25em] uppercase ${cls.cls}`}>
+                {cls.label}
+              </span>
+              <ul className="mt-3 list-disc space-y-1 pl-5 font-script text-sm italic ink-soft">
+                {(a.ai_indicators ?? []).map((i: string, idx: number) => (
+                  <li key={idx}>{i}</li>
+                ))}
+              </ul>
+              <p className="mt-3 font-script text-xs italic ink-soft">
+                Advisory only — this estimate never changes the quality score or moderation status.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 font-script text-sm italic ink-soft">
+              <p>📏 Characters: {row.note.length}</p>
+              <p>🗓 Submitted: {new Date(row.created_at).toLocaleString()}</p>
+              <p>✅ Status: {row.status}</p>
+              <p>
+                🔍 Analysed:{" "}
+                {row.analyzed_at ? new Date(row.analyzed_at).toLocaleString() : "—"}
+                {a.source === "heuristic" ? " (offline scoring)" : ""}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
