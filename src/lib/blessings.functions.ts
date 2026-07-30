@@ -19,6 +19,13 @@ export const submitBlessing = createServerFn({ method: "POST" })
     if (error || !row) throw new Error(error?.message ?? "Insert failed");
 
     try {
+      const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+      await analyzeAndStore(supabaseAdmin, { id: row.id, name: row.name, note: row.note });
+    } catch (e) {
+      console.error("[blessings] analysis on submit failed", e);
+    }
+
+    try {
       await supabaseAdmin.from("moderation_logs").insert({
         blessing_id: row.id,
         guest_name: row.name,
@@ -80,23 +87,51 @@ export const submitBlessing = createServerFn({ method: "POST" })
 export const getApprovedBlessings = createServerFn({ method: "GET" })
   .handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [{ data, error }, settingsRes] = await Promise.all([
+    const [{ data, error }, settingsRes, rankingRes] = await Promise.all([
       supabaseAdmin
-      .from("blessings")
-      .select("id, name, note, approved_at")
-      .eq("approved", true)
-      .eq("rejected", false)
-      .eq("hidden", false)
-      .order("sort_order", { ascending: true, nullsFirst: false })
-        .order("approved_at", { ascending: true }),
+        .from("blessings")
+        .select("id, name, note, approved_at, quality_score, sort_order")
+        .eq("approved", true)
+        .eq("rejected", false)
+        .eq("hidden", false),
       supabaseAdmin
         .from("site_settings")
         .select("value")
         .eq("key", "public_dates")
         .maybeSingle(),
+      supabaseAdmin
+        .from("site_settings")
+        .select("value")
+        .eq("key", "blessings_ranking")
+        .maybeSingle(),
     ]);
     if (error) throw new Error(error.message);
     const showDates =
       (settingsRes.data?.value as { show?: boolean } | null)?.show !== false;
-    return { blessings: data ?? [], showDates };
+    const manual =
+      (rankingRes.data?.value as { mode?: string } | null)?.mode === "manual";
+
+    const rows = [...(data ?? [])];
+    rows.sort((a: any, b: any) => {
+      if (manual) {
+        const ao = a.sort_order ?? Number.MAX_SAFE_INTEGER;
+        const bo = b.sort_order ?? Number.MAX_SAFE_INTEGER;
+        if (ao !== bo) return ao - bo;
+      } else {
+        const as = a.quality_score ?? -1;
+        const bs = b.quality_score ?? -1;
+        if (as !== bs) return bs - as;
+      }
+      return (a.approved_at ?? "").localeCompare(b.approved_at ?? "");
+    });
+
+    return {
+      blessings: rows.map(({ id, name, note, approved_at }: any) => ({
+        id,
+        name,
+        note,
+        approved_at,
+      })),
+      showDates,
+    };
   });
