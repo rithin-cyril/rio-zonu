@@ -312,12 +312,19 @@ export const adminListBlessings = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await requireAdmin(context as any);
     const { data, error } = await supabaseAdmin
       .from("blessings")
-      .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason, sort_order, last_edited_at, last_edited_by")
+      .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason, sort_order, last_edited_at, last_edited_by, quality_score, ai_probability, analysis, analyzed_at")
       .order("sort_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
+    const { data: rankingRow } = await supabaseAdmin
+      .from("site_settings")
+      .select("value")
+      .eq("key", "blessings_ranking")
+      .maybeSingle();
     return {
       blessings: (data ?? []).map((b: any) => ({ ...b, status: computeStatus(b) })),
+      rankingMode:
+        (rankingRow?.value as { mode?: string } | null)?.mode === "manual" ? "manual" : "ai",
     };
   });
 
@@ -375,6 +382,12 @@ export const adminApproveBlessing = createServerFn({ method: "POST" })
       previous_status: prevStatus,
       new_status: "approved",
     });
+    try {
+      const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+      await analyzeAndStore(supabaseAdmin, prev as any);
+    } catch (e) {
+      console.error("[admin] analysis on approve failed", e);
+    }
     return { ok: true };
   });
 
