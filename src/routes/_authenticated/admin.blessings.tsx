@@ -489,7 +489,7 @@ function SortableCard({
         </button>
         <div className="flex flex-col items-center gap-1">
           <div
-            title="Display Position — the live position on the public website (admin-only)"
+            title={`Display Position — live position on the public website (admin-only), of ${visibleCount} shown publicly`}
             className={`flex h-7 min-w-9 items-center justify-center rounded-full border px-2 font-display text-[10px] font-semibold ${
               position ? "border-gold/50 text-gold-gradient" : "border-slate-300 text-slate-400"
             }`}
@@ -693,7 +693,7 @@ function EditModal({
           </div>
           <p className="font-script text-xs italic ink-soft">
             Display order is managed from the list using drag-and-drop and the
-            move buttons. Position #{row.sort_order ?? "—"} currently.
+            move buttons. Display Position #{row.display_position ?? "—"} currently.
           </p>
         </div>
         <div className="mt-6 flex justify-end gap-2">
