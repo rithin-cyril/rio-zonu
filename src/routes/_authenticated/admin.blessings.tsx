@@ -51,6 +51,9 @@ type Row = {
   ai_probability: number | null;
   analysis: any | null;
   analyzed_at: string | null;
+  approved_at?: string | null;
+  display_position: number | null;
+  ai_rank: number | null;
 };
 type Version = {
   id: string;
@@ -67,7 +70,7 @@ const FILTERS = ["all", "pending", "approved", "hidden", "rejected"] as const;
 type Filter = (typeof FILTERS)[number];
 
 const SORTS = {
-  manual: "Manual order",
+  manual: "Display position (live public order)",
   score_desc: "Highest score",
   score_asc: "Lowest score",
   ai_desc: "Highest AI probability",
