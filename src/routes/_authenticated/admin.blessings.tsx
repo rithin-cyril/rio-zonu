@@ -431,7 +431,9 @@ function AdminBlessings() {
 function SortableCard({
   row,
   position,
+  index,
   total,
+  visibleCount,
   pending,
   draggable,
   onApprove,
@@ -444,8 +446,10 @@ function SortableCard({
   onMove,
 }: {
   row: Row;
-  position: number;
+  position: number | null;
+  index: number;
   total: number;
+  visibleCount: number;
   pending: boolean;
   draggable: boolean;
   onApprove: () => void;
@@ -483,8 +487,21 @@ function SortableCard({
         >
           ⋮⋮
         </button>
-        <div className="flex h-7 min-w-9 items-center justify-center rounded-full border border-gold/50 px-2 font-display text-[10px] font-semibold text-gold-gradient">
-          #{position}
+        <div className="flex flex-col items-center gap-1">
+          <div
+            title="Display Position — the live position on the public website (admin-only)"
+            className={`flex h-7 min-w-9 items-center justify-center rounded-full border px-2 font-display text-[10px] font-semibold ${
+              position ? "border-gold/50 text-gold-gradient" : "border-slate-300 text-slate-400"
+            }`}
+          >
+            #{position ?? "—"}
+          </div>
+          <span
+            title="AI Overall Rank — recommendation only"
+            className="rounded-full border border-sky-200 px-1.5 py-0.5 font-display text-[8px] tracking-[0.15em] text-sky-700"
+          >
+            AI #{row.ai_rank ?? "—"}
+          </span>
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -531,10 +548,10 @@ function SortableCard({
 
       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gold/20 pt-3">
         <div className="flex flex-wrap gap-1">
-          <MoveBtn label="⤒ Top" disabled={position === 1} onClick={() => onMove("top")} />
-          <MoveBtn label="↑ Up" disabled={position === 1} onClick={() => onMove("up")} />
-          <MoveBtn label="↓ Down" disabled={position === total} onClick={() => onMove("down")} />
-          <MoveBtn label="⤓ Bottom" disabled={position === total} onClick={() => onMove("bottom")} />
+          <MoveBtn label="⤒ Top" disabled={index === 1} onClick={() => onMove("top")} />
+          <MoveBtn label="↑ Up" disabled={index === 1} onClick={() => onMove("up")} />
+          <MoveBtn label="↓ Down" disabled={index === total} onClick={() => onMove("down")} />
+          <MoveBtn label="⤓ Bottom" disabled={index === total} onClick={() => onMove("bottom")} />
         </div>
         <div className="ml-auto flex flex-wrap gap-2">
           <button
