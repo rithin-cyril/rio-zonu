@@ -74,6 +74,7 @@ function AdminShell() {
         <nav className="mx-auto flex max-w-6xl flex-wrap gap-1 px-5 pb-3 text-sm">
           <NavTab to="/admin" exact>Overview</NavTab>
           <NavTab to="/admin/blessings">Blessings</NavTab>
+          <NavTab to="/admin/reports">Reports</NavTab>
           <NavTab to="/admin/logs">Moderation Logs</NavTab>
         </nav>
       </header>

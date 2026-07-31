@@ -51,6 +51,9 @@ type Row = {
   ai_probability: number | null;
   analysis: any | null;
   analyzed_at: string | null;
+  approved_at?: string | null;
+  display_position: number | null;
+  ai_rank: number | null;
 };
 type Version = {
   id: string;
@@ -67,7 +70,7 @@ const FILTERS = ["all", "pending", "approved", "hidden", "rejected"] as const;
 type Filter = (typeof FILTERS)[number];
 
 const SORTS = {
-  manual: "Manual order",
+  manual: "Display position (live public order)",
   score_desc: "Highest score",
   score_asc: "Lowest score",
   ai_desc: "Highest AI probability",
@@ -234,6 +237,17 @@ function AdminBlessings() {
     [rows, analysisId],
   );
 
+  // Display Position is recomputed locally so it stays correct while the
+  // admin drags/moves rows before saving. Only publicly visible (approved)
+  // blessings occupy a position — it mirrors the live public order.
+  const positions = useMemo(() => {
+    const map = new Map<string, number>();
+    let n = 0;
+    for (const r of rows) if (r.status === "approved") map.set(r.id, ++n);
+    return map;
+  }, [rows]);
+  const visibleCount = positions.size;
+
   const displayRows = useMemo(() => {
     if (sort === "manual") return rows;
     const s = [...rows];
@@ -310,6 +324,8 @@ function AdminBlessings() {
           {rankingMode === "manual"
             ? "The public wall uses your saved manual order."
             : "The public wall shows the highest Blessing Quality Scores first."}{" "}
+          This list mirrors the exact public order — #Display Position is the live
+          website position (never shown to guests), while AI # is a recommendation.
           Drag the handle (⋮⋮) or use the move buttons, then save to override.
           Sorting the list above is a view only — it does not change the public order.
         </p>
@@ -335,13 +351,16 @@ function AdminBlessings() {
               {displayRows.map((b) => {
                 const hidden = filter !== "all" && b.status !== filter;
                 if (hidden) return null;
-                const position = rows.findIndex((r) => r.id === b.id) + 1;
+                const index = rows.findIndex((r) => r.id === b.id) + 1;
+                const position = positions.get(b.id) ?? null;
                 return (
                   <SortableCard
                     key={b.id}
                     row={b}
                     position={position}
+                    index={index}
                     total={rows.length}
+                    visibleCount={visibleCount}
                     draggable={sort === "manual"}
                     pending={pending === b.id}
                     onApprove={() =>
@@ -414,7 +433,9 @@ function AdminBlessings() {
 function SortableCard({
   row,
   position,
+  index,
   total,
+  visibleCount,
   pending,
   draggable,
   onApprove,
@@ -427,8 +448,10 @@ function SortableCard({
   onMove,
 }: {
   row: Row;
-  position: number;
+  position: number | null;
+  index: number;
   total: number;
+  visibleCount: number;
   pending: boolean;
   draggable: boolean;
   onApprove: () => void;
@@ -466,8 +489,21 @@ function SortableCard({
         >
           ⋮⋮
         </button>
-        <div className="flex h-7 min-w-9 items-center justify-center rounded-full border border-gold/50 px-2 font-display text-[10px] font-semibold text-gold-gradient">
-          #{position}
+        <div className="flex flex-col items-center gap-1">
+          <div
+            title={`Display Position — live position on the public website (admin-only), of ${visibleCount} shown publicly`}
+            className={`flex h-7 min-w-9 items-center justify-center rounded-full border px-2 font-display text-[10px] font-semibold ${
+              position ? "border-gold/50 text-gold-gradient" : "border-slate-300 text-slate-400"
+            }`}
+          >
+            #{position ?? "—"}
+          </div>
+          <span
+            title="AI Overall Rank — recommendation only"
+            className="rounded-full border border-sky-200 px-1.5 py-0.5 font-display text-[8px] tracking-[0.15em] text-sky-700"
+          >
+            AI #{row.ai_rank ?? "—"}
+          </span>
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -514,10 +550,10 @@ function SortableCard({
 
       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gold/20 pt-3">
         <div className="flex flex-wrap gap-1">
-          <MoveBtn label="⤒ Top" disabled={position === 1} onClick={() => onMove("top")} />
-          <MoveBtn label="↑ Up" disabled={position === 1} onClick={() => onMove("up")} />
-          <MoveBtn label="↓ Down" disabled={position === total} onClick={() => onMove("down")} />
-          <MoveBtn label="⤓ Bottom" disabled={position === total} onClick={() => onMove("bottom")} />
+          <MoveBtn label="⤒ Top" disabled={index === 1} onClick={() => onMove("top")} />
+          <MoveBtn label="↑ Up" disabled={index === 1} onClick={() => onMove("up")} />
+          <MoveBtn label="↓ Down" disabled={index === total} onClick={() => onMove("down")} />
+          <MoveBtn label="⤓ Bottom" disabled={index === total} onClick={() => onMove("bottom")} />
         </div>
         <div className="ml-auto flex flex-wrap gap-2">
           <button
@@ -659,7 +695,7 @@ function EditModal({
           </div>
           <p className="font-script text-xs italic ink-soft">
             Display order is managed from the list using drag-and-drop and the
-            move buttons. Position #{row.sort_order ?? "—"} currently.
+            move buttons. Display Position #{row.display_position ?? "—"} currently.
           </p>
         </div>
         <div className="mt-6 flex justify-end gap-2">

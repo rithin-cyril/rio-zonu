@@ -1,15 +1,22 @@
 import { useMemo } from "react";
 
+// Deterministic pseudo-random so the server and client render identical
+// petals (Math.random() caused a hydration mismatch).
+function rand(seed: number) {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
 export function Petals({ count = 24 }: { count?: number }) {
   const petals = useMemo(
     () =>
       Array.from({ length: count }).map((_, i) => ({
-        left: Math.random() * 100,
-        delay: Math.random() * 12,
-        duration: 12 + Math.random() * 14,
-        size: 8 + Math.random() * 14,
-        kind: Math.random() > 0.5 ? "rose" : "jasmine",
-        rot: Math.random() * 360,
+        left: rand(i + 1) * 100,
+        delay: rand(i + 101) * 12,
+        duration: 12 + rand(i + 201) * 14,
+        size: 8 + rand(i + 301) * 14,
+        kind: rand(i + 401) > 0.5 ? "rose" : "jasmine",
+        rot: rand(i + 501) * 360,
       })),
     [count],
   );

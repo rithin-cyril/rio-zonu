@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminLogsRouteImport } from './routes/_authenticated/admin.logs'
 import { Route as AuthenticatedAdminBlessingsRouteImport } from './routes/_authenticated/admin.blessings'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -64,6 +65,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminLogsRoute = AuthenticatedAdminLogsRouteImport.update({
   id: '/logs',
   path: '/logs',
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/blessings': typeof AuthenticatedAdminBlessingsRoute
   '/admin/logs': typeof AuthenticatedAdminLogsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
@@ -117,6 +125,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/blessings': typeof AuthenticatedAdminBlessingsRoute
   '/admin/logs': typeof AuthenticatedAdminLogsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
@@ -133,6 +142,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/blessings': typeof AuthenticatedAdminBlessingsRoute
   '/_authenticated/admin/logs': typeof AuthenticatedAdminLogsRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/blessings/$id/approve': typeof ApiPublicBlessingsIdApproveRoute
   '/api/public/blessings/$id/reject': typeof ApiPublicBlessingsIdRejectRoute
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/admin/blessings'
     | '/admin/logs'
+    | '/admin/reports'
     | '/admin/'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/admin/blessings'
     | '/admin/logs'
+    | '/admin/reports'
     | '/admin'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
@@ -177,6 +189,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/blessings'
     | '/_authenticated/admin/logs'
+    | '/_authenticated/admin/reports'
     | '/_authenticated/admin/'
     | '/api/public/blessings/$id/approve'
     | '/api/public/blessings/$id/reject'
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/logs': {
       id: '/_authenticated/admin/logs'
       path: '/logs'
@@ -293,12 +313,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBlessingsRoute: typeof AuthenticatedAdminBlessingsRoute
   AuthenticatedAdminLogsRoute: typeof AuthenticatedAdminLogsRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBlessingsRoute: AuthenticatedAdminBlessingsRoute,
   AuthenticatedAdminLogsRoute: AuthenticatedAdminLogsRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
