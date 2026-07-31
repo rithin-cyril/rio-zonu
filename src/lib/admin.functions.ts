@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { withPositions } from "@/lib/blessing-order";
 
 type Status = "pending" | "approved" | "hidden" | "rejected";
 
@@ -321,10 +322,16 @@ export const adminListBlessings = createServerFn({ method: "GET" })
       .select("value")
       .eq("key", "blessings_ranking")
       .maybeSingle();
+    const rankingMode =
+      (rankingRow?.value as { mode?: string } | null)?.mode === "manual" ? "manual" : "ai";
     return {
-      blessings: (data ?? []).map((b: any) => ({ ...b, status: computeStatus(b) })),
-      rankingMode:
-        (rankingRow?.value as { mode?: string } | null)?.mode === "manual" ? "manual" : "ai",
+      // Ordered exactly like the public wall: visible blessings first in live
+      // public order (display_position #1..#N), then everything else.
+      blessings: withPositions(
+        (data ?? []).map((b: any) => ({ ...b, status: computeStatus(b) })) as any[],
+        rankingMode === "manual",
+      ),
+      rankingMode,
     };
   });
 

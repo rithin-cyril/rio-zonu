@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { sortPublicOrder } from "@/lib/blessing-order";
 
 const submitSchema = z.object({
   name: z.string().trim().min(1).max(80),
@@ -111,19 +112,7 @@ export const getApprovedBlessings = createServerFn({ method: "GET" })
     const manual =
       (rankingRes.data?.value as { mode?: string } | null)?.mode === "manual";
 
-    const rows = [...(data ?? [])];
-    rows.sort((a: any, b: any) => {
-      if (manual) {
-        const ao = a.sort_order ?? Number.MAX_SAFE_INTEGER;
-        const bo = b.sort_order ?? Number.MAX_SAFE_INTEGER;
-        if (ao !== bo) return ao - bo;
-      } else {
-        const as = a.quality_score ?? -1;
-        const bs = b.quality_score ?? -1;
-        if (as !== bs) return bs - as;
-      }
-      return (a.approved_at ?? "").localeCompare(b.approved_at ?? "");
-    });
+    const rows = sortPublicOrder((data ?? []) as any[], manual);
 
     return {
       blessings: rows.map(({ id, name, note, approved_at }: any) => ({
