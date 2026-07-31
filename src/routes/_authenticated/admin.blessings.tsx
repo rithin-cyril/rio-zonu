@@ -237,6 +237,17 @@ function AdminBlessings() {
     [rows, analysisId],
   );
 
+  // Display Position is recomputed locally so it stays correct while the
+  // admin drags/moves rows before saving. Only publicly visible (approved)
+  // blessings occupy a position — it mirrors the live public order.
+  const positions = useMemo(() => {
+    const map = new Map<string, number>();
+    let n = 0;
+    for (const r of rows) if (r.status === "approved") map.set(r.id, ++n);
+    return map;
+  }, [rows]);
+  const visibleCount = positions.size;
+
   const displayRows = useMemo(() => {
     if (sort === "manual") return rows;
     const s = [...rows];
