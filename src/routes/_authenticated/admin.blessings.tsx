@@ -324,6 +324,8 @@ function AdminBlessings() {
           {rankingMode === "manual"
             ? "The public wall uses your saved manual order."
             : "The public wall shows the highest Blessing Quality Scores first."}{" "}
+          This list mirrors the exact public order — #Display Position is the live
+          website position (never shown to guests), while AI # is a recommendation.
           Drag the handle (⋮⋮) or use the move buttons, then save to override.
           Sorting the list above is a view only — it does not change the public order.
         </p>
