@@ -349,13 +349,16 @@ function AdminBlessings() {
               {displayRows.map((b) => {
                 const hidden = filter !== "all" && b.status !== filter;
                 if (hidden) return null;
-                const position = rows.findIndex((r) => r.id === b.id) + 1;
+                const index = rows.findIndex((r) => r.id === b.id) + 1;
+                const position = positions.get(b.id) ?? null;
                 return (
                   <SortableCard
                     key={b.id}
                     row={b}
                     position={position}
+                    index={index}
                     total={rows.length}
+                    visibleCount={visibleCount}
                     draggable={sort === "manual"}
                     pending={pending === b.id}
                     onApprove={() =>
