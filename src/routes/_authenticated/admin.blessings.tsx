@@ -30,6 +30,9 @@ import {
   adminRestoreBlessing,
   adminReanalyzeBlessing,
   adminSetRankingMode,
+  adminListBlessingIdsForAnalysis,
+  adminReanalyzeBatch,
+  adminLogBulkReanalysis,
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/blessings")({
@@ -122,6 +125,9 @@ function AdminBlessings() {
   const listVersions = useServerFn(adminListBlessingVersions);
   const reanalyze = useServerFn(adminReanalyzeBlessing);
   const setRanking = useServerFn(adminSetRankingMode);
+  const listIds = useServerFn(adminListBlessingIdsForAnalysis);
+  const reanalyzeBatch = useServerFn(adminReanalyzeBatch);
+  const logBulk = useServerFn(adminLogBulkReanalysis);
 
   const [rows, setRows] = useState<Row[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
@@ -134,6 +140,62 @@ function AdminBlessings() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [historyId, setHistoryId] = useState<string | null>(null);
   const [analysisId, setAnalysisId] = useState<string | null>(null);
+  const [confirmBulk, setConfirmBulk] = useState(false);
+  const [bulk, setBulk] = useState<BulkState | null>(null);
+
+  const runBulkReanalysis = useCallback(async () => {
+    setConfirmBulk(false);
+    let items: { id: string; name: string }[] = [];
+    try {
+      items = (await listIds()).items;
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not load blessings");
+      return;
+    }
+    if (items.length === 0) {
+      toast.message("No blessings to re-analyse.");
+      return;
+    }
+    const total = items.length;
+    const started = Date.now();
+    setBulk({ total, done: 0, current: items[0]!.name, etaMs: null, failed: 0, finished: false });
+
+    const BATCH = 3;
+    let done = 0;
+    let failed = 0;
+    for (let i = 0; i < items.length; i += BATCH) {
+      const chunk = items.slice(i, i + BATCH);
+      try {
+        const r = await reanalyzeBatch({ data: { ids: chunk.map((c) => c.id) } });
+        failed += (r as any).failed ?? 0;
+      } catch {
+        failed += chunk.length;
+      }
+      done += chunk.length;
+      const elapsed = Date.now() - started;
+      const etaMs = done < total ? Math.round((elapsed / done) * (total - done)) : 0;
+      setBulk({
+        total,
+        done,
+        failed,
+        current: items[Math.min(done, total - 1)]!.name,
+        etaMs,
+        finished: false,
+      });
+      // Yield to the browser so the UI stays responsive between batches.
+      await new Promise((r) => setTimeout(r, 0));
+    }
+
+    try {
+      await logBulk({ data: { total, failed } });
+    } catch {
+      /* logging is best-effort */
+    }
+    setBulk({ total, done, failed, current: null, etaMs: 0, finished: true });
+    await refresh();
+    toast.success(`Re-analysed ${total - failed} of ${total} blessings`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listIds, reanalyzeBatch, logBulk, refresh]);
 
   const refresh = useCallback(async () => {
     try {
@@ -336,7 +398,22 @@ function AdminBlessings() {
         >
           ✨ Reset to AI ranking
         </button>
+        <button
+          onClick={() => setConfirmBulk(true)}
+          disabled={!!bulk && !bulk.finished}
+          className="rounded-md border border-indigo-400 px-3 py-1.5 font-display text-[10px] font-semibold tracking-[0.3em] uppercase text-indigo-700 transition hover:bg-indigo-50 disabled:opacity-40"
+        >
+          🔄 Re-analyze all blessings
+        </button>
       </div>
+
+      {confirmBulk && (
+        <ConfirmBulkModal
+          onCancel={() => setConfirmBulk(false)}
+          onConfirm={runBulkReanalysis}
+        />
+      )}
+      {bulk && <BulkProgressModal state={bulk} onClose={() => setBulk(null)} />}
 
       {loading ? (
         <p className="font-script italic ink-soft">Loading…</p>
