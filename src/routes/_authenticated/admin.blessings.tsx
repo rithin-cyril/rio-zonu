@@ -143,6 +143,19 @@ function AdminBlessings() {
   const [confirmBulk, setConfirmBulk] = useState(false);
   const [bulk, setBulk] = useState<BulkState | null>(null);
 
+  const refresh = useCallback(async () => {
+    try {
+      const r = await list();
+      setRows(r.blessings as any);
+      setRankingMode(((r as any).rankingMode ?? "ai") as "ai" | "manual");
+      setDirty(false);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  }, [list]);
+
   const runBulkReanalysis = useCallback(async () => {
     setConfirmBulk(false);
     let items: { id: string; name: string }[] = [];
@@ -196,19 +209,6 @@ function AdminBlessings() {
     toast.success(`Re-analysed ${total - failed} of ${total} blessings`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listIds, reanalyzeBatch, logBulk, refresh]);
-
-  const refresh = useCallback(async () => {
-    try {
-      const r = await list();
-      setRows(r.blessings as any);
-      setRankingMode(((r as any).rankingMode ?? "ai") as "ai" | "manual");
-      setDirty(false);
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to load");
-    } finally {
-      setLoading(false);
-    }
-  }, [list]);
 
   useEffect(() => {
     refresh();
