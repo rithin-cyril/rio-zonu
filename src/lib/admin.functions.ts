@@ -704,6 +704,64 @@ export const adminReanalyzeBlessing = createServerFn({ method: "POST" })
     return { ok: true, analysis };
   });
 
+// Ids of every blessing, so the client can drive a batched bulk re-analysis
+// with real progress. Analysis-only — never touches text, status or order.
+export const adminListBlessingIdsForAnalysis = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { data, error } = await supabaseAdmin
+      .from("blessings")
+      .select("id, name")
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    return { items: (data ?? []) as { id: string; name: string }[] };
+  });
+
+export const adminReanalyzeBatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(5) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("blessings")
+      .select("id, name, note")
+      .in("id", data.ids);
+    if (error) throw new Error(error.message);
+    let done = 0;
+    let failed = 0;
+    for (const row of rows ?? []) {
+      const analysis = await analyzeAndStore(supabaseAdmin, row as any);
+      if (analysis) done++;
+      else failed++;
+    }
+    return { ok: true, done, failed };
+  });
+
+export const adminLogBulkReanalysis = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ total: z.number().int().min(0), failed: z.number().int().min(0) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    await writeLog({
+      supabaseAdmin,
+      blessing_id: null,
+      guest_name: null,
+      action: "reanalyzed_all",
+      administrator: adminEmail,
+      administrator_id: adminId,
+      previous_status: null,
+      new_status: null,
+      reason: `re-analysed ${data.total - data.failed}/${data.total} blessings`,
+    });
+    return { ok: true };
+  });
+
 export const adminSetRankingMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ mode: z.enum(["ai", "manual"]) }).parse(d))
