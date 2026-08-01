@@ -30,6 +30,9 @@ import {
   adminRestoreBlessing,
   adminReanalyzeBlessing,
   adminSetRankingMode,
+  adminListBlessingIdsForAnalysis,
+  adminReanalyzeBatch,
+  adminLogBulkReanalysis,
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/blessings")({
@@ -68,6 +71,126 @@ type Version = {
 
 const FILTERS = ["all", "pending", "approved", "hidden", "rejected"] as const;
 type Filter = (typeof FILTERS)[number];
+
+type BulkState = {
+  total: number;
+  done: number;
+  failed: number;
+  current: string | null;
+  etaMs: number | null;
+  finished: boolean;
+};
+
+function formatEta(ms: number | null) {
+  if (ms === null) return "estimating…";
+  const s = Math.max(0, Math.round(ms / 1000));
+  if (s < 60) return `${s}s remaining`;
+  return `${Math.floor(s / 60)}m ${s % 60}s remaining`;
+}
+
+function ConfirmBulkModal({
+  onCancel,
+  onConfirm,
+}: {
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="dialog" aria-modal="true">
+      <div className="w-full max-w-md rounded-lg border border-gold/40 bg-white p-6 shadow-2xl">
+        <h3 className="font-script text-2xl italic text-gold-gradient">Re-analyze all blessings</h3>
+        <p className="mt-3 font-script text-base italic ink">
+          This will re-analyze every blessing using the latest scoring algorithm. Continue?
+        </p>
+        <p className="mt-2 font-script text-xs italic ink-soft">
+          Only analysis data changes — text, approval status, visibility, history and the
+          public order are preserved.
+        </p>
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            onClick={onCancel}
+            className="rounded border border-gold/40 px-4 py-2 font-display text-[10px] tracking-[0.3em] uppercase ink-soft hover:bg-gold/5"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="rounded border border-indigo-600 bg-indigo-600 px-4 py-2 font-display text-[10px] font-semibold tracking-[0.3em] uppercase text-white hover:bg-indigo-700"
+          >
+            Re-analyze all
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BulkProgressModal({ state, onClose }: { state: BulkState; onClose: () => void }) {
+  const pct = state.total ? Math.round((state.done / state.total) * 100) : 0;
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="dialog" aria-modal="true">
+      <div className="w-full max-w-md rounded-lg border border-gold/40 bg-white p-6 shadow-2xl">
+        {state.finished ? (
+          <>
+            <h3 className="font-script text-2xl italic text-emerald-700">
+              ✅ Successfully re-analyzed all blessings.
+            </h3>
+            <p className="mt-2 font-display text-[10px] tracking-[0.3em] uppercase ink-soft">Updated</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 font-script text-sm italic ink-soft">
+              <li>Scores</li>
+              <li>Rankings</li>
+              <li>Report cards</li>
+              <li>Category leaderboards</li>
+              <li>AI overall rankings</li>
+            </ul>
+            {state.failed > 0 && (
+              <p className="mt-3 font-script text-sm italic text-amber-700">
+                {state.failed} blessing{state.failed > 1 ? "s" : ""} could not be analysed and kept
+                the previous scores.
+              </p>
+            )}
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={onClose}
+                className="rounded border border-gold/50 px-4 py-2 font-display text-[10px] font-semibold tracking-[0.3em] uppercase text-gold-gradient hover:bg-gold/5"
+              >
+                Done
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h3 className="font-script text-2xl italic text-gold-gradient">
+              Re-analyzing blessings…
+            </h3>
+            <p className="mt-3 font-display text-[10px] tracking-[0.3em] uppercase ink-soft">
+              Progress
+            </p>
+            <p className="font-script text-lg italic ink">
+              {state.done} / {state.total} completed
+            </p>
+            <div
+              className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gold/10"
+              role="progressbar"
+              aria-valuenow={pct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <div
+                className="h-full rounded-full bg-[oklch(0.72_0.11_80)] transition-[width] duration-300"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <p className="mt-3 truncate font-script text-sm italic ink-soft">
+              Currently analysing: {state.current ?? "—"}
+            </p>
+            <p className="font-script text-xs italic ink-soft">{formatEta(state.etaMs)}</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const SORTS = {
   manual: "Display position (live public order)",
@@ -122,6 +245,9 @@ function AdminBlessings() {
   const listVersions = useServerFn(adminListBlessingVersions);
   const reanalyze = useServerFn(adminReanalyzeBlessing);
   const setRanking = useServerFn(adminSetRankingMode);
+  const listIds = useServerFn(adminListBlessingIdsForAnalysis);
+  const reanalyzeBatch = useServerFn(adminReanalyzeBatch);
+  const logBulk = useServerFn(adminLogBulkReanalysis);
 
   const [rows, setRows] = useState<Row[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
@@ -134,6 +260,8 @@ function AdminBlessings() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [historyId, setHistoryId] = useState<string | null>(null);
   const [analysisId, setAnalysisId] = useState<string | null>(null);
+  const [confirmBulk, setConfirmBulk] = useState(false);
+  const [bulk, setBulk] = useState<BulkState | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -147,6 +275,60 @@ function AdminBlessings() {
       setLoading(false);
     }
   }, [list]);
+
+  const runBulkReanalysis = useCallback(async () => {
+    setConfirmBulk(false);
+    let items: { id: string; name: string }[] = [];
+    try {
+      items = (await listIds()).items;
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not load blessings");
+      return;
+    }
+    if (items.length === 0) {
+      toast.message("No blessings to re-analyse.");
+      return;
+    }
+    const total = items.length;
+    const started = Date.now();
+    setBulk({ total, done: 0, current: items[0]!.name, etaMs: null, failed: 0, finished: false });
+
+    const BATCH = 3;
+    let done = 0;
+    let failed = 0;
+    for (let i = 0; i < items.length; i += BATCH) {
+      const chunk = items.slice(i, i + BATCH);
+      try {
+        const r = await reanalyzeBatch({ data: { ids: chunk.map((c) => c.id) } });
+        failed += (r as any).failed ?? 0;
+      } catch {
+        failed += chunk.length;
+      }
+      done += chunk.length;
+      const elapsed = Date.now() - started;
+      const etaMs = done < total ? Math.round((elapsed / done) * (total - done)) : 0;
+      setBulk({
+        total,
+        done,
+        failed,
+        current: items[Math.min(done, total - 1)]!.name,
+        etaMs,
+        finished: false,
+      });
+      // Yield to the browser so the UI stays responsive between batches.
+      await new Promise((r) => setTimeout(r, 0));
+    }
+
+    try {
+      await logBulk({ data: { total, failed } });
+    } catch {
+      /* logging is best-effort */
+    }
+    setBulk({ total, done, failed, current: null, etaMs: 0, finished: true });
+    await refresh();
+    toast.success(`Re-analysed ${total - failed} of ${total} blessings`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listIds, reanalyzeBatch, logBulk, refresh]);
 
   useEffect(() => {
     refresh();
@@ -336,7 +518,22 @@ function AdminBlessings() {
         >
           ✨ Reset to AI ranking
         </button>
+        <button
+          onClick={() => setConfirmBulk(true)}
+          disabled={!!bulk && !bulk.finished}
+          className="rounded-md border border-indigo-400 px-3 py-1.5 font-display text-[10px] font-semibold tracking-[0.3em] uppercase text-indigo-700 transition hover:bg-indigo-50 disabled:opacity-40"
+        >
+          🔄 Re-analyze all blessings
+        </button>
       </div>
+
+      {confirmBulk && (
+        <ConfirmBulkModal
+          onCancel={() => setConfirmBulk(false)}
+          onConfirm={runBulkReanalysis}
+        />
+      )}
+      {bulk && <BulkProgressModal state={bulk} onClose={() => setBulk(null)} />}
 
       {loading ? (
         <p className="font-script italic ink-soft">Loading…</p>
@@ -774,6 +971,7 @@ function AnalysisModal({ row, onClose }: { row: Row; onClose: () => void }) {
             <div className="space-y-3">
               <p className="font-display text-[10px] tracking-[0.3em] uppercase ink-soft">Breakdown</p>
               <Bar label="❤️ Emotional quality" value={b.emotional_quality} />
+              <Bar label="👨‍👩‍👧 Personalization & authenticity" value={b.personalization} />
               <Bar label="💍 Wedding relevance" value={b.wedding_relevance} />
               <Bar label="✨ Originality" value={b.originality} />
               <Bar label="📝 Writing quality" value={b.writing_quality} />

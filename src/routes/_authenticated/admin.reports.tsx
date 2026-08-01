@@ -25,6 +25,7 @@ type Row = {
 
 const CATEGORIES = [
   { key: "emotional_quality", label: "❤️ Emotional Quality" },
+  { key: "personalization", label: "👨‍👩‍👧 Personalization & Authenticity" },
   { key: "wedding_relevance", label: "💍 Wedding Relevance" },
   { key: "originality", label: "✨ Originality" },
   { key: "writing_quality", label: "📝 Writing Quality" },
@@ -461,6 +462,7 @@ function ReportCard({ row, onClose }: { row: Row; onClose: () => void }) {
         <div className="mt-5 space-y-3">
           <p className="font-display text-[10px] tracking-[0.3em] uppercase ink-soft">Score breakdown</p>
           <Bar label="❤️ Emotional quality" value={b.emotional_quality} />
+          <Bar label="👨‍👩‍👧 Personalization & authenticity" value={b.personalization} />
           <Bar label="💍 Wedding relevance" value={b.wedding_relevance} />
           <Bar label="✨ Originality" value={b.originality} />
           <Bar label="📝 Writing quality" value={b.writing_quality} />

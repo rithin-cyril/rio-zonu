@@ -76,7 +76,10 @@ export function Countdown() {
               <div className="relative aspect-square w-full max-w-[88px] sm:max-w-[110px] md:max-w-[120px]">
                 <div className="lux-card absolute inset-0 rounded-full" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-2xl font-semibold text-gold-gradient sm:text-3xl md:text-4xl">
+                  <span
+                    suppressHydrationWarning
+                    className="font-display text-2xl font-semibold text-gold-gradient sm:text-3xl md:text-4xl"
+                  >
                     {String(p.value).padStart(2, "0")}
                   </span>
                 </div>
