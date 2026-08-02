@@ -152,15 +152,27 @@ export const adminExists = createServerFn({ method: "GET" }).handler(async () =>
 export const checkAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", context.userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    const email = (context.claims?.email as string | undefined) ?? null;
-    return { isAdmin: !!data, email, adminId: emailToAdminId(email) };
+    try {
+      const { loadAdminContext } = await import("@/lib/rbac.server");
+      const me = await loadAdminContext(context as any);
+      return {
+        isAdmin: true,
+        email: me.email,
+        adminId: me.username,
+        fullName: me.fullName,
+        role: me.role,
+        permissions: me.permissions,
+      };
+    } catch {
+      return {
+        isAdmin: false,
+        email: null,
+        adminId: null,
+        fullName: null,
+        role: null,
+        permissions: [] as string[],
+      };
+    }
   });
 
 // ---- Login / Logout audit ----
@@ -180,6 +192,14 @@ export const logAuthEvent = createServerFn({ method: "POST" })
       administrator_id: context.userId,
       previous_status: null,
       new_status: null,
+    });
+    const { logActivity } = await import("@/lib/rbac.server");
+    await logActivity(supabaseAdmin, {
+      actor_id: context.userId,
+      actor_label: adminId,
+      action: data.action,
+      target_user_id: context.userId,
+      target_label: adminId,
     });
     return { ok: true };
   });
