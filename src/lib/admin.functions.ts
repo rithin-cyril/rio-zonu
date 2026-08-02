@@ -313,7 +313,7 @@ export const resetAdminPassword = createServerFn({ method: "POST" })
 export const adminListBlessings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { supabaseAdmin } = await requireAdmin(context as any, "blessings.view");
     const { data, error } = await supabaseAdmin
       .from("blessings")
       .select("id, name, note, created_at, approved, rejected, hidden, approved_at, rejected_at, rejection_reason, sort_order, last_edited_at, last_edited_by, quality_score, ai_probability, analysis, analyzed_at")
@@ -341,7 +341,7 @@ export const adminListBlessings = createServerFn({ method: "GET" })
 export const adminListLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { supabaseAdmin } = await requireAdmin(context as any, "moderation.logs");
     const { data, error } = await supabaseAdmin
       .from("moderation_logs")
       .select("*")
@@ -368,7 +368,7 @@ export const adminApproveBlessing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => idInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "blessings.approve");
     const prev = await loadBlessing(supabaseAdmin, data.id);
     const prevStatus = computeStatus(prev);
     const isOverride = prevStatus === "rejected" || prevStatus === "hidden";
@@ -405,7 +405,7 @@ export const adminHideBlessing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => idInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "blessings.hide");
     const prev = await loadBlessing(supabaseAdmin, data.id);
     const prevStatus = computeStatus(prev);
     const { error } = await supabaseAdmin
@@ -430,7 +430,7 @@ export const adminDeleteBlessing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => idInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "blessings.delete");
     const prev = await loadBlessing(supabaseAdmin, data.id);
     const prevStatus = computeStatus(prev);
     const { error } = await supabaseAdmin.from("blessings").delete().eq("id", data.id);
@@ -452,7 +452,7 @@ export const adminRestoreBlessing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => idInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "blessings.hide");
     const prev = await loadBlessing(supabaseAdmin, data.id);
     const prevStatus = computeStatus(prev);
     const { error } = await supabaseAdmin
@@ -525,7 +525,7 @@ export const adminEditBlessing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => editSchema.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "blessings.edit");
     const prev = await loadBlessing(supabaseAdmin, data.id);
     const prevStatus = computeStatus(prev);
 
@@ -602,7 +602,7 @@ export const adminListBlessingVersions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => idInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { supabaseAdmin } = await requireAdmin(context as any, "blessings.view");
     const prev = await loadBlessing(supabaseAdmin, data.id);
     await ensureOriginalVersion(supabaseAdmin, prev as any, computeStatus(prev));
     const { data: versions, error } = await supabaseAdmin
@@ -623,7 +623,7 @@ export const adminReorderBlessings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => reorderSchema.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "rankings.recalculate");
 
     const { data: existing, error: exErr } = await supabaseAdmin
       .from("blessings")
@@ -688,7 +688,7 @@ export const adminReanalyzeBlessing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => idInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "blessings.reanalyse");
     const prev = await loadBlessing(supabaseAdmin, data.id);
     const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
     const analysis = await analyzeAndStore(supabaseAdmin, prev as any);
@@ -729,7 +729,7 @@ export const adminReanalyzeBlessing = createServerFn({ method: "POST" })
 export const adminListBlessingIdsForAnalysis = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { supabaseAdmin } = await requireAdmin(context as any, "blessings.reanalyse");
     const { data, error } = await supabaseAdmin
       .from("blessings")
       .select("id, name")
@@ -744,7 +744,7 @@ export const adminReanalyzeBatch = createServerFn({ method: "POST" })
     z.object({ ids: z.array(z.string().uuid()).min(1).max(5) }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { supabaseAdmin } = await requireAdmin(context as any, "blessings.reanalyse");
     const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
     const { data: rows, error } = await supabaseAdmin
       .from("blessings")
@@ -767,7 +767,7 @@ export const adminLogBulkReanalysis = createServerFn({ method: "POST" })
     z.object({ total: z.number().int().min(0), failed: z.number().int().min(0) }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "blessings.reanalyse");
     await writeLog({
       supabaseAdmin,
       blessing_id: null,
@@ -786,7 +786,7 @@ export const adminSetRankingMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ mode: z.enum(["ai", "manual"]) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "rankings.recalculate");
     const { error } = await supabaseAdmin.from("site_settings").upsert(
       {
         key: "blessings_ranking",
@@ -814,7 +814,7 @@ export const adminSetRankingMode = createServerFn({ method: "POST" })
 export const adminGetShowPublicDates = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await requireAdmin(context as any);
+    const { supabaseAdmin } = await requireAdmin(context as any, "blessings.view");
     const { data } = await supabaseAdmin
       .from("site_settings")
       .select("value")
@@ -828,7 +828,7 @@ export const adminSetShowPublicDates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ show: z.boolean() }).parse(d))
   .handler(async ({ data, context }) => {
-    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any);
+    const { supabaseAdmin, adminId, adminEmail } = await requireAdmin(context as any, "website.settings");
     const { error } = await supabaseAdmin
       .from("site_settings")
       .upsert(
