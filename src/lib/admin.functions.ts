@@ -60,17 +60,20 @@ function computeStatus(row: { approved: boolean; rejected: boolean; hidden: bool
   return "pending";
 }
 
-async function requireAdmin(context: { userId: string; claims: any; supabase: any }) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", context.userId)
-    .eq("role", "admin")
-    .maybeSingle();
-  if (error || !data) throw new Error("Forbidden: admin role required");
-  const email = (context.claims?.email as string | undefined) ?? "admin";
-  return { supabaseAdmin, adminId: context.userId, adminEmail: email };
+// Permission-aware guard. Loads the caller's role, status, session cutoff and
+// effective permissions, then enforces the permission this action requires.
+async function requireAdmin(
+  context: { userId: string; claims: any; supabase: any },
+  permission?: string,
+) {
+  const { requirePermission } = await import("@/lib/rbac.server");
+  const me = await requirePermission(context, permission);
+  return {
+    supabaseAdmin: me.supabaseAdmin,
+    adminId: me.userId,
+    adminEmail: me.username,
+    me,
+  };
 }
 
 async function writeLog(opts: {
