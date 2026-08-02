@@ -114,7 +114,7 @@ export function Blessings() {
                 disabled={submitting}
                 className="mt-6 inline-flex min-h-11 items-center rounded border border-gold px-6 py-2.5 font-display text-[11px] font-semibold tracking-[0.4em] text-gold-gradient transition hover:bg-gold/10 disabled:opacity-50"
               >
-                {submitting ? "SENDING…" : "SEND BLESSING"}
+              {submitting ? "ANALYSING…" : "SEND BLESSING"}
               </button>
             </>
           )}
