@@ -376,7 +376,7 @@ export async function analyzeAndStore(
 ) {
   try {
     const analysis = await analyzeBlessing(blessing.name, blessing.note);
-    await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from("blessings")
       .update({
         quality_score: analysis.quality_score,
@@ -385,6 +385,7 @@ export async function analyzeAndStore(
         analyzed_at: analysis.analyzed_at,
       })
       .eq("id", blessing.id);
+    if (error) throw new Error(error.message);
     return analysis;
   } catch (e) {
     console.error("[blessing-analysis] store failed", e);

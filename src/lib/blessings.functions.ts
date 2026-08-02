@@ -20,13 +20,6 @@ export const submitBlessing = createServerFn({ method: "POST" })
     if (error || !row) throw new Error(error?.message ?? "Insert failed");
 
     try {
-      const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
-      await analyzeAndStore(supabaseAdmin, { id: row.id, name: row.name, note: row.note });
-    } catch (e) {
-      console.error("[blessings] analysis on submit failed", e);
-    }
-
-    try {
       await supabaseAdmin.from("moderation_logs").insert({
         blessing_id: row.id,
         guest_name: row.name,
@@ -39,50 +32,45 @@ export const submitBlessing = createServerFn({ method: "POST" })
       console.error("[blessings] log submitted failed", e);
     }
 
-    const webhook = process.env.DISCORD_WEBHOOK_URL;
-    const siteUrl = process.env.PUBLIC_SITE_URL ?? "https://rio-zonu.lovable.app";
-    if (webhook) {
-      const approveUrl = `${siteUrl}/api/public/blessings/${row.id}/approve?token=${encodeURIComponent(moderation_token)}`;
-      const rejectUrl = `${siteUrl}/api/public/blessings/${row.id}/reject?token=${encodeURIComponent(moderation_token)}`;
-      const submitted = new Date(row.created_at);
-      const submittedStr = submitted.toUTCString();
-      const embed = {
-        title: "💒 New Wedding Blessing Awaiting Review",
-        description:
-          `A new blessing has been submitted for **Rithin & Harshita**.\n\n` +
-          `[🟢 **Approve Blessing**](${approveUrl})  •  [🔴 **Reject Blessing**](${rejectUrl})`,
-        color: 0xb89b5e,
-        fields: [
-          { name: "👤 Guest Name", value: row.name.slice(0, 256), inline: true },
-          { name: "✉️ Message Length", value: `${row.note.length} characters`, inline: true },
-          { name: "🕊️ Blessing Message", value: row.note.length > 1024 ? row.note.slice(0, 1021) + "..." : row.note },
-          { name: "📅 Submitted", value: submittedStr, inline: false },
-        ],
-        footer: { text: "Rithin & Harshita • Wedding Blessings" },
-        timestamp: submitted.toISOString(),
-      };
-      const payload = {
-        username: "Wedding Blessings",
-        embeds: [embed],
-        allowed_mentions: { parse: [] },
-      };
+    // 1) Analyse first — the moderator must never see an unanalysed blessing.
+    const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
+    const analysis = await analyzeAndStore(supabaseAdmin, {
+      id: row.id,
+      name: row.name,
+      note: row.note,
+    });
+
+    if (!analysis) {
+      console.error("[blessings] analysis failed on submit", row.id);
       try {
-        const res = await fetch(webhook, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+        await supabaseAdmin
+          .from("blessings")
+          .update({ analysis: { failed: true, failed_at: new Date().toISOString() } })
+          .eq("id", row.id);
+        await supabaseAdmin.from("moderation_logs").insert({
+          blessing_id: row.id,
+          guest_name: row.name,
+          action: "analysis_failed",
+          administrator: "system",
+          previous_status: "pending",
+          new_status: "pending",
+          reason: "Analysis failed — Discord approval request not sent. Retry from the admin panel.",
         });
-        if (!res.ok) {
-          console.error("[blessings] Discord webhook failed", res.status, await res.text());
-        }
       } catch (e) {
-        console.error("[blessings] Discord webhook error", e);
+        console.error("[blessings] marking analysis failure failed", e);
       }
-    } else {
-      console.error("[blessings] DISCORD_WEBHOOK_URL not configured");
+      return { ok: true, analyzed: false, notified: false };
     }
 
-    return { ok: true };
+    // 2) Only now notify the moderator, with the full analysis attached.
+    const { sendModerationRequest } = await import("@/lib/blessing-notify.server");
+    const notified = await sendModerationRequest(
+      supabaseAdmin,
+      { ...row, moderation_token },
+      analysis,
+    );
+
+    return { ok: true, analyzed: true, notified };
   });
 
 export const getApprovedBlessings = createServerFn({ method: "GET" })
