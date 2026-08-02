@@ -690,6 +690,23 @@ export const adminReanalyzeBlessing = createServerFn({ method: "POST" })
     const { analyzeAndStore } = await import("@/lib/blessing-analysis.server");
     const analysis = await analyzeAndStore(supabaseAdmin, prev as any);
     if (!analysis) throw new Error("Analysis failed. Please try again.");
+
+    // If the submit-time analysis had failed, the Discord approval request was
+    // never sent. Send it now that we have a complete analysis.
+    try {
+      const { data: full } = await supabaseAdmin
+        .from("blessings")
+        .select("id, name, note, created_at, moderation_token, email_sent, approved, rejected")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (full && !full.email_sent && !full.approved && !full.rejected) {
+        const { sendModerationRequest } = await import("@/lib/blessing-notify.server");
+        await sendModerationRequest(supabaseAdmin, full as any, analysis);
+      }
+    } catch (e) {
+      console.error("[admin] moderation resend after re-analysis failed", e);
+    }
+
     await writeLog({
       supabaseAdmin,
       blessing_id: data.id,
