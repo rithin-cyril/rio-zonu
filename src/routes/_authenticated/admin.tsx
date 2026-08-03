@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { checkAdmin, logAuthEvent } from "@/lib/admin.functions";
+import { adminMe } from "@/lib/users.functions";
+import { hasPermission } from "@/lib/permissions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminShell,
@@ -20,6 +22,8 @@ function AdminShell() {
   const logEvt = useServerFn(logAuthEvent);
   const [ok, setOk] = useState<null | boolean>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const loadMe = useServerFn(adminMe);
+  const [me, setMe] = useState<Awaited<ReturnType<typeof adminMe>> | null>(null);
 
   useEffect(() => {
     verifyAdmin()
@@ -35,6 +39,12 @@ function AdminShell() {
         navigate({ to: "/auth", replace: true });
       });
   }, [verifyAdmin, navigate]);
+
+  useEffect(() => {
+    loadMe()
+      .then(setMe)
+      .catch(() => setMe(null));
+  }, [loadMe]);
 
   async function onLogout() {
     try { await logEvt({ data: { action: "logout" } }); } catch {}
@@ -62,7 +72,9 @@ function AdminShell() {
             <h1 className="font-script text-2xl italic text-gold-gradient">Rithin &amp; Harshita</h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline font-script italic text-sm ink-soft">Rithin</span>
+            <span className="hidden sm:inline font-script italic text-sm ink-soft">
+              {me?.fullName ?? "Admin"}
+            </span>
             <button
               onClick={onLogout}
               className="inline-flex min-h-10 items-center rounded border border-gold/60 px-4 py-2 font-display text-[10px] font-semibold tracking-[0.3em] text-gold-gradient transition hover:bg-gold/10"
@@ -73,9 +85,18 @@ function AdminShell() {
         </div>
         <nav className="mx-auto flex max-w-6xl flex-wrap gap-1 px-5 pb-3 text-sm">
           <NavTab to="/admin" exact>Overview</NavTab>
-          <NavTab to="/admin/blessings">Blessings</NavTab>
-          <NavTab to="/admin/reports">Reports</NavTab>
-          <NavTab to="/admin/logs">Moderation Logs</NavTab>
+          {(!me || hasPermission(me.permissions, "blessings.view")) && (
+            <NavTab to="/admin/blessings">Blessings</NavTab>
+          )}
+          {(!me || hasPermission(me.permissions, "rankings.report_cards")) && (
+            <NavTab to="/admin/reports">Reports</NavTab>
+          )}
+          {(!me || hasPermission(me.permissions, "moderation.logs")) && (
+            <NavTab to="/admin/logs">Moderation Logs</NavTab>
+          )}
+          {me && hasPermission(me.permissions, "users.view") && (
+            <NavTab to="/admin/users">Users</NavTab>
+          )}
         </nav>
       </header>
       <main className="mx-auto max-w-6xl px-5 py-6">
