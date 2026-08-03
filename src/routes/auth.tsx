@@ -13,6 +13,8 @@ import {
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>): { next?: string } =>
+    typeof s.next === "string" ? { next: s.next } : {},
   component: AuthPage,
 });
 
@@ -42,8 +44,24 @@ function adminIdToEmail(adminId: string) {
   return `${adminId}@${ADMIN_EMAIL_DOMAIN}`;
 }
 
+/** Only allow same-origin relative paths as post-login redirect targets. */
+function safeNext(next: string | undefined): string | null {
+  if (!next) return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const nextPath = safeNext(next);
+  const goAfterAuth = () => {
+    if (nextPath) {
+      window.location.replace(nextPath);
+      return;
+    }
+    navigate({ to: "/admin", replace: true });
+  };
   const checkAdminExists = useServerFn(adminExists);
   const register = useServerFn(registerAdmin);
   const logEvt = useServerFn(logAuthEvent);
@@ -63,7 +81,7 @@ function AuthPage() {
   useEffect(() => {
     // If already signed in, go to admin
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/admin", replace: true });
+      if (data.user) goAfterAuth();
     });
     checkAdminExists().then((r) => {
       setNeedsBootstrap(!r.exists);
@@ -105,7 +123,7 @@ function AuthPage() {
         });
         if (lErr) throw lErr;
         await logEvt({ data: { action: "login" } }).catch(() => {});
-        navigate({ to: "/admin", replace: true });
+        goAfterAuth();
         return;
       }
 
@@ -153,7 +171,7 @@ function AuthPage() {
         throw new Error("Invalid Admin ID or password.");
       }
       await logEvt({ data: { action: "login" } }).catch(() => {});
-      navigate({ to: "/admin", replace: true });
+      goAfterAuth();
     } catch (err: any) {
       setError(err?.message ?? "Request failed");
     } finally {
