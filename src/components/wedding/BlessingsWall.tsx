@@ -99,7 +99,7 @@ export function BlessingsWall() {
           <>
             <ul
               role="list"
-              className="mt-7 grid auto-rows-fr grid-flow-row grid-cols-1 items-stretch gap-4 sm:grid-cols-2 md:mt-8 md:gap-5"
+              className="mt-6 grid grid-flow-row grid-cols-1 items-start gap-3 sm:grid-cols-2 md:mt-7 md:gap-4"
             >
               {shown.map((b, i) => (
                 <motion.li
@@ -109,13 +109,13 @@ export function BlessingsWall() {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: (i % 2) * 0.05 }}
                   whileHover={{ y: -2 }}
-                  className="lux-card group relative flex h-full min-w-0 flex-col rounded-xl p-5 text-left md:p-6"
+                  className="lux-card group relative flex min-w-0 flex-col rounded-xl p-4 text-left md:p-5"
                 >
                   <p className="relative whitespace-pre-wrap break-words hyphens-auto font-script text-lg italic leading-relaxed ink md:text-xl [overflow-wrap:anywhere]">
                     {b.note}
                   </p>
-                  <div className="mt-3 pt-3">
-                    <div className="mb-2 h-px w-10 bg-[oklch(0.72_0.11_80)]/60" />
+                  <div className="mt-2.5">
+                    <div className="mb-1.5 h-px w-10 bg-[oklch(0.72_0.11_80)]/60" />
                     <p className="font-display text-[11px] font-semibold tracking-[0.38em] text-gold-gradient">
                       — {b.name.toUpperCase()}
                     </p>
