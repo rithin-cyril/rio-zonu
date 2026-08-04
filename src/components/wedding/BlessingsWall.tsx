@@ -99,7 +99,7 @@ export function BlessingsWall() {
           <>
             <ul
               role="list"
-              className="mt-6 grid grid-flow-row grid-cols-1 items-start gap-3 sm:grid-cols-2 md:mt-7 md:gap-4"
+              className="mt-6 columns-1 gap-5 sm:columns-2 md:mt-7 md:gap-6 [column-fill:balance]"
             >
               {shown.map((b, i) => (
                 <motion.li
@@ -109,7 +109,7 @@ export function BlessingsWall() {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: (i % 2) * 0.05 }}
                   whileHover={{ y: -2 }}
-                  className="lux-card group relative flex min-w-0 flex-col rounded-xl p-4 text-left md:p-5"
+                  className="lux-card group relative mb-5 block min-w-0 break-inside-avoid rounded-xl p-4 text-left md:mb-6 md:p-5"
                 >
                   <p className="relative whitespace-pre-wrap break-words hyphens-auto font-script text-lg italic leading-relaxed ink md:text-xl [overflow-wrap:anywhere]">
                     {b.note}
