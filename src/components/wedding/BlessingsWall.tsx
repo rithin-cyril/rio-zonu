@@ -99,7 +99,7 @@ export function BlessingsWall() {
           <>
             <ul
               role="list"
-              className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-8 md:gap-5"
+              className="mt-7 grid auto-rows-fr grid-flow-row grid-cols-1 items-stretch gap-4 sm:grid-cols-2 md:mt-8 md:gap-5"
             >
               {shown.map((b, i) => (
                 <motion.li
