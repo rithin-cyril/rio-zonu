@@ -44,7 +44,7 @@ export async function finalizeUpload(
   const publicBucket = row.bucket_public as string;
   const expected = row.kind === "photo" ? "image" : "video";
 
-  const fail = async (reason: string) => {
+  const fail = async (reason: string, diag?: Record<string, unknown>) => {
     console.error(
       JSON.stringify({
         scope: "gallery-upload",
@@ -54,6 +54,7 @@ export async function finalizeUpload(
         kind: row.kind,
         actor: row.source,
         message: reason,
+        ...diag,
         at: new Date().toISOString(),
       }),
     );
@@ -80,21 +81,35 @@ export async function finalizeUpload(
   let bytesPoster = 0;
 
   try {
+    // The original is quarantined and never served, so we only block bytes
+    // that are actively dangerous (executables / scripts / archives). Camera
+    // formats we cannot fingerprint (HEIC variants, RAW, exotic containers)
+    // must not fail the whole submission.
     const orig = await inspectStoredObject(supabaseAdmin, PRIVATE_BUCKET, row.original_path);
-    if (!orig.sniffed || orig.sniffed.family !== expected) {
-      return await fail("This file is not a valid photo or video and was rejected.");
+    if (orig.dangerous || orig.size === 0) {
+      return await fail("This file is not a valid photo or video and was rejected.", {
+        slot: "original",
+        head: orig.head,
+        size: orig.size,
+      });
     }
     bytesOriginal = orig.size;
 
+    // The public derivative IS served, so it must be a real image/video.
     const pub = await inspectStoredObject(supabaseAdmin, publicBucket, row.public_path);
     if (!pub.sniffed || pub.sniffed.family !== expected) {
-      return await fail("The processed file failed validation and was rejected.");
+      return await fail("The processed file failed validation and was rejected.", {
+        slot: "public",
+        head: pub.head,
+        detected: pub.sniffed?.type ?? null,
+      });
     }
     bytesPublic = pub.size;
   } catch (e: any) {
     if (e?.message && /rejected/.test(e.message)) throw e;
     return await fail("The upload could not be verified. Please try again.");
   }
+
 
   let posterPath: string | null = row.poster_path;
   try {
