@@ -40,7 +40,7 @@ export function Gallery() {
   if (!state?.show || state.media.length === 0) return null;
 
   return (
-    <section id="gallery" className="lux-section overflow-hidden py-8 md:py-11">
+    <section id="gallery" className="lux-section overflow-hidden pb-10 pt-6 md:pb-14 md:pt-8">
       <div className="mx-auto max-w-5xl px-5 text-center sm:px-6">
         <p className="font-display text-[10px] tracking-[0.45em] text-gold-gradient">
           MOMENTS &amp; MEMORIES
