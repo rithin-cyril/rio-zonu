@@ -294,15 +294,16 @@ function Card({ item, children }: { item: Item; children?: React.ReactNode }) {
       <div className="overflow-hidden rounded-lg bg-black/5">
         {item.poster || item.url ? (
           item.kind === "video" && !item.poster ? (
-            <video src={item.url ?? undefined} controls className="aspect-[4/3] w-full object-cover" />
+            <video src={item.url ?? undefined} controls className="max-h-[60vh] w-full object-contain" />
           ) : (
             <img
               src={(item.poster ?? item.url)!}
               alt={item.caption || "Gallery media"}
               loading="lazy"
-              className="aspect-[4/3] w-full object-cover"
+              className="block h-auto max-h-[60vh] w-full max-w-full object-contain"
             />
           )
+
         ) : (
           <div className="grid aspect-[4/3] place-items-center text-xs ink-soft">
             {item.status === "failed" ? "Upload failed" : "Processing…"}
