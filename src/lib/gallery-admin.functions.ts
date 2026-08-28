@@ -81,7 +81,8 @@ export const adminGalleryList = createServerFn({ method: "GET" })
     // so total/free are reported as unavailable rather than invented.
     const sum = (pred: (r: any) => boolean, cols: string[]) =>
       rows.filter(pred).reduce((a, r) => a + cols.reduce((b, c) => b + (r[c] ?? 0), 0), 0);
-    const all = () => true;
+    // Failed uploads have their objects removed, so they must not be counted.
+    const all = (r: any) => r.status !== "failed";
     const storage = {
       source: "application" as const,
       usedBytes: sum(all, ["bytes_original", "bytes_public", "bytes_poster"]),
