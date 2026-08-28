@@ -262,6 +262,62 @@ function Lightbox({
   );
 }
 
+/**
+ * Shows the already-cached grid thumbnail instantly (blurred, correct aspect
+ * ratio) and cross-fades to the full-size optimised photo once it decodes, so
+ * opening a photo never leaves a blank box. No extra network request: the
+ * poster is served from cache, the full image is the same optimised WebP the
+ * gallery already exposes.
+ */
+function LightboxPhoto({ item }: { item: PublicMedia }) {
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [item.id]);
+
+  // Covers the cache-hit case where load fires before React attaches onLoad.
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) setLoaded(true);
+  }, [item.id]);
+
+  const ratio = item.width && item.height ? `${item.width} / ${item.height}` : undefined;
+
+  return (
+    <div
+      className="relative mx-auto max-h-[78dvh] w-auto max-w-full overflow-hidden rounded-xl"
+      style={{ aspectRatio: ratio }}
+    >
+      {item.poster && !loaded && (
+        <img
+          src={item.poster}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full scale-105 object-contain blur-md"
+        />
+      )}
+      {!item.poster && !loaded && (
+        <div className="absolute inset-0 animate-pulse bg-white/10" />
+      )}
+      <img
+        ref={imgRef}
+        src={item.url}
+        alt={item.caption || "Wedding gallery moment"}
+        width={item.width ?? undefined}
+        height={item.height ?? undefined}
+        decoding="async"
+        fetchPriority="high"
+        onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
+        className={`relative mx-auto max-h-[78dvh] w-auto max-w-full object-contain transition-opacity duration-300 ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+      />
+    </div>
+  );
+}
+
 function NavBtn({
   side,
   onClick,
