@@ -66,7 +66,7 @@ export function Gate({
           aria-hidden
           initial={{ x: "-60%", opacity: 0 }}
           animate={{ x: "60%", opacity: [0, 0.55, 0] }}
-          transition={{ duration: 0.85, ease: "easeOut" }}
+          transition={{ duration: 0.34, ease: "easeOut", delay: 0.16 }}
           className="pointer-events-none absolute inset-y-0 left-0 z-30 w-[70%]"
           style={{
             background:
