@@ -34,13 +34,19 @@ export function Gate({
       initial={false}
       animate={
         opened
-          ? { opacity: 0, y: reduceMotion ? 0 : "-6%", scale: reduceMotion ? 1 : 1.015 }
+          ? { opacity: 0, y: reduceMotion ? 0 : "-14%", scale: reduceMotion ? 1 : 1.012 }
           : { opacity: 1, y: 0, scale: 1 }
       }
       transition={
         reduceMotion
-          ? { duration: 0.18, ease: "linear" }
-          : { duration: 1.05, ease: [0.4, 0, 0.2, 1] }
+          ? { duration: 0.16, ease: "linear" }
+          : {
+              // Decisive exit: cover is essentially gone by ~420ms so the
+              // invitation text never crossfades against the cover text.
+              y: { duration: 0.42, ease: [0.32, 0, 0.67, 0] },
+              scale: { duration: 0.42, ease: [0.32, 0, 0.67, 0] },
+              opacity: { duration: 0.3, ease: "easeIn", delay: 0.08 },
+            }
       }
       onAnimationComplete={() => opened && onRevealed?.()}
       className="fixed inset-0 z-50 overflow-hidden bg-[#f6ecd8]"
