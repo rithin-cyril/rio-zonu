@@ -11,12 +11,13 @@ export function Petals({ count = 24 }: { count?: number }) {
   const petals = useMemo(
     () =>
       Array.from({ length: count }).map((_, i) => ({
-        left: rand(i + 1) * 100,
-        delay: rand(i + 101) * 12,
-        duration: 12 + rand(i + 201) * 14,
-        size: 8 + rand(i + 301) * 14,
+        // Rounded so SSR markup and client props stringify identically.
+        left: +(rand(i + 1) * 100).toFixed(3),
+        delay: +(rand(i + 101) * 12).toFixed(3),
+        duration: +(12 + rand(i + 201) * 14).toFixed(3),
+        size: +(8 + rand(i + 301) * 14).toFixed(3),
         kind: rand(i + 401) > 0.5 ? "rose" : "jasmine",
-        rot: rand(i + 501) * 360,
+        rot: +(rand(i + 501) * 360).toFixed(3),
       })),
     [count],
   );
