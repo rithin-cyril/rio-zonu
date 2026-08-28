@@ -41,12 +41,7 @@ export function WeddingInvitation() {
           backgroundSize: "640px 640px",
         }}
       />
-      <motion.div
-        className="relative z-10"
-        initial={false}
-        animate={opened ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
-        style={{ transformOrigin: "top center" }}
-      >
+      <div className="relative z-10">
       {!revealed && (
         <Gate opened={opened} onOpen={() => setOpened(true)} onRevealed={() => setRevealed(true)} />
       )}
@@ -79,7 +74,7 @@ export function WeddingInvitation() {
       <SectionDivider />
       <Gallery />
       <Closing />
-      </motion.div>
+      </div>
     </main>
   );
 }
