@@ -41,10 +41,42 @@ export function WeddingInvitation() {
           backgroundSize: "640px 640px",
         }}
       />
-      <div className="relative z-10">
       {!revealed && (
         <Gate opened={opened} onOpen={() => setOpened(true)} onRevealed={() => setRevealed(true)} />
       )}
+
+      {/* Soft glimmer that passes across the invitation just as the cover clears. */}
+      {revealed && !reduceMotion && (
+        <motion.span
+          aria-hidden
+          initial={{ x: "-70%", opacity: 0 }}
+          animate={{ x: "70%", opacity: [0, 0.32, 0] }}
+          transition={{ duration: 0.36, ease: "easeOut", delay: 0.06 }}
+          className="pointer-events-none fixed inset-y-0 left-0 z-40 w-[70%]"
+          style={{
+            background:
+              "linear-gradient(100deg, transparent 0%, rgba(255,246,224,0.7) 50%, transparent 100%)",
+            mixBlendMode: "screen",
+            willChange: "transform, opacity",
+          }}
+        />
+      )}
+
+      <motion.div
+        className="relative z-10"
+        initial={false}
+        animate={
+          opened
+            ? { opacity: 1, y: 0 }
+            : { opacity: 0, y: reduceMotion ? 0 : 20 }
+        }
+        transition={
+          reduceMotion
+            ? { duration: 0.2, ease: "linear" }
+            : { duration: 0.36, ease: [0.16, 1, 0.3, 1], delay: 0.46 }
+        }
+        style={{ willChange: opened ? "auto" : "transform, opacity" }}
+      >
       {revealed && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -74,7 +106,7 @@ export function WeddingInvitation() {
       <SectionDivider />
       <Gallery />
       <Closing />
-      </div>
+      </motion.div>
     </main>
   );
 }
