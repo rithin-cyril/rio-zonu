@@ -6,8 +6,11 @@ const listeners = new Set<(cmd: Cmd) => void>();
 
 export function onMusicCommand(fn: (cmd: Cmd) => void) {
   listeners.add(fn);
-  return () => listeners.delete(fn);
+  return () => {
+    listeners.delete(fn);
+  };
 }
+
 
 function emit(cmd: Cmd) {
   listeners.forEach((fn) => fn(cmd));
