@@ -37,6 +37,7 @@ function AdminGallery() {
   const [busy, setBusy] = useState<string | null>(null);
   const [category, setCategory] = useState<string>("wedding");
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const movingRef = useRef(false);
 
   const refresh = useCallback(() => {
     list()
@@ -81,9 +82,11 @@ function AdminGallery() {
             .uploadToSignedUrl(slot.path, slot.token, blob);
           if (error) throw new Error(error.message);
         };
-        await put(slots.original, file);
-        await put(slots.public, opt.main);
-        await put(slots.poster, opt.poster);
+        await Promise.all([
+          put(slots.original, file),
+          put(slots.public, opt.main),
+          put(slots.poster, opt.poster),
+        ]);
         await finalizeUpload({
           data: {
             id: slots.id,
@@ -114,13 +117,23 @@ function AdminGallery() {
   }
 
   async function move(item: Item, dir: -1 | 1) {
+    // Serialise reorders: overlapping requests can persist a mixed order.
+    if (movingRef.current) return;
+    movingRef.current = true;
     const ids = library.map((i) => i.id);
     const idx = ids.indexOf(item.id);
     const to = idx + dir;
-    if (idx < 0 || to < 0 || to >= ids.length) return;
+    if (idx < 0 || to < 0 || to >= ids.length) {
+      movingRef.current = false;
+      return;
+    }
     [ids[idx], ids[to]] = [ids[to]!, ids[idx]!];
     setData({ ...data!, items: ids.map((id) => library.find((i) => i.id === id)!).concat(pending, rejected) });
-    await act(() => reorder({ data: { ids } }), "Order updated");
+    try {
+      await act(() => reorder({ data: { ids } }), "Order updated");
+    } finally {
+      movingRef.current = false;
+    }
   }
 
   return (

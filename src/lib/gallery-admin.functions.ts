@@ -81,15 +81,24 @@ export const adminGalleryList = createServerFn({ method: "GET" })
     // so total/free are reported as unavailable rather than invented.
     const sum = (pred: (r: any) => boolean, cols: string[]) =>
       rows.filter(pred).reduce((a, r) => a + cols.reduce((b, c) => b + (r[c] ?? 0), 0), 0);
-    const all = () => true;
+    // Failed uploads have their objects removed, so they must not be counted.
+    const all = (r: any) => r.status !== "failed";
     const storage = {
       source: "application" as const,
       usedBytes: sum(all, ["bytes_original", "bytes_public", "bytes_poster"]),
       totalBytes: null as number | null,
       freeBytes: null as number | null,
       breakdown: {
-        photos: sum((r) => r.kind === "photo", ["bytes_original", "bytes_public", "bytes_poster"]),
-        videos: sum((r) => r.kind === "video", ["bytes_original", "bytes_public", "bytes_poster"]),
+        photos: sum((r) => all(r) && r.kind === "photo", [
+          "bytes_original",
+          "bytes_public",
+          "bytes_poster",
+        ]),
+        videos: sum((r) => all(r) && r.kind === "video", [
+          "bytes_original",
+          "bytes_public",
+          "bytes_poster",
+        ]),
         pending: sum((r) => r.approval_status === "pending", [
           "bytes_original",
           "bytes_public",
@@ -202,12 +211,17 @@ export const adminGalleryCreateUpload = createServerFn({ method: "POST" })
       return { bucket, path, token: s.token as string };
     };
 
+    const [signedOriginal, signedPublic, signedPoster] = await Promise.all([
+      sign(PRIVATE_BUCKET, original),
+      sign(PUBLIC_BUCKET, pub),
+      sign(PUBLIC_BUCKET, poster),
+    ]);
     const out = {
       id,
       ref: trace.ref,
-      original: await sign(PRIVATE_BUCKET, original),
-      public: await sign(PUBLIC_BUCKET, pub),
-      poster: await sign(PUBLIC_BUCKET, poster),
+      original: signedOriginal,
+      public: signedPublic,
+      poster: signedPoster,
     };
     trace.log("UPLOAD_COMPLETE", { mediaId: id });
     return out;
@@ -344,6 +358,9 @@ export const adminGalleryReview = createServerFn({ method: "POST" })
           published: false,
           public_path: null,
           poster_path: null,
+          // Derivatives were deleted above — stop counting them as used storage.
+          bytes_public: 0,
+          bytes_poster: 0,
           rejection_reason: data.reason ?? null,
           reviewed_at: now,
           reviewed_by: me.userId,
