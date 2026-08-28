@@ -282,13 +282,10 @@ function LightboxPhoto({ item }: { item: PublicMedia }) {
     if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) setLoaded(true);
   }, [item.id]);
 
-  const ratio = item.width && item.height ? `${item.width} / ${item.height}` : undefined;
-
   return (
-    <div
-      className="relative mx-auto max-h-[78dvh] w-auto max-w-full overflow-hidden rounded-xl"
-      style={{ aspectRatio: ratio }}
-    >
+    // The image's width/height attributes reserve the box before it decodes,
+    // so the wrapper simply tracks the image and nothing jumps.
+    <div className="relative mx-auto block w-fit max-w-full overflow-hidden rounded-xl">
       {item.poster && !loaded && (
         <img
           src={item.poster}
