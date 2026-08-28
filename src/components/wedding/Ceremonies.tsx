@@ -23,7 +23,7 @@ const events = [
   {
     n: "03",
     title: "Wedding Celebration",
-    date: "25 October 2026",
+    date: "Sunday, October 25th, 2026",
     time: "7:30 PM onwards",
     venue: "Sai Mangalam",
     address: "Risali Chandkhuri Road, Vidyut Nagar, Durg, Chhattisgarh",
