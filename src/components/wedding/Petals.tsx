@@ -31,8 +31,8 @@ export function Petals({ count = 24 }: { count?: number }) {
             left: `${p.left}%`,
             animationDelay: `-${p.delay}s`,
             animationDuration: `${p.duration}s`,
-            width: p.size,
-            height: p.size,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
             transform: `rotate(${p.rot}deg) translateZ(0)`,
             willChange: "transform, opacity",
           }}
