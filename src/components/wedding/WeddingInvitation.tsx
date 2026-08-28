@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Gate } from "./Gate";
 import { Hero } from "./Hero";
@@ -20,7 +21,12 @@ import floralBg from "@/assets/floral-bg.jpg";
 
 export function WeddingInvitation() {
   const [opened, setOpened] = useState(false);
+  // Non-critical layers (petals, audio, floating controls) only mount once the
+  // reveal animation has finished, so nothing competes with it for the main
+  // thread on mobile.
+  const [revealed, setRevealed] = useState(false);
   const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotion();
   return (
     <main
       id="main"
@@ -35,11 +41,26 @@ export function WeddingInvitation() {
           backgroundSize: "640px 640px",
         }}
       />
-      <div className="relative z-10">
-      <Gate opened={opened} onOpen={() => setOpened(true)} />
-      {opened && <Petals count={isMobile ? 10 : 24} />}
-      {opened && <MusicPlayer />}
-      {opened && <BackToTop />}
+      <motion.div
+        className="relative z-10"
+        initial={false}
+        animate={opened ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
+        style={{ transformOrigin: "top center" }}
+      >
+      {!revealed && (
+        <Gate opened={opened} onOpen={() => setOpened(true)} onRevealed={() => setRevealed(true)} />
+      )}
+      {revealed && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduceMotion ? 0 : 0.8, ease: "easeOut" }}
+        >
+          <Petals count={isMobile ? 10 : 24} />
+        </motion.div>
+      )}
+      {revealed && <MusicPlayer />}
+      {revealed && <BackToTop />}
       <Hero />
       <SectionDivider />
       <Welcome />
@@ -58,7 +79,7 @@ export function WeddingInvitation() {
       <SectionDivider />
       <Gallery />
       <Closing />
-      </div>
+      </motion.div>
     </main>
   );
 }
