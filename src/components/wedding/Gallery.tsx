@@ -24,6 +24,11 @@ export function Gallery() {
     refresh();
   }, [refresh]);
 
+  // The lightbox index points into the filtered list — reset it when filtering.
+  useEffect(() => {
+    setActive(null);
+  }, [tab]);
+
   const tabs = useMemo(() => {
     const present = new Set((state?.media ?? []).map((m) => m.category));
     return [
