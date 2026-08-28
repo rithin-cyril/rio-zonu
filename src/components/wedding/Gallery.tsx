@@ -317,9 +317,9 @@ function LightboxPhoto({ item }: { item: PublicMedia }) {
         fetchPriority="high"
         onLoad={() => setLoaded(true)}
         onError={() => setLoaded(true)}
-        className={`relative mx-auto max-h-[78dvh] w-auto max-w-full object-contain transition-opacity duration-300 ${
-          loaded ? "opacity-100" : "opacity-0"
-        }`}
+        className={`relative mx-auto object-contain transition-opacity duration-300 ${
+          ratio ? "h-full w-full" : "max-h-[78dvh] w-auto max-w-full"
+        } ${loaded ? "opacity-100" : "opacity-0"}`}
       />
     </div>
   );
