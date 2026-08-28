@@ -372,3 +372,12 @@ function Btn({
     </button>
   );
 }
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-gold/25 bg-white/60 px-3 py-2">
+      <dt className="font-display text-[9px] tracking-[0.25em] ink-soft">{label.toUpperCase()}</dt>
+      <dd className="mt-1 text-sm">{value}</dd>
+    </div>
+  );
+}
