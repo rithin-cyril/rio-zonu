@@ -226,6 +226,102 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_media: {
+        Row: {
+          approval_status: string
+          bucket_public: string
+          bytes_original: number
+          bytes_poster: number
+          bytes_public: number
+          caption: string
+          category: string
+          created_at: string
+          duration_seconds: number | null
+          error: string | null
+          height: number | null
+          id: string
+          kind: string
+          original_path: string | null
+          poster_path: string | null
+          public_path: string | null
+          published: boolean
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewed_by_label: string | null
+          sort_order: number | null
+          source: string
+          status: string
+          submitted_at: string
+          submitter_ip: string | null
+          submitter_name: string | null
+          submitter_ua: string | null
+          updated_at: string
+          width: number | null
+        }
+        Insert: {
+          approval_status?: string
+          bucket_public?: string
+          bytes_original?: number
+          bytes_poster?: number
+          bytes_public?: number
+          caption?: string
+          category?: string
+          created_at?: string
+          duration_seconds?: number | null
+          error?: string | null
+          height?: number | null
+          id?: string
+          kind: string
+          original_path?: string | null
+          poster_path?: string | null
+          public_path?: string | null
+          published?: boolean
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewed_by_label?: string | null
+          sort_order?: number | null
+          source?: string
+          status?: string
+          submitted_at?: string
+          submitter_ip?: string | null
+          submitter_name?: string | null
+          submitter_ua?: string | null
+          updated_at?: string
+          width?: number | null
+        }
+        Update: {
+          approval_status?: string
+          bucket_public?: string
+          bytes_original?: number
+          bytes_poster?: number
+          bytes_public?: number
+          caption?: string
+          category?: string
+          created_at?: string
+          duration_seconds?: number | null
+          error?: string | null
+          height?: number | null
+          id?: string
+          kind?: string
+          original_path?: string | null
+          poster_path?: string | null
+          public_path?: string | null
+          published?: boolean
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewed_by_label?: string | null
+          sort_order?: number | null
+          source?: string
+          status?: string
+          submitted_at?: string
+          submitter_ip?: string | null
+          submitter_name?: string | null
+          submitter_ua?: string | null
+          updated_at?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       moderation_logs: {
         Row: {
           action: string
