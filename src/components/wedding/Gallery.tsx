@@ -90,8 +90,14 @@ export function Gallery() {
               <img
                 src={m.poster ?? m.url}
                 alt={m.caption || "Wedding gallery moment"}
-                loading="lazy"
+                // Width/height reserve the correct box so the grid never jumps
+                // while thumbnails stream in.
+                width={m.width ?? undefined}
+                height={m.height ?? undefined}
+                loading={i < 3 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : "auto"}
                 decoding="async"
+                sizes="(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
                 className="block h-auto w-full max-w-full object-contain transition duration-500 group-hover:scale-[1.04]"
               />
 
