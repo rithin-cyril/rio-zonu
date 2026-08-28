@@ -19,9 +19,7 @@ import floralBg from "@/assets/floral-bg.jpg";
 
 export function WeddingInvitation() {
   const [opened, setOpened] = useState(false);
-  const isMobile =
-    typeof window !== "undefined" &&
-    window.matchMedia("(max-width: 640px)").matches;
+  const isMobile = useIsMobile();
   return (
     <main
       id="main"
