@@ -89,8 +89,16 @@ export const adminGalleryList = createServerFn({ method: "GET" })
       totalBytes: null as number | null,
       freeBytes: null as number | null,
       breakdown: {
-        photos: sum((r) => r.kind === "photo", ["bytes_original", "bytes_public", "bytes_poster"]),
-        videos: sum((r) => r.kind === "video", ["bytes_original", "bytes_public", "bytes_poster"]),
+        photos: sum((r) => all(r) && r.kind === "photo", [
+          "bytes_original",
+          "bytes_public",
+          "bytes_poster",
+        ]),
+        videos: sum((r) => all(r) && r.kind === "video", [
+          "bytes_original",
+          "bytes_public",
+          "bytes_poster",
+        ]),
         pending: sum((r) => r.approval_status === "pending", [
           "bytes_original",
           "bytes_public",
