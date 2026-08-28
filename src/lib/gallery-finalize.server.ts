@@ -28,12 +28,35 @@ export async function finalizeUpload(
   if (row.source !== input.expectSource) throw new Error("Upload not found.");
   if (row.status !== "uploading") return { ok: true, status: row.status };
 
+  console.log(
+    JSON.stringify({
+      scope: "gallery-upload",
+      stage: "PROCESSING_START",
+      mediaId: row.id,
+      kind: row.kind,
+      category: row.category,
+      actor: row.source,
+      at: new Date().toISOString(),
+    }),
+  );
   await supabaseAdmin.from("gallery_media").update({ status: "processing" }).eq("id", row.id);
 
   const publicBucket = row.bucket_public as string;
   const expected = row.kind === "photo" ? "image" : "video";
 
   const fail = async (reason: string) => {
+    console.error(
+      JSON.stringify({
+        scope: "gallery-upload",
+        stage: "UPLOAD_FAILED",
+        failedStage: "PROCESSING_START",
+        mediaId: row.id,
+        kind: row.kind,
+        actor: row.source,
+        message: reason,
+        at: new Date().toISOString(),
+      }),
+    );
     await removeObjects(supabaseAdmin, [
       { bucket: PRIVATE_BUCKET, path: row.original_path },
       { bucket: publicBucket, path: row.public_path },
@@ -112,5 +135,14 @@ export async function finalizeUpload(
     });
   }
 
+  console.log(
+    JSON.stringify({
+      scope: "gallery-upload",
+      stage: "PROCESSING_COMPLETE",
+      mediaId: row.id,
+      actor: row.source,
+      at: new Date().toISOString(),
+    }),
+  );
   return { ok: true, status: "ready" as const };
 }

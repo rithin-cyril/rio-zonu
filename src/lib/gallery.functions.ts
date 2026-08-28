@@ -96,7 +96,13 @@ export const guestCreateUpload = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { requestMeta, storagePath } = await import("@/lib/gallery.server");
+    const { startUploadTrace } = await import("@/lib/gallery-log.server");
     const { ip, ua } = requestMeta();
+    const trace = startUploadTrace({
+      actor: "guest",
+      kind: data.kind,
+      category: data.category ?? "wedding",
+    });
 
     // Abuse protection: cap submissions per IP per hour.
     if (ip) {
@@ -107,14 +113,18 @@ export const guestCreateUpload = createServerFn({ method: "POST" })
         .eq("submitter_ip", ip)
         .gte("submitted_at", since);
       if ((count ?? 0) >= 15) {
+        trace.fail("PERMISSION_CHECK", new Error("rate limited"));
         throw new Error("Too many uploads from this connection. Please try again later.");
       }
     }
+    trace.log("FILE_VALIDATION", { ext: data.ext });
 
     const id = crypto.randomUUID();
     const original = storagePath("pending", id, "original", data.ext);
     const pub = storagePath("pending", id, "public", data.kind === "photo" ? "webp" : data.ext);
     const poster = storagePath("pending", id, "poster", "webp");
+
+    trace.log("UPLOAD_INITIALIZATION", { mediaId: id, bucket: PRIVATE_BUCKET });
 
     const { error } = await supabaseAdmin.from("gallery_media").insert({
       id,
@@ -133,25 +143,34 @@ export const guestCreateUpload = createServerFn({ method: "POST" })
       submitter_ip: ip,
       submitter_ua: ua,
     });
-    if (error) throw new Error("Could not start the upload. Please try again.");
+    if (error) throw trace.fail("DATABASE_RECORD", error, { mediaId: id });
+    trace.log("DATABASE_RECORD", { mediaId: id });
 
     const sign = async (path: string) => {
+      trace.log("STORAGE_REQUEST", { bucket: PRIVATE_BUCKET });
       const { data: s, error: e } = await supabaseAdmin.storage
         .from(PRIVATE_BUCKET)
         .createSignedUploadUrl(path);
-      if (e || !s) throw new Error("Could not start the upload. Please try again.");
+      if (e || !s)
+        throw trace.fail("STORAGE_RESPONSE", e ?? new Error("no signed url"), {
+          bucket: PRIVATE_BUCKET,
+        });
+      trace.log("STORAGE_RESPONSE", { bucket: PRIVATE_BUCKET, ok: true });
       return { path, token: s.token as string };
     };
 
-    return {
+    const out = {
       id,
+      ref: trace.ref,
       bucket: PRIVATE_BUCKET,
-
       original: await sign(original),
       public: await sign(pub),
       poster: await sign(poster),
     };
+    trace.log("UPLOAD_COMPLETE", { mediaId: id });
+    return out;
   });
+
 
 /**
  * Step 2 of a guest submission. Validates the ACTUAL bytes of everything that
