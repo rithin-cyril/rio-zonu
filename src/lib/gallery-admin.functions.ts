@@ -117,14 +117,32 @@ export const adminGalleryCreateUpload = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const me = await guard(context as any);
+    const { startUploadTrace } = await import("@/lib/gallery-log.server");
+    const trace = startUploadTrace({
+      actor: "admin",
+      kind: data.kind,
+      category: data.category,
+    });
+
+    let me: Awaited<ReturnType<typeof guard>>;
+    try {
+      me = await guard(context as any);
+      trace.log("PERMISSION_CHECK", { permission: PERM, granted: true });
+    } catch (e) {
+      throw trace.fail("PERMISSION_CHECK", e, { granted: false });
+    }
+
     const { storagePath } = await import("@/lib/gallery.server");
     const { supabaseAdmin } = me;
+
+    trace.log("FILE_VALIDATION", { ext: data.ext });
 
     const id = crypto.randomUUID();
     const original = storagePath("library", id, "original", data.ext);
     const pub = storagePath("library", id, "public", data.kind === "photo" ? "webp" : data.ext);
     const poster = storagePath("library", id, "poster", "webp");
+
+    trace.log("UPLOAD_INITIALIZATION", { mediaId: id, bucket: PUBLIC_BUCKET });
 
     const { error } = await supabaseAdmin.from("gallery_media").insert({
       id,
@@ -145,23 +163,30 @@ export const adminGalleryCreateUpload = createServerFn({ method: "POST" })
       reviewed_by_label: me.username,
       reviewed_at: new Date().toISOString(),
     });
-    if (error) throw new Error("Could not start the upload.");
+    if (error) throw trace.fail("DATABASE_RECORD", error, { mediaId: id });
+    trace.log("DATABASE_RECORD", { mediaId: id });
 
     const sign = async (bucket: string, path: string) => {
+      trace.log("STORAGE_REQUEST", { bucket });
       const { data: s, error: e } = await supabaseAdmin.storage
         .from(bucket)
         .createSignedUploadUrl(path);
-      if (e || !s) throw new Error("Could not start the upload.");
+      if (e || !s) throw trace.fail("STORAGE_RESPONSE", e ?? new Error("no signed url"), { bucket });
+      trace.log("STORAGE_RESPONSE", { bucket, ok: true });
       return { bucket, path, token: s.token as string };
     };
 
-    return {
+    const out = {
       id,
+      ref: trace.ref,
       original: await sign(PRIVATE_BUCKET, original),
       public: await sign(PUBLIC_BUCKET, pub),
       poster: await sign(PUBLIC_BUCKET, poster),
     };
+    trace.log("UPLOAD_COMPLETE", { mediaId: id });
+    return out;
   });
+
 
 export const adminGalleryFinalizeUpload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
