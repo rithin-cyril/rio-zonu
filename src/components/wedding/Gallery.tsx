@@ -120,12 +120,7 @@ export function Gallery() {
         <GalleryUpload onSubmitted={refresh} />
       </div>
 
-      <Lightbox
-        items={items}
-        index={active}
-        onClose={() => setActive(null)}
-        onIndex={setActive}
-      />
+      <Lightbox items={items} index={active} onClose={closeLightbox} onIndex={setActive} />
     </section>
   );
 }
