@@ -123,10 +123,17 @@ function AdminGallery() {
     const ids = library.map((i) => i.id);
     const idx = ids.indexOf(item.id);
     const to = idx + dir;
-    if (idx < 0 || to < 0 || to >= ids.length) return;
+    if (idx < 0 || to < 0 || to >= ids.length) {
+      movingRef.current = false;
+      return;
+    }
     [ids[idx], ids[to]] = [ids[to]!, ids[idx]!];
     setData({ ...data!, items: ids.map((id) => library.find((i) => i.id === id)!).concat(pending, rejected) });
-    await act(() => reorder({ data: { ids } }), "Order updated");
+    try {
+      await act(() => reorder({ data: { ids } }), "Order updated");
+    } finally {
+      movingRef.current = false;
+    }
   }
 
   return (
