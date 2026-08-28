@@ -245,6 +245,7 @@ export type Database = {
           poster_path: string | null
           public_path: string | null
           published: boolean
+          rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           reviewed_by_label: string | null
@@ -256,6 +257,8 @@ export type Database = {
           submitter_name: string | null
           submitter_ua: string | null
           updated_at: string
+          uploaded_by: string | null
+          uploaded_by_label: string | null
           width: number | null
         }
         Insert: {
@@ -276,6 +279,7 @@ export type Database = {
           poster_path?: string | null
           public_path?: string | null
           published?: boolean
+          rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           reviewed_by_label?: string | null
@@ -287,6 +291,8 @@ export type Database = {
           submitter_name?: string | null
           submitter_ua?: string | null
           updated_at?: string
+          uploaded_by?: string | null
+          uploaded_by_label?: string | null
           width?: number | null
         }
         Update: {
@@ -307,6 +313,7 @@ export type Database = {
           poster_path?: string | null
           public_path?: string | null
           published?: boolean
+          rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           reviewed_by_label?: string | null
@@ -318,6 +325,8 @@ export type Database = {
           submitter_name?: string | null
           submitter_ua?: string | null
           updated_at?: string
+          uploaded_by?: string | null
+          uploaded_by_label?: string | null
           width?: number | null
         }
         Relationships: []
