@@ -102,7 +102,8 @@ export function Gate({
             style={{
               background:
                 "linear-gradient(180deg, rgba(246,236,216,0.38) 0%, rgba(246,236,216,0.22) 18%, rgba(246,236,216,0.44) 45%, rgba(246,236,216,0.28) 68%, rgba(246,236,216,0.58) 100%)",
-              backdropFilter: "blur(10px)",
+              backdropFilter: closing ? undefined : "blur(10px)",
+              backgroundColor: closing ? "rgba(246,236,216,0.30)" : undefined,
             }}
           />
 
@@ -122,7 +123,7 @@ export function Gate({
               background:
                 "linear-gradient(180deg, rgba(255,225,170,0.28) 0%, rgba(255,225,170,0.10) 46%, transparent 100%)",
               mixBlendMode: "screen",
-              animation: "godray-drift 8s ease-in-out infinite",
+              animation: closing ? "none" : "godray-drift 8s ease-in-out infinite",
             }}
           />
 
@@ -161,7 +162,7 @@ export function Gate({
               width: "clamp(100px, 27vw, 128px)",
               height: "clamp(100px, 27vw, 128px)",
               transform: "translate(-50%, -50%)",
-              animation: "seal-ring 2.6s ease-out infinite",
+              animation: closing ? "none" : "seal-ring 2.6s ease-out infinite",
             }}
           />
 
@@ -176,7 +177,7 @@ export function Gate({
               transform: "translate(-50%, -50%)",
               background:
                 "radial-gradient(circle, rgba(201,179,126,0.55) 0%, rgba(201,179,126,0.25) 45%, rgba(201,179,126,0) 75%)",
-              animation: "glow-pulse 2.6s ease-in-out infinite",
+              animation: closing ? "none" : "glow-pulse 2.6s ease-in-out infinite",
             }}
           />
 
@@ -243,7 +244,7 @@ export function Gate({
               background:
                 "linear-gradient(180deg, rgba(255,225,170,0.28) 0%, rgba(255,225,170,0.10) 40%, transparent 100%)",
               mixBlendMode: "screen",
-              animation: "godray-drift 8s ease-in-out infinite",
+              animation: closing ? "none" : "godray-drift 8s ease-in-out infinite",
             }}
           />
 
@@ -257,7 +258,7 @@ export function Gate({
               width: "10cqh",
               height: "10cqh",
               transform: "translate(-50%, -50%)",
-              animation: "seal-ring 2.6s ease-out infinite",
+              animation: closing ? "none" : "seal-ring 2.6s ease-out infinite",
             }}
           />
 
@@ -273,7 +274,7 @@ export function Gate({
               transform: "translate(-50%, -50%)",
               background:
                 "radial-gradient(circle, rgba(201,179,126,0.55) 0%, rgba(201,179,126,0.25) 45%, rgba(201,179,126,0) 75%)",
-              animation: "glow-pulse 2.6s ease-in-out infinite",
+              animation: closing ? "none" : "glow-pulse 2.6s ease-in-out infinite",
             }}
           />
         </div>
