@@ -280,10 +280,22 @@ function LightboxPhoto({ item }: { item: PublicMedia }) {
     if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) setLoaded(true);
   }, [item.id]);
 
+  // Reserve the exact final box up-front from the stored dimensions, so the
+  // placeholder and the loaded photo occupy identical space — no layout jump.
+  const ratio = item.width && item.height ? item.width / item.height : null;
+  const boxStyle = ratio
+    ? {
+        aspectRatio: `${item.width} / ${item.height}`,
+        width: `min(100%, calc(78dvh * ${ratio}))`,
+        maxHeight: "78dvh",
+      }
+    : undefined;
+
   return (
-    // The image's width/height attributes reserve the box before it decodes,
-    // so the wrapper simply tracks the image and nothing jumps.
-    <div className="relative mx-auto block w-fit max-w-full overflow-hidden rounded-xl">
+    <div
+      className={`relative mx-auto overflow-hidden rounded-xl ${ratio ? "" : "block w-fit max-w-full"}`}
+      style={boxStyle}
+    >
       {item.poster && !loaded && (
         <img
           src={item.poster}
