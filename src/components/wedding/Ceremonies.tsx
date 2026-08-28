@@ -20,6 +20,15 @@ const events = [
     address: "Siddapura, South Coorg, Karnataka",
     map: "https://maps.app.goo.gl/MQvLuRsfRmm8VZ8y8",
   },
+  {
+    n: "03",
+    title: "Wedding Celebration",
+    date: "25 October 2026",
+    time: "7:30 PM onwards",
+    venue: "Sai Mangalam",
+    address: "Risali Chandkhuri Road, Vidyut Nagar, Durg, Chhattisgarh",
+    map: "https://share.google/tUW1I7yggArL7Zcdf",
+  },
 ];
 
 export function Ceremonies() {
@@ -69,7 +78,17 @@ export function Ceremonies() {
                   <div className="font-script mt-3 space-y-1 border-t border-gold/40 pt-3 text-[16px] leading-snug ink">
                     <p>📅 {e.date}</p>
                     <p className="font-semibold text-gold-gradient">🕒 {e.time}</p>
-                    <p className="pt-0.5 font-semibold ink">📍 {e.venue}</p>
+                    <p className="pt-0.5 font-semibold ink">
+                      📍{" "}
+                      <a
+                        href={e.map}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline decoration-gold/50 underline-offset-4 transition hover:text-gold-gradient"
+                      >
+                        {e.venue}
+                      </a>
+                    </p>
                     <p className="text-[14px] italic ink-soft">{e.address}</p>
                   </div>
 

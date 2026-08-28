@@ -19,6 +19,15 @@ const events = [
     address: "Siddapura, South Coorg, Karnataka",
     map: "https://maps.app.goo.gl/MQvLuRsfRmm8VZ8y8",
   },
+  {
+    order: 3,
+    title: "Wedding Celebration",
+    date: "25 October 2026",
+    time: "7:30 PM onwards",
+    venue: "Sai Mangalam",
+    address: "Risali Chandkhuri Road, Vidyut Nagar, Durg, Chhattisgarh",
+    map: "https://share.google/tUW1I7yggArL7Zcdf",
+  },
 ];
 
 export default defineTool({
