@@ -18,10 +18,14 @@ const MAX_EDGE = 2200;
 const THUMB_EDGE = 720;
 
 async function toBlob(canvas: HTMLCanvasElement, quality = 0.82): Promise<Blob> {
-  const types = ["image/webp", "image/jpeg"];
-  for (const type of types) {
-    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, type, quality));
-    if (blob && blob.size > 0) return blob;
+  // JPEG needs a higher quality value than WebP for comparable fidelity.
+  const types: Array<[string, number]> = [
+    ["image/webp", quality],
+    ["image/jpeg", Math.min(0.95, quality + 0.08)],
+  ];
+  for (const [type, q] of types) {
+    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, type, q));
+    if (blob && blob.size > 0 && blob.type === type) return blob;
   }
   throw new Error("Could not encode image");
 }
