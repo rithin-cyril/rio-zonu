@@ -1,4 +1,5 @@
-import { motion } from "motion/react";
+import { useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import gateBg from "@/assets/gate-bg.png.asset.json";
 import { Petals } from "./Petals";
 
@@ -9,28 +10,76 @@ import { Petals } from "./Petals";
  * The container is sized with `max` so mobile gets a true full-screen cover
  * presentation instead of a contained, square-looking frame.
  */
-export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }) {
+export function Gate({
+  onOpen,
+  opened,
+  onRevealed,
+}: {
+  onOpen: () => void;
+  opened: boolean;
+  onRevealed?: () => void;
+}) {
   const SEAL_X = 50; // %
   const SEAL_Y = 67.6; // %, measured from artwork
   const mobileSealY = 71.5; // %, tuned for the mobile full-screen crop
+  const reduceMotion = useReducedMotion();
+  // Backdrop-filter is the single most expensive layer here: rasterising a
+  // blurred snapshot of a full-screen photo every frame is what made the exit
+  // stutter on phones. We drop it the instant the cover starts moving and
+  // replace it with an equivalent flat tint, which composites for free.
+  const [closing, setClosing] = useState(false);
 
   return (
     <motion.section
       initial={false}
-      animate={opened ? { opacity: 0, scale: 1.03, pointerEvents: "none" } : { opacity: 1, scale: 1 }}
-      transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+      animate={
+        opened
+          ? { opacity: 0, y: reduceMotion ? 0 : "-6%", scale: reduceMotion ? 1 : 1.015 }
+          : { opacity: 1, y: 0, scale: 1 }
+      }
+      transition={
+        reduceMotion
+          ? { duration: 0.18, ease: "linear" }
+          : { duration: 1.05, ease: [0.4, 0, 0.2, 1] }
+      }
+      onAnimationComplete={() => opened && onRevealed?.()}
       className="fixed inset-0 z-50 overflow-hidden bg-[#f6ecd8]"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      style={{
+        paddingBottom: "env(safe-area-inset-bottom)",
+        pointerEvents: opened ? "none" : "auto",
+        willChange: "transform, opacity",
+        backfaceVisibility: "hidden",
+      }}
     >
       {/* Pre-open ambient petals, like the reference site */}
       {!opened && <Petals count={14} />}
 
+      {/* Soft, short-lived light sweep across the invitation as it opens. */}
+      {closing && !reduceMotion && (
+        <motion.span
+          aria-hidden
+          initial={{ x: "-60%", opacity: 0 }}
+          animate={{ x: "60%", opacity: [0, 0.55, 0] }}
+          transition={{ duration: 0.85, ease: "easeOut" }}
+          className="pointer-events-none absolute inset-y-0 left-0 z-30 w-[70%]"
+          style={{
+            background:
+              "linear-gradient(100deg, transparent 0%, rgba(255,246,224,0.75) 50%, transparent 100%)",
+            mixBlendMode: "screen",
+            willChange: "transform, opacity",
+          }}
+        />
+      )}
+
       <motion.button
-        onClick={onOpen}
+        onClick={() => {
+          setClosing(true);
+          onOpen();
+        }}
         initial={false}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
-        whileTap={{ scale: 0.98 }}
+        whileTap={{ scale: 0.985 }}
         aria-label="Tap to open the invitation"
         className="group absolute inset-0 h-full w-full cursor-pointer"
       >
@@ -53,7 +102,8 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
             style={{
               background:
                 "linear-gradient(180deg, rgba(246,236,216,0.38) 0%, rgba(246,236,216,0.22) 18%, rgba(246,236,216,0.44) 45%, rgba(246,236,216,0.28) 68%, rgba(246,236,216,0.58) 100%)",
-              backdropFilter: "blur(10px)",
+              backdropFilter: closing ? undefined : "blur(10px)",
+              backgroundColor: closing ? "rgba(246,236,216,0.30)" : undefined,
             }}
           />
 
@@ -73,7 +123,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
               background:
                 "linear-gradient(180deg, rgba(255,225,170,0.28) 0%, rgba(255,225,170,0.10) 46%, transparent 100%)",
               mixBlendMode: "screen",
-              animation: "godray-drift 8s ease-in-out infinite",
+              animation: closing ? "none" : "godray-drift 8s ease-in-out infinite",
             }}
           />
 
@@ -112,7 +162,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
               width: "clamp(100px, 27vw, 128px)",
               height: "clamp(100px, 27vw, 128px)",
               transform: "translate(-50%, -50%)",
-              animation: "seal-ring 2.6s ease-out infinite",
+              animation: closing ? "none" : "seal-ring 2.6s ease-out infinite",
             }}
           />
 
@@ -127,7 +177,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
               transform: "translate(-50%, -50%)",
               background:
                 "radial-gradient(circle, rgba(201,179,126,0.55) 0%, rgba(201,179,126,0.25) 45%, rgba(201,179,126,0) 75%)",
-              animation: "glow-pulse 2.6s ease-in-out infinite",
+              animation: closing ? "none" : "glow-pulse 2.6s ease-in-out infinite",
             }}
           />
 
@@ -194,7 +244,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
               background:
                 "linear-gradient(180deg, rgba(255,225,170,0.28) 0%, rgba(255,225,170,0.10) 40%, transparent 100%)",
               mixBlendMode: "screen",
-              animation: "godray-drift 8s ease-in-out infinite",
+              animation: closing ? "none" : "godray-drift 8s ease-in-out infinite",
             }}
           />
 
@@ -208,7 +258,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
               width: "10cqh",
               height: "10cqh",
               transform: "translate(-50%, -50%)",
-              animation: "seal-ring 2.6s ease-out infinite",
+              animation: closing ? "none" : "seal-ring 2.6s ease-out infinite",
             }}
           />
 
@@ -224,7 +274,7 @@ export function Gate({ onOpen, opened }: { onOpen: () => void; opened: boolean }
               transform: "translate(-50%, -50%)",
               background:
                 "radial-gradient(circle, rgba(201,179,126,0.55) 0%, rgba(201,179,126,0.25) 45%, rgba(201,179,126,0) 75%)",
-              animation: "glow-pulse 2.6s ease-in-out infinite",
+              animation: closing ? "none" : "glow-pulse 2.6s ease-in-out infinite",
             }}
           />
         </div>
