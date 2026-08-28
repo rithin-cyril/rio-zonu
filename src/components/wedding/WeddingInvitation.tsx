@@ -53,6 +53,9 @@ export function WeddingInvitation() {
       <SectionDivider />
       <Ceremonies />
       <SectionDivider />
+      <Gallery />
+
+      <SectionDivider />
       <Blessings />
       <SectionDivider />
       <BlessingsWall />
