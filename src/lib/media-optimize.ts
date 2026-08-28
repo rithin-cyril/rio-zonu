@@ -99,13 +99,20 @@ export async function optimizeVideo(file: File): Promise<Optimized> {
 
     let poster: Blob | null = null;
     try {
+      const target = Math.min(1, (video.duration || 1) / 3);
       await new Promise<void>((resolve) => {
         video.onseeked = () => resolve();
-        video.currentTime = Math.min(1, (video.duration || 1) / 3);
+        video.currentTime = target;
         setTimeout(resolve, 6000);
       });
-      const shot = render(video, video.videoWidth, video.videoHeight, THUMB_EDGE * 1.6, true);
-      poster = await toBlob(shot.canvas, 0.75);
+      // Only capture when the seek really landed — otherwise the decoder may
+      // still hold a blank/partial frame and we'd store a black poster.
+      const landed =
+        !video.seeking && Math.abs(video.currentTime - target) < 0.5 && video.videoWidth > 0;
+      if (landed) {
+        const shot = render(video, video.videoWidth, video.videoHeight, THUMB_EDGE * 1.6, true);
+        poster = await toBlob(shot.canvas, 0.75);
+      }
     } catch {
       poster = null;
     }
