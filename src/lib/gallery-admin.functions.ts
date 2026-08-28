@@ -76,13 +76,39 @@ export const adminGalleryList = createServerFn({ method: "GET" })
       };
     });
 
+    // Storage breakdown — application-calculated from tracked file sizes.
+    // The storage provider does not expose a quota/usage API to this app,
+    // so total/free are reported as unavailable rather than invented.
+    const sum = (pred: (r: any) => boolean, cols: string[]) =>
+      rows.filter(pred).reduce((a, r) => a + cols.reduce((b, c) => b + (r[c] ?? 0), 0), 0);
+    const all = () => true;
+    const storage = {
+      source: "application" as const,
+      usedBytes: sum(all, ["bytes_original", "bytes_public", "bytes_poster"]),
+      totalBytes: null as number | null,
+      freeBytes: null as number | null,
+      breakdown: {
+        photos: sum((r) => r.kind === "photo", ["bytes_original", "bytes_public", "bytes_poster"]),
+        videos: sum((r) => r.kind === "video", ["bytes_original", "bytes_public", "bytes_poster"]),
+        pending: sum((r) => r.approval_status === "pending", [
+          "bytes_original",
+          "bytes_public",
+          "bytes_poster",
+        ]),
+        originals: sum(all, ["bytes_original"]),
+        optimized: sum(all, ["bytes_public", "bytes_poster"]),
+      },
+    };
+
     return {
       items,
       galleryVisible: (setting?.value as { show?: boolean } | null)?.show === true,
-      storageBytes: items.reduce((a, i) => a + i.bytes, 0),
+      storageBytes: storage.usedBytes,
+      storage,
       permissions: me.permissions,
     };
   });
+
 
 // ---- Show / hide the whole gallery on the public site ----
 export const adminSetGalleryVisible = createServerFn({ method: "POST" })
