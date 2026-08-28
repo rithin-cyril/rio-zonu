@@ -106,7 +106,7 @@ export function WeddingInvitation() {
       <SectionDivider />
       <Gallery />
       <Closing />
-      </div>
+      </motion.div>
     </main>
   );
 }
