@@ -349,6 +349,9 @@ export const adminGalleryReview = createServerFn({ method: "POST" })
           published: false,
           public_path: null,
           poster_path: null,
+          // Derivatives were deleted above — stop counting them as used storage.
+          bytes_public: 0,
+          bytes_poster: 0,
           rejection_reason: data.reason ?? null,
           reviewed_at: now,
           reviewed_by: me.userId,
