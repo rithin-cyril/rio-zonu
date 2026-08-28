@@ -169,9 +169,8 @@ export const guestCreateUpload = createServerFn({ method: "POST" })
     };
     trace.log("UPLOAD_COMPLETE", { mediaId: id });
     return out;
-
-    };
   });
+
 
 /**
  * Step 2 of a guest submission. Validates the ACTUAL bytes of everything that
