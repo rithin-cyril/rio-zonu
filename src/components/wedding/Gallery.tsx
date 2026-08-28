@@ -168,6 +168,22 @@ function Lightbox({
     };
   }, [item]);
 
+  // Warm the neighbours so arrow navigation is instant. Photos only — videos
+  // must never be prefetched at full size on mobile data.
+  useEffect(() => {
+    if (index === null || items.length < 2) return;
+    const targets = [items[(index + 1) % items.length], items[(index - 1 + items.length) % items.length]];
+    const imgs = targets
+      .filter((t) => t && t.kind === "photo" && t.url)
+      .map((t) => {
+        const img = new Image();
+        img.decoding = "async";
+        img.src = t!.url;
+        return img;
+      });
+    return () => imgs.forEach((img) => (img.src = ""));
+  }, [index, items]);
+
   return (
     <AnimatePresence>
       {item && (
