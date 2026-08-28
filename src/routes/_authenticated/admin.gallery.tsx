@@ -116,6 +116,9 @@ function AdminGallery() {
   }
 
   async function move(item: Item, dir: -1 | 1) {
+    // Serialise reorders: overlapping requests can persist a mixed order.
+    if (movingRef.current) return;
+    movingRef.current = true;
     const ids = library.map((i) => i.id);
     const idx = ids.indexOf(item.id);
     const to = idx + dir;
