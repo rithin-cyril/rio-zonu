@@ -15,16 +15,17 @@ const ascii = (b: Uint8Array, s: string, at = 0) =>
  * Real file-signature sniffing. Client MIME types, extensions and filenames
  * are never trusted — only the actual bytes decide what a file is.
  */
-export function sniff(b: Uint8Array): Sniffed {
-  // Hard rejects: executables / scripts / polyglots.
-  if (has(b, [0x4d, 0x5a])) return null; // MZ (exe/dll)
-  if (has(b, [0x7f, 0x45, 0x4c, 0x46])) return null; // ELF
-  if (has(b, [0x23, 0x21])) return null; // #!
-  if (has(b, [0x50, 0x4b, 0x03, 0x04])) return null; // zip/office/apk
+export function isDangerous(b: Uint8Array): boolean {
+  if (has(b, [0x4d, 0x5a])) return true; // MZ (exe/dll)
+  if (has(b, [0x7f, 0x45, 0x4c, 0x46])) return true; // ELF
+  if (has(b, [0x23, 0x21])) return true; // #!
+  if (has(b, [0x50, 0x4b, 0x03, 0x04])) return true; // zip/office/apk
   const head = new TextDecoder("latin1").decode(b.slice(0, 512)).toLowerCase();
-  if (head.includes("<?php") || head.includes("<script") || head.includes("<!doctype html")) {
-    return null;
-  }
+  return head.includes("<?php") || head.includes("<script") || head.includes("<!doctype html");
+}
+
+export function sniff(b: Uint8Array): Sniffed {
+  if (isDangerous(b)) return null;
 
   if (has(b, [0xff, 0xd8, 0xff])) return { type: "image/jpeg", family: "image" };
   if (has(b, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
@@ -83,14 +84,22 @@ export async function inspectStoredObject(
   supabaseAdmin: any,
   bucket: string,
   path: string,
-): Promise<{ sniffed: Sniffed; size: number }> {
+): Promise<{ sniffed: Sniffed; dangerous: boolean; head: string; size: number }> {
   const url = await signedUrl(supabaseAdmin, bucket, path, 60);
   const res = await fetch(url, { headers: { Range: "bytes=0-1023" } });
   if (!res.ok && res.status !== 206) throw new Error("Uploaded file could not be read back");
   const buf = new Uint8Array(await res.arrayBuffer());
   const range = res.headers.get("content-range");
   const total = range ? Number(range.split("/")[1]) : Number(res.headers.get("content-length") ?? 0);
-  return { sniffed: sniff(buf), size: Number.isFinite(total) ? total : 0 };
+  const head = [...buf.slice(0, 16)]
+    .map((n) => n.toString(16).padStart(2, "0"))
+    .join(" ");
+  return {
+    sniffed: sniff(buf),
+    dangerous: isDangerous(buf),
+    head,
+    size: Number.isFinite(total) ? total : 0,
+  };
 }
 
 export async function removeObjects(
