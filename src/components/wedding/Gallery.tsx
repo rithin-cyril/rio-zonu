@@ -14,6 +14,9 @@ export function Gallery() {
   const [tab, setTab] = useState<string>("all");
   const [active, setActive] = useState<number | null>(null);
 
+  // Stable identity keeps the lightbox from re-rendering on unrelated updates.
+  const closeLightbox = useCallback(() => setActive(null), []);
+
   const refresh = useCallback(() => {
     load()
       .then((r) => setState(r as { show: boolean; media: PublicMedia[] }))
