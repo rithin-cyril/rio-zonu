@@ -81,9 +81,11 @@ function AdminGallery() {
             .uploadToSignedUrl(slot.path, slot.token, blob);
           if (error) throw new Error(error.message);
         };
-        await put(slots.original, file);
-        await put(slots.public, opt.main);
-        await put(slots.poster, opt.poster);
+        await Promise.all([
+          put(slots.original, file),
+          put(slots.public, opt.main),
+          put(slots.poster, opt.poster),
+        ]);
         await finalizeUpload({
           data: {
             id: slots.id,
