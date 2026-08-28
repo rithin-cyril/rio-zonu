@@ -2,22 +2,36 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { Volume2, VolumeX } from "lucide-react";
 import song from "@/assets/wedding-song.mp3";
+import { onMusicCommand } from "@/lib/music-bus";
 
 export function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [muted, setMuted] = useState<boolean>(false);
+  const [ducked, setDucked] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = 0.55;
     audio.muted = muted;
-    if (!muted) {
+    if (!muted && !ducked) {
       audio.play().catch(() => {
         /* autoplay blocked – will start on next user interaction */
       });
+    } else {
+      audio.pause();
     }
-  }, [muted]);
+  }, [muted, ducked]);
+
+  // Gallery videos take priority over the background music.
+  useEffect(
+    () =>
+      onMusicCommand((cmd) => {
+        setDucked(cmd === "pause-for-video");
+      }),
+    [],
+  );
+
 
   return (
     <>

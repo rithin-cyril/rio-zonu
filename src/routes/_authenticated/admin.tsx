@@ -91,9 +91,13 @@ function AdminShell() {
           {(!me || hasPermission(me.permissions, "rankings.report_cards")) && (
             <NavTab to="/admin/reports">Reports</NavTab>
           )}
+          {me && hasPermission(me.permissions, "website.gallery") && (
+            <NavTab to="/admin/gallery">Gallery</NavTab>
+          )}
           {(!me || hasPermission(me.permissions, "moderation.logs")) && (
             <NavTab to="/admin/logs">Moderation Logs</NavTab>
           )}
+
           {me && hasPermission(me.permissions, "users.view") && (
             <NavTab to="/admin/users">Users</NavTab>
           )}

@@ -8,6 +8,8 @@ import { Families } from "./Families";
 import { Ceremonies } from "./Ceremonies";
 import { Blessings } from "./Blessings";
 import { BlessingsWall } from "./BlessingsWall";
+import { Gallery } from "./Gallery";
+
 import { Closing } from "./Closing";
 import { SectionDivider } from "./SectionDivider";
 import { Petals } from "./Petals";
@@ -50,6 +52,9 @@ export function WeddingInvitation() {
       <Families />
       <SectionDivider />
       <Ceremonies />
+      <SectionDivider />
+      <Gallery />
+
       <SectionDivider />
       <Blessings />
       <SectionDivider />
