@@ -159,13 +159,18 @@ export const guestCreateUpload = createServerFn({ method: "POST" })
       return { path, token: s.token as string };
     };
 
+    const [signedOriginal, signedPublic, signedPoster] = await Promise.all([
+      sign(original),
+      sign(pub),
+      sign(poster),
+    ]);
     const out = {
       id,
       ref: trace.ref,
       bucket: PRIVATE_BUCKET,
-      ...(([o, p, po]) => ({ original: o, public: p, poster: po }))(
-        await Promise.all([sign(original), sign(pub), sign(poster)]),
-      ),
+      original: signedOriginal,
+      public: signedPublic,
+      poster: signedPoster,
     };
     trace.log("UPLOAD_COMPLETE", { mediaId: id });
     return out;
