@@ -60,22 +60,9 @@ export function Gate({
       {/* Pre-open ambient petals, like the reference site */}
       {!opened && <Petals count={14} />}
 
-      {/* Soft, short-lived light sweep across the invitation as it opens. */}
-      {closing && !reduceMotion && (
-        <motion.span
-          aria-hidden
-          initial={{ x: "-60%", opacity: 0 }}
-          animate={{ x: "60%", opacity: [0, 0.55, 0] }}
-          transition={{ duration: 0.34, ease: "easeOut", delay: 0.16 }}
-          className="pointer-events-none absolute inset-y-0 left-0 z-30 w-[70%]"
-          style={{
-            background:
-              "linear-gradient(100deg, transparent 0%, rgba(255,246,224,0.75) 50%, transparent 100%)",
-            mixBlendMode: "screen",
-            willChange: "transform, opacity",
-          }}
-        />
-      )}
+      {/* The light sweep now plays over the revealed invitation (see
+          WeddingInvitation), so the cover can exit cleanly and quickly. */}
+
 
       <motion.button
         onClick={() => {
