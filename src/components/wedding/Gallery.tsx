@@ -69,7 +69,7 @@ export function Gallery() {
           </div>
         )}
 
-        <div className="mt-7 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+        <div className="mt-7 grid grid-cols-1 items-start gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3">
           {items.map((m, i) => (
             <motion.button
               key={m.id}
@@ -79,7 +79,7 @@ export function Gallery() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.55, delay: Math.min(i, 6) * 0.04 }}
-              className="lux-card group relative overflow-hidden rounded-xl"
+              className="lux-card group relative block w-full overflow-hidden rounded-xl"
               aria-label={m.caption || `Open ${m.kind}`}
             >
               <img
@@ -87,8 +87,9 @@ export function Gallery() {
                 alt={m.caption || "Wedding gallery moment"}
                 loading="lazy"
                 decoding="async"
-                className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                className="block h-auto w-full max-w-full object-contain transition duration-500 group-hover:scale-[1.04]"
               />
+
               {m.kind === "video" && (
                 <span className="pointer-events-none absolute inset-0 grid place-items-center">
                   <span className="grid h-12 w-12 place-items-center rounded-full border border-gold bg-white/80 shadow-gold backdrop-blur">
