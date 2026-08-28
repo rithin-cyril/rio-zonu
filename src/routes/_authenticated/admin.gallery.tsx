@@ -174,7 +174,38 @@ function AdminGallery() {
           />
           {busy && <span className="font-script text-sm italic ink-soft">{busy}</span>}
         </div>
+
+        <div className="mt-5 border-t border-gold/20 pt-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 className="font-display text-[10px] tracking-[0.4em] text-gold-gradient">STORAGE</h3>
+            <span className="text-[10px] ink-soft">
+              Estimated — calculated from files tracked by this app
+            </span>
+          </div>
+          <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <Stat label="Used (est.)" value={formatBytes(data.storage?.usedBytes ?? data.storageBytes)} />
+            <Stat label="Free" value="Unavailable" />
+            <Stat label="Total" value="Unavailable" />
+            <Stat label="Usage" value="Unavailable" />
+          </dl>
+          <p className="mt-2 text-[10px] ink-soft">
+            The storage provider does not expose quota data to this app, so free/total/usage % are
+            not shown rather than estimated.
+          </p>
+          <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <Stat label="Photos (est.)" value={formatBytes(data.storage?.breakdown.photos ?? 0)} />
+            <Stat label="Videos (est.)" value={formatBytes(data.storage?.breakdown.videos ?? 0)} />
+            <Stat label="Pending (est.)" value={formatBytes(data.storage?.breakdown.pending ?? 0)} />
+            <Stat label="Originals (est.)" value={formatBytes(data.storage?.breakdown.originals ?? 0)} />
+            <Stat label="Optimized (est.)" value={formatBytes(data.storage?.breakdown.optimized ?? 0)} />
+          </dl>
+          <p className="mt-2 text-[10px] ink-soft">
+            Used = originals + optimized + posters. Photos/Videos split the same total, so they never
+            double-count; Pending is a subset shown for reference only.
+          </p>
+        </div>
       </section>
+
 
       {pending.length > 0 && (
         <section>
