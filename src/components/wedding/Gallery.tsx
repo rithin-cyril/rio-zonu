@@ -14,6 +14,9 @@ export function Gallery() {
   const [tab, setTab] = useState<string>("all");
   const [active, setActive] = useState<number | null>(null);
 
+  // Stable identity keeps the lightbox from re-rendering on unrelated updates.
+  const closeLightbox = useCallback(() => setActive(null), []);
+
   const refresh = useCallback(() => {
     load()
       .then((r) => setState(r as { show: boolean; media: PublicMedia[] }))
@@ -90,8 +93,14 @@ export function Gallery() {
               <img
                 src={m.poster ?? m.url}
                 alt={m.caption || "Wedding gallery moment"}
-                loading="lazy"
+                // Width/height reserve the correct box so the grid never jumps
+                // while thumbnails stream in.
+                width={m.width ?? undefined}
+                height={m.height ?? undefined}
+                loading={i < 3 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : "auto"}
                 decoding="async"
+                sizes="(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
                 className="block h-auto w-full max-w-full object-contain transition duration-500 group-hover:scale-[1.04]"
               />
 
@@ -114,12 +123,7 @@ export function Gallery() {
         <GalleryUpload onSubmitted={refresh} />
       </div>
 
-      <Lightbox
-        items={items}
-        index={active}
-        onClose={() => setActive(null)}
-        onIndex={setActive}
-      />
+      <Lightbox items={items} index={active} onClose={closeLightbox} onIndex={setActive} />
     </section>
   );
 }
@@ -161,6 +165,22 @@ function Lightbox({
       if (item?.kind === "video") musicBus.resumeAfterVideo();
     };
   }, [item]);
+
+  // Warm the neighbours so arrow navigation is instant. Photos only — videos
+  // must never be prefetched at full size on mobile data.
+  useEffect(() => {
+    if (index === null || items.length < 2) return;
+    const targets = [items[(index + 1) % items.length], items[(index - 1 + items.length) % items.length]];
+    const imgs = targets
+      .filter((t) => t && t.kind === "photo" && t.url)
+      .map((t) => {
+        const img = new Image();
+        img.decoding = "async";
+        img.src = t!.url;
+        return img;
+      });
+    return () => imgs.forEach((img) => (img.src = ""));
+  }, [index, items]);
 
   return (
     <AnimatePresence>
@@ -211,11 +231,7 @@ function Lightbox({
             onClick={(e) => e.stopPropagation()}
           >
             {item.kind === "photo" ? (
-              <img
-                src={item.url}
-                alt={item.caption || "Wedding gallery moment"}
-                className="mx-auto max-h-[78dvh] w-auto max-w-full rounded-xl object-contain"
-              />
+              <LightboxPhoto item={item} />
             ) : (
               <video
                 ref={videoRef}
@@ -241,6 +257,71 @@ function Lightbox({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+/**
+ * Shows the already-cached grid thumbnail instantly (blurred, correct aspect
+ * ratio) and cross-fades to the full-size optimised photo once it decodes, so
+ * opening a photo never leaves a blank box. No extra network request: the
+ * poster is served from cache, the full image is the same optimised WebP the
+ * gallery already exposes.
+ */
+function LightboxPhoto({ item }: { item: PublicMedia }) {
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [item.id]);
+
+  // Covers the cache-hit case where load fires before React attaches onLoad.
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) setLoaded(true);
+  }, [item.id]);
+
+  // Reserve the exact final box up-front from the stored dimensions, so the
+  // placeholder and the loaded photo occupy identical space — no layout jump.
+  const ratio = item.width && item.height ? item.width / item.height : null;
+  const boxStyle = ratio
+    ? {
+        aspectRatio: `${item.width} / ${item.height}`,
+        width: `min(100%, calc(78dvh * ${ratio}))`,
+        maxHeight: "78dvh",
+      }
+    : undefined;
+
+  return (
+    <div
+      className={`relative mx-auto overflow-hidden rounded-xl ${ratio ? "" : "block w-fit max-w-full"}`}
+      style={boxStyle}
+    >
+      {item.poster && !loaded && (
+        <img
+          src={item.poster}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full scale-105 object-contain blur-md"
+        />
+      )}
+      {!item.poster && !loaded && (
+        <div className="absolute inset-0 animate-pulse bg-white/10" />
+      )}
+      <img
+        ref={imgRef}
+        src={item.url}
+        alt={item.caption || "Wedding gallery moment"}
+        width={item.width ?? undefined}
+        height={item.height ?? undefined}
+        decoding="async"
+        fetchPriority="high"
+        onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
+        className={`relative mx-auto object-contain transition-opacity duration-300 ${
+          ratio ? "h-full w-full" : "max-h-[78dvh] w-auto max-w-full"
+        } ${loaded ? "opacity-100" : "opacity-0"}`}
+      />
+    </div>
   );
 }
 
