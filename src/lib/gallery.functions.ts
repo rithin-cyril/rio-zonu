@@ -111,28 +111,29 @@ export const guestCreateUpload = createServerFn({ method: "POST" })
       }
     }
 
-    const { data: row, error } = await supabaseAdmin
-      .from("gallery_media")
-      .insert({
-        kind: data.kind,
-        category: data.category ?? "wedding",
-        caption: data.caption ?? "",
-        source: "guest",
-        approval_status: "pending",
-        status: "uploading",
-        published: false,
-        bucket_public: PRIVATE_BUCKET,
-        submitter_name: data.name,
-        submitter_ip: ip,
-        submitter_ua: ua,
-      })
-      .select("id")
-      .single();
-    if (error || !row) throw new Error("Could not start the upload. Please try again.");
+    const id = crypto.randomUUID();
+    const original = storagePath("pending", id, "original", data.ext);
+    const pub = storagePath("pending", id, "public", data.kind === "photo" ? "webp" : data.ext);
+    const poster = storagePath("pending", id, "poster", "webp");
 
-    const original = storagePath("pending", row.id, "original", data.ext);
-    const pub = storagePath("pending", row.id, "public", data.kind === "photo" ? "webp" : data.ext);
-    const poster = storagePath("pending", row.id, "poster", "webp");
+    const { error } = await supabaseAdmin.from("gallery_media").insert({
+      id,
+      kind: data.kind,
+      category: data.category ?? "wedding",
+      caption: data.caption ?? "",
+      source: "guest",
+      approval_status: "pending",
+      status: "uploading",
+      published: false,
+      bucket_public: PRIVATE_BUCKET,
+      original_path: original,
+      public_path: pub,
+      poster_path: poster,
+      submitter_name: data.name,
+      submitter_ip: ip,
+      submitter_ua: ua,
+    });
+    if (error) throw new Error("Could not start the upload. Please try again.");
 
     const sign = async (path: string) => {
       const { data: s, error: e } = await supabaseAdmin.storage
@@ -143,7 +144,9 @@ export const guestCreateUpload = createServerFn({ method: "POST" })
     };
 
     return {
-      id: row.id,
+      id,
+      bucket: PRIVATE_BUCKET,
+
       bucket: PRIVATE_BUCKET,
       original: await sign(original),
       public: await sign(pub),
