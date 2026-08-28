@@ -147,7 +147,6 @@ export const guestCreateUpload = createServerFn({ method: "POST" })
       id,
       bucket: PRIVATE_BUCKET,
 
-      bucket: PRIVATE_BUCKET,
       original: await sign(original),
       public: await sign(pub),
       poster: await sign(poster),
