@@ -37,6 +37,7 @@ function AdminGallery() {
   const [busy, setBusy] = useState<string | null>(null);
   const [category, setCategory] = useState<string>("wedding");
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const movingRef = useRef(false);
 
   const refresh = useCallback(() => {
     list()
