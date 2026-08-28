@@ -217,11 +217,7 @@ function Lightbox({
             onClick={(e) => e.stopPropagation()}
           >
             {item.kind === "photo" ? (
-              <img
-                src={item.url}
-                alt={item.caption || "Wedding gallery moment"}
-                className="mx-auto max-h-[78dvh] w-auto max-w-full rounded-xl object-contain"
-              />
+              <LightboxPhoto item={item} />
             ) : (
               <video
                 ref={videoRef}
