@@ -202,12 +202,17 @@ export const adminGalleryCreateUpload = createServerFn({ method: "POST" })
       return { bucket, path, token: s.token as string };
     };
 
+    const [signedOriginal, signedPublic, signedPoster] = await Promise.all([
+      sign(PRIVATE_BUCKET, original),
+      sign(PUBLIC_BUCKET, pub),
+      sign(PUBLIC_BUCKET, poster),
+    ]);
     const out = {
       id,
       ref: trace.ref,
-      original: await sign(PRIVATE_BUCKET, original),
-      public: await sign(PUBLIC_BUCKET, pub),
-      poster: await sign(PUBLIC_BUCKET, poster),
+      original: signedOriginal,
+      public: signedPublic,
+      poster: signedPoster,
     };
     trace.log("UPLOAD_COMPLETE", { mediaId: id });
     return out;
