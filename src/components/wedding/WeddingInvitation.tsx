@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Gate } from "./Gate";
 import { Hero } from "./Hero";
 import { Welcome } from "./Welcome";
