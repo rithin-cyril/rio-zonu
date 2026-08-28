@@ -334,3 +334,38 @@ function NavBtn({
     </button>
   );
 }
+
+// TEMP probe export (removed after verification)
+export function GalleryProbe({ count }: { count: number }) {
+  const items = Array.from({ length: count }).map((_, i) => ({
+    id: `m${i}`,
+    kind: "photo" as const,
+    category: "wedding" as const,
+    caption: `Moment ${i}`,
+    url: `/__mock/big.png?i=${i}`,
+    poster: `/__mock/thumb.png?i=${i}`,
+    width: 1600,
+    height: 1067,
+  }));
+  const [active, setActive] = useState<number | null>(null);
+  return (
+    <div id="gallery">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+        {items.map((m, i) => (
+          <button key={m.id} type="button" aria-label={`Open ${m.caption}`} onClick={() => setActive(i)}>
+            <img
+              src={m.poster}
+              alt=""
+              width={m.width}
+              height={m.height}
+              loading={i < 3 ? "eager" : "lazy"}
+              decoding="async"
+              className="block h-auto w-full"
+            />
+          </button>
+        ))}
+      </div>
+      <Lightbox items={items} index={active} onClose={() => setActive(null)} onIndex={setActive} />
+    </div>
+  );
+}
