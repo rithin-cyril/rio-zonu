@@ -23,9 +23,12 @@ async function toBlob(canvas: HTMLCanvasElement, quality = 0.82): Promise<Blob> 
     ["image/webp", quality],
     ["image/jpeg", Math.min(0.95, quality + 0.08)],
   ];
-  for (const [type, q] of types) {
+  for (let i = 0; i < types.length; i++) {
+    const [type, q] = types[i]!;
     const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, type, q));
-    if (blob && blob.size > 0 && blob.type === type) return blob;
+    // A browser without WebP encoding silently returns PNG; fall through to JPEG.
+    const last = i === types.length - 1;
+    if (blob && blob.size > 0 && (last || blob.type === type)) return blob;
   }
   throw new Error("Could not encode image");
 }
