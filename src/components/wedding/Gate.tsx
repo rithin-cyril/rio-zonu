@@ -1,4 +1,5 @@
-import { motion } from "motion/react";
+import { useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import gateBg from "@/assets/gate-bg.png.asset.json";
 import { Petals } from "./Petals";
 
