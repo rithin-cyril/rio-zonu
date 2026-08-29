@@ -77,8 +77,7 @@ export const adminGalleryList = createServerFn({ method: "GET" })
     });
 
     // Storage breakdown — application-calculated from tracked file sizes.
-    // The storage provider does not expose a quota/usage API to this app,
-    // so total/free are reported as unavailable rather than invented.
+    // No provider quota is available, so only "used" is reported (no total/free/%).
     const sum = (pred: (r: any) => boolean, cols: string[]) =>
       rows.filter(pred).reduce((a, r) => a + cols.reduce((b, c) => b + (r[c] ?? 0), 0), 0);
     // Failed uploads have their objects removed, so they must not be counted.
@@ -86,8 +85,6 @@ export const adminGalleryList = createServerFn({ method: "GET" })
     const storage = {
       source: "application" as const,
       usedBytes: sum(all, ["bytes_original", "bytes_public", "bytes_poster"]),
-      totalBytes: null as number | null,
-      freeBytes: null as number | null,
       breakdown: {
         photos: sum((r) => all(r) && r.kind === "photo", [
           "bytes_original",
