@@ -196,15 +196,11 @@ function AdminGallery() {
             </span>
           </div>
           <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <Stat label="Used (est.)" value={formatBytes(data.storage?.usedBytes ?? data.storageBytes)} />
-            <Stat label="Free" value="Unavailable" />
-            <Stat label="Total" value="Unavailable" />
-            <Stat label="Usage" value="Unavailable" />
+            <Stat
+              label="Storage used (est.)"
+              value={formatBytes(data.storage?.usedBytes ?? data.storageBytes)}
+            />
           </dl>
-          <p className="mt-2 text-[10px] ink-soft">
-            The storage provider does not expose quota data to this app, so free/total/usage % are
-            not shown rather than estimated.
-          </p>
           <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
             <Stat label="Photos (est.)" value={formatBytes(data.storage?.breakdown.photos ?? 0)} />
             <Stat label="Videos (est.)" value={formatBytes(data.storage?.breakdown.videos ?? 0)} />
@@ -212,6 +208,7 @@ function AdminGallery() {
             <Stat label="Originals (est.)" value={formatBytes(data.storage?.breakdown.originals ?? 0)} />
             <Stat label="Optimized (est.)" value={formatBytes(data.storage?.breakdown.optimized ?? 0)} />
           </dl>
+
           <p className="mt-2 text-[10px] ink-soft">
             Used = originals + optimized + posters. Photos/Videos split the same total, so they never
             double-count; Pending is a subset shown for reference only.
